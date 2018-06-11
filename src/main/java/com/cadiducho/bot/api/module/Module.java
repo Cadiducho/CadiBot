@@ -6,12 +6,14 @@ import com.cadiducho.telegrambotapi.Update;
 
 public interface Module {
 
+    BotServer botServer = BotServer.getInstance();
+    
     /**
      * Devuelve si el módulo está activado en el servidor
      * @return enabled
      */
     default boolean isEnabled() {
-        return BotServer.getInstance().getModuleManager().getModules().contains(this);
+        return botServer.getModuleManager().getModules().contains(this);
     }
 
     /**

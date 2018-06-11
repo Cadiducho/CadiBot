@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -67,5 +68,20 @@ public class ModuleManager {
         addLocalModules();
 
         modules.forEach(Module::onLoad);
+    }
+    
+    /**
+     * Obten un modulo por su id
+     *
+     * @param id la id para buscar
+     * @return el modulo, o Optional.empty() si no ha sido encontrado
+     */
+    public Optional<Module> getModule(String id) {
+        for (Module mod : modules) {
+            if (mod.getName().equalsIgnoreCase(id)) {
+                return Optional.of(mod);
+            }
+        }
+        return Optional.empty();
     }
 }

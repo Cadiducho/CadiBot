@@ -2,6 +2,7 @@ package com.cadiducho.bot.api.command;
 
 import com.cadiducho.bot.BotServer;
 import com.cadiducho.bot.MySQL;
+import com.cadiducho.bot.api.module.Module;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import com.cadiducho.telegrambotapi.User;
@@ -24,6 +25,19 @@ public interface BotCommand {
      * @throws TelegramException Excepción ocurrida
      */
     default void execute(Chat chat, User from, String label, String[] args, Integer messageId, Date date) throws TelegramException {
+    }
+    
+    default Module getModule() {
+        if (!this.getClass().isAnnotationPresent(CommandInfo.class)) {
+            return null;
+        }
+        Class<? extends Module> mclass = this.getClass().getAnnotation(CommandInfo.class).module();
+        for (Module module : botServer.getModuleManager().getModules()) {
+            if (module.getClass().equals(mclass)) {
+                return module;
+            }
+        }
+        return null;
     }
     
     //la primera aliase de la anotación
