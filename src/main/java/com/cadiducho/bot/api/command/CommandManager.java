@@ -36,8 +36,24 @@ public class CommandManager {
         cmds.add(cmd);
     }
 
-    public void load() {        
+    public void load() {
+        register(new VersionCMD());
+        register(new ChangelogCMD());
+        register(new HoraCMD());
+        register(new IntentarCMD());
+        register(new UpdateUsernameCMD());
+        register(new BroadcastCMD());
+        register(new CatCMD());
 
+        register(new SimpleTextCMD(Arrays.asList(":)"), Arrays.asList(":)", ":D", ":smile:", ":smiley:", ":grinning:", ":blush:")));
+        register(new SimpleTextCMD(Arrays.asList("haber si me muero"), "Ojalá"));
+        register(new SimpleTextCMD(Arrays.asList("/patata"), "Soy una patata y tú no. Bienvenido a tu cinta"));
+        register(new SimplePhotoCMD(Arrays.asList("emosido engañado", "emosido engañados"), "AgADBAADJKkxGygIoVKAZOwKkgWHWn7avBkABP0h-V4_8VernoACAAEC"));
+        register(new SimpleGifCMD(Arrays.asList("what"), "CgADBAADMwMAAjAZZAenCigGk2AkogI"));
+        register(new SimpleGifCMD(Arrays.asList("aplausos"), "CgADBAADTAMAAjEZZAfPEedEXgJYPwI"));
+        register(new SimpleGifCMD(Arrays.asList("/servilleta"), "CgADBAADiwMAAt_WwFGgpX45Eh_AKAI"));
+        register(new SimpleVoiceCMD(Arrays.asList("/titanic"), "AwADBAADujYAAv4dZAcEaOHAa3eQ8wI"));
+        register(new SimpleVoiceCMD(Arrays.asList("puigdemont", "/viva"), "AwADBAAD0AIAAnhgYFAc6it_QeBppwI"));
     }
 
     /**
