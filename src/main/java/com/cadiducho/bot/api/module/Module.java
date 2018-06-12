@@ -4,6 +4,10 @@ import com.cadiducho.bot.BotServer;
 import com.cadiducho.bot.api.command.BotCommand;
 import com.cadiducho.telegrambotapi.Update;
 
+/**
+ * Modulo para funcionalidades del bot
+ * @author Cadiducho
+ */
 public interface Module {
 
     BotServer botServer = BotServer.getInstance();

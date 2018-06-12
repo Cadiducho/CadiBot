@@ -1,6 +1,9 @@
 package com.cadiducho.bot.api.module;
 
 import com.cadiducho.bot.BotServer;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -12,9 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class ModuleManager {

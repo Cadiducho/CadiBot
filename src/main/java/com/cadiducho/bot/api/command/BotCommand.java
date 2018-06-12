@@ -7,10 +7,15 @@ import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Comando para el bot
+ * @author Cadiducho
+ */
 public interface BotCommand {
     BotServer botServer = BotServer.getInstance();
     
