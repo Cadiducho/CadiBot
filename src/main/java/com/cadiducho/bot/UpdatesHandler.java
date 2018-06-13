@@ -28,11 +28,11 @@ public class UpdatesHandler implements LongPollingHandler {
 
     @Override
     public void handleUpdate(Update update) {
+        /*
         if (update.getCallback_query() != null) {
             CallbackQuery cb = update.getCallback_query();
             System.out.println(cb.getData());
-        }
-
+        }*/
         
         //Si es ejecutado por el framework de comandos no hacer nada más
         if (update.getMessage().getType().equals(Message.Type.TEXT) && server.getCommandManager().onCmd(bot, update)) {
@@ -47,6 +47,7 @@ public class UpdatesHandler implements LongPollingHandler {
             reponseId = update.getMessage().getReply_to_message().getMessage_id();
         }
         try {
+            msg = msg.replace("@" + bot.getMe().getUsername(), "");
             String reponse;
             
             //ToDo: a módulo de insultos
