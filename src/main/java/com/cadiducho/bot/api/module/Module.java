@@ -2,6 +2,7 @@ package com.cadiducho.bot.api.module;
 
 import com.cadiducho.bot.BotServer;
 import com.cadiducho.bot.api.command.BotCommand;
+import com.cadiducho.telegrambotapi.CallbackQuery;
 import com.cadiducho.telegrambotapi.Update;
 
 /**
@@ -54,9 +55,10 @@ public interface Module {
     }
     
     //ToDo: Mejorar API de módulos, no ejecutar todos los listeners en todos los modulos
-    default void onCommandExecuted(BotCommand cmd) {
+    
+    default void onPostCommand(Update update, boolean success) {
     }
     
-    default void onPostCommand(Update update) {
+    default void onCallbackQuery(CallbackQuery callbackQuery) {  
     }
 }

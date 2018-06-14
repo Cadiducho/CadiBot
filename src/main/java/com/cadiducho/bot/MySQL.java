@@ -75,7 +75,7 @@ public class MySQL {
     public void updateUsername(int userid, String groupchat) throws SQLException {
         Optional<User> user = Optional.empty();
         try {
-            user = Optional.ofNullable(BotServer.getInstance().getCadibot().getChatMember(groupchat, userid).getUser());
+            user = Optional.ofNullable(server.getCadibot().getChatMember(groupchat, userid).getUser());
         } catch (TelegramException ignored) {
         }
         if (user.isPresent()) {

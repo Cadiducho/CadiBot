@@ -13,12 +13,11 @@ import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Class to handle and add all his commands
@@ -28,13 +27,8 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class CommandManager {
 
-    private final List<BotCommand> cmds = new ArrayList<>();
+    private final Map<String, BotCommand> commandMap = new HashMap<>();
     private final BotServer server;
-    
-    public void register(BotCommand cmd) {
-        //server.debugLog("Registrando comando /" + cmd.getName());
-        cmds.add(cmd);
-    }
 
     public void load() {
         register(new VersionCMD());
@@ -56,42 +50,51 @@ public class CommandManager {
         register(new SimpleVoiceCMD(Arrays.asList("puigdemont", "/viva"), "AwADBAAD0AIAAnhgYFAc6it_QeBppwI"));
     }
 
+    public void register(BotCommand cmd) {
+        cmd.getAliases().forEach(alias -> commandMap.put(alias, cmd));
+    }
+    
+    public Optional<BotCommand> getCommand(String alias) {
+        return Optional.ofNullable(commandMap.get(alias));
+    }
+    
     /**
      * Ejecutar un comando
      * @param bot Bot que recibe la update
      * @param update Update del comando
      * @return Verdadero si se ha ejecutado, falso si no
+     * @throws com.cadiducho.telegrambotapi.exception.TelegramException Excepcion
      */
-    public boolean onCmd(TelegramBot bot, Update update) {
+    public boolean onCmd(TelegramBot bot, Update update) throws TelegramException {
         Date now = new Date();
         Message message = update.getMessage();
         User from = update.getMessage().getFrom();
-        
+
         System.out.println(BotServer.fulltime.format(now) + " " + (from.getUsername() == null ? from.getFirst_name() : ("@" + from.getUsername())) + ": " + message.getText());
-        
-        try {
-            String[] rawcmd = message.getText().split(" ");
-            String label = rawcmd[0].replace("@" + bot.getMe().getUsername(), "");
-            Integer replyId = message.getMessage_id();
-            
-            //Si el mensaje es respondiendo a alguien, dirigir respuesta a ese mensaje
-            if (message.getReply_to_message() != null) {
-                replyId = message.getReply_to_message().getMessage_id();
-            }
-            
-            for (BotCommand cmd : cmds) {
-                if ((cmd.getName().split(" ").length > 1) && ((cmd.getName().equalsIgnoreCase(message.getText())) || (cmd.getAliases().contains(message.getText()))) || (cmd.getName().equalsIgnoreCase(label)) || (cmd.getAliases().contains(label.toLowerCase()))) {
-                    System.out.println(" # Ejecutando '" + cmd.getName() + "'");
-                    cmd.execute(message.getChat(), from, label, Arrays.copyOfRange(rawcmd, 1, rawcmd.length), replyId, now);
-                    server.getModuleManager().getModules().forEach(m -> m.onCommandExecuted(cmd));
-                    return true;
-                }
-            }
-        } catch (TelegramException ex) {
-            Logger.getLogger(CommandManager.class.getName()).log(Level.SEVERE, null, ex);
+
+        String[] rawcmd = message.getText().split(" ");
+        if (rawcmd.length == 0) {
+            return false;
         }
         
-        server.getModuleManager().getModules().forEach(m -> m.onPostCommand(update));
-        return false;
+        String sentLabel = rawcmd[0].toLowerCase().replace("@" + bot.getMe().getUsername(), "");
+        Optional<BotCommand> target = getCommand(sentLabel);
+        if (!target.isPresent()) {
+            // no encontrado por primer alias, buscar frase entera
+            target = getCommand(message.getText().toLowerCase());
+            if (!target.isPresent()) {
+                return false; // ni alias ni frase entera
+            }
+        }
+        
+        // Si el mensaje es respondiendo a alguien, dirigir respuesta a ese mensaje
+        Integer replyId = message.getMessage_id();
+        if (message.getReply_to_message() != null) {
+            replyId = message.getReply_to_message().getMessage_id();
+        }
+
+        System.out.println(" # Ejecutando '" + target.get().getName() + "'");
+        target.get().execute(message.getChat(), from, sentLabel, Arrays.copyOfRange(rawcmd, 1, rawcmd.length), replyId, now);
+        return true;
     }
 }
