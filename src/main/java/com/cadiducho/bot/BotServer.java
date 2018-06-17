@@ -14,7 +14,7 @@ import java.util.Scanner;
 
 public class BotServer {
 
-    public static final String VERSION = "2.0-beta2";
+    public static final String VERSION = "2.0-beta3";
     
     @Getter static boolean running = true;
     private static final Scanner in = new Scanner(System.in);
