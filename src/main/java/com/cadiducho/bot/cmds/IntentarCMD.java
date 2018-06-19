@@ -7,13 +7,13 @@ import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 import com.vdurmont.emoji.EmojiManager;
 
-import java.util.Date;
+import java.time.Instant;
 
 @CommandInfo(aliases = "/intentar")
 public class IntentarCMD implements BotCommand {
 
     @Override
-    public void execute(Chat chat, User from, String label, String[] args, Integer messageId, Date date) throws TelegramException {
+    public void execute(Chat chat, User from, String label, String[] args, Integer messageId, Instant instant) throws TelegramException {
         if (args.length == 0) {
             getBot().sendMessage(chat.getId(), "<b>Usa:</b> /intentar <i>acción</i>", "html", null, false, messageId, null);
             return;

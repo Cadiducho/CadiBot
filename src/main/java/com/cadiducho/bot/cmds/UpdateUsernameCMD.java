@@ -7,7 +7,7 @@ import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public class UpdateUsernameCMD implements BotCommand {
 
     @Override
-    public void execute(Chat chat, User from, String label, String[] args, Integer messageId, Date date) throws TelegramException {
+    public void execute(Chat chat, User from, String label, String[] args, Integer messageId, Instant instant) throws TelegramException {
         try {
             getMySQL().updateUsername(from.getId(), chat.getId());
             if (chat.isGroupChat()) {

@@ -11,7 +11,7 @@ import com.vdurmont.emoji.EmojiManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,7 +19,7 @@ import java.util.List;
 public class ChangelogCMD implements BotCommand {
     
     @Override
-    public void execute(Chat chat, User from, String label, String[] args, Integer messageId, Date date) throws TelegramException {
+    public void execute(Chat chat, User from, String label, String[] args, Integer messageId, Instant instant) throws TelegramException {
         List<String> cambios = getChangelog(5); //ToDo: /changelog <número>
         if (cambios.isEmpty()) {
             getBot().sendMessage(chat.getId(), "No he podido cargar el changelog " + EmojiManager.getForAlias("scream_cat").getUnicode());

@@ -7,13 +7,13 @@ import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 
-import java.util.Date;
+import java.time.Instant;
 
 @CommandInfo(aliases = "/version")
 public class VersionCMD implements BotCommand {
     
     @Override
-    public void execute(Chat chat, User from, String label, String[] args, Integer messageId, Date date) throws TelegramException {
+    public void execute(Chat chat, User from, String label, String[] args, Integer messageId, Instant instant) throws TelegramException {
         getBot().sendMessage(chat.getId(), "Ejecutando versión " + BotServer.VERSION, null, null, false, messageId, null);
     }
 }

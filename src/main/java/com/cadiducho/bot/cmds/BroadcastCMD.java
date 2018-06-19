@@ -6,13 +6,13 @@ import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 
-import java.util.Date;
+import java.time.Instant;
 
 @CommandInfo(aliases = "/broadcastcadibot")
 public class BroadcastCMD implements BotCommand {
 
     @Override
-    public void execute(Chat chat, User from, String label, String[] args, Integer messageId, Date date) throws TelegramException {
+    public void execute(Chat chat, User from, String label, String[] args, Integer messageId, Instant instant) throws TelegramException {
         if (!from.getUsername().equalsIgnoreCase("cadiducho")) {
             getBot().sendMessage(chat.getId(), "No tienes permiso para usar este comando", null, null, false, messageId, null);
             return;
