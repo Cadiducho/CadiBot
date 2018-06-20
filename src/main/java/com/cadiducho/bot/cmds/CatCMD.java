@@ -7,7 +7,7 @@ import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 import com.cadiducho.telegrambotapi.inline.InlineKeyboardMarkup;
 
-import java.util.Date;
+import java.time.Instant;
 
 @CommandInfo(aliases = {"cat", "miau", "meow", "gato"})
 public class CatCMD implements BotCommand {
@@ -15,7 +15,7 @@ public class CatCMD implements BotCommand {
     private static final String catApi = "https://cataas.com/cat/cute";
 
     @Override
-    public void execute(Chat chat, User from, String label, String[] args, Integer messageId, Date date) throws TelegramException {
+    public void execute(Chat chat, User from, String label, String[] args, Integer messageId, Instant instant) throws TelegramException {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
 
         /*InlineKeyboardButton voteUp = new InlineKeyboardButton();
@@ -27,7 +27,7 @@ public class CatCMD implements BotCommand {
         inlineKeyboard.setInline_keyboard(Arrays.asList(Arrays.asList(voteUp, voteDown)));*/
         //ToDo: Guardar puntuación de gatos para enviar esos en caso de error
         
-        String catFile = catApi + "?" + date.getTime(); //añadir numero para tener variación
+        String catFile = catApi + "?" + instant.getNano(); //añadir numero para tener variación
         getBot().sendPhoto(chat.getId(), catFile, null, false, null, inlineKeyboard);
     }
 }

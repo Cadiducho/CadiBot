@@ -3,6 +3,7 @@ package com.cadiducho.bot.api.command.simple;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
+import java.time.Instant;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -31,8 +32,8 @@ public class SimplePhotoCMD extends SimpleCommand {
     }
     
     @Override
-    public void execute(Chat chat, User from, String label, String[] args, Integer replyId, Date date) throws TelegramException {
-        Random rand = new Random(date.getTime());
+    public void execute(Chat chat, User from, String label, String[] args, Integer replyId, Instant instant) throws TelegramException {
+        Random rand = new Random(instant.getNano());
         String photoId = photos.get(rand.nextInt(photos.size()));
         
         getBot().sendPhoto(chat.getId(), photoId, null, false, isReplying ? replyId : null, null);

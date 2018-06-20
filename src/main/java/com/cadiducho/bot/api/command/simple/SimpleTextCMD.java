@@ -4,6 +4,7 @@ import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 import com.vdurmont.emoji.EmojiParser;
+import java.time.Instant;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -32,8 +33,8 @@ public class SimpleTextCMD extends SimpleCommand {
     }
 
     @Override
-    public void execute(Chat chat, User from, String label, String[] args, Integer replyId, Date date) throws TelegramException {
-        Random rand = new Random(date.getTime());
+    public void execute(Chat chat, User from, String label, String[] args, Integer replyId, Instant instant) throws TelegramException {
+        Random rand = new Random(instant.getNano());
         String reply = EmojiParser.parseToUnicode(replies.get(rand.nextInt(replies.size())));
         
         getBot().sendMessage(chat.getId(), reply, null, null, false, isReplying ? replyId : null, null);
