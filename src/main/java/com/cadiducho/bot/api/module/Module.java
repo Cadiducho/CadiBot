@@ -1,7 +1,6 @@
 package com.cadiducho.bot.api.module;
 
 import com.cadiducho.bot.BotServer;
-import com.cadiducho.bot.api.command.BotCommand;
 import com.cadiducho.telegrambotapi.CallbackQuery;
 import com.cadiducho.telegrambotapi.Update;
 
