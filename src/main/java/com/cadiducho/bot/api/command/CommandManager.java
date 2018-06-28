@@ -14,6 +14,8 @@ import com.cadiducho.telegrambotapi.exception.TelegramException;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -67,12 +69,11 @@ public class CommandManager {
      * @throws com.cadiducho.telegrambotapi.exception.TelegramException Excepcion
      */
     public boolean onCmd(TelegramBot bot, Update update) throws TelegramException {
-        Date d_now = new Date();
         Instant now = Instant.now();
         Message message = update.getMessage();
         User from = update.getMessage().getFrom();
 
-        System.out.println(BotServer.fulltime.format(d_now) + " " + (from.getUsername() == null ? from.getFirst_name() : ("@" + from.getUsername())) + ": " + message.getText());
+        System.out.println(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withZone(ZoneId.systemDefault()).format(now) + " " + (from.getUsername() == null ? from.getFirst_name() : ("@" + from.getUsername())) + ": " + message.getText());
 
         String[] rawcmd = message.getText().split(" ");
         if (rawcmd.length == 0) {
@@ -96,7 +97,6 @@ public class CommandManager {
         }
 
         System.out.println(" # Ejecutando '" + target.get().getName() + "'");
-        target.get().execute(message.getChat(), from, sentLabel, Arrays.copyOfRange(rawcmd, 1, rawcmd.length), replyId, d_now);
         target.get().execute(message.getChat(), from, sentLabel, Arrays.copyOfRange(rawcmd, 1, rawcmd.length), replyId, now);
         return true;
     }
