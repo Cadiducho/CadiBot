@@ -9,13 +9,10 @@ import org.apache.commons.cli.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class BotServer {
 
-    @Getter static boolean running = true;
-    private static final Scanner in = new Scanner(System.in);
     /**
      * The logger for this server
      */
@@ -29,6 +26,7 @@ public class BotServer {
     @Getter private static BotServer instance;
     @Getter private final ModuleManager moduleManager;
     @Getter private final CommandManager commandManager;
+    private final ConsoleManager consoleManager;
     @Getter private MySQL mysql;
     @Getter private TelegramBot cadibot;
 
@@ -76,19 +74,22 @@ public class BotServer {
     private BotServer() {
         instance = this;
         moduleManager = new ModuleManager(instance, "modules");
+        consoleManager = new ConsoleManager(instance);
         commandManager = new CommandManager(instance);
     }
     
     private void startServer(CommandLine cmd) {
         logger.info("Servidor arrancado");
 
+        consoleManager.startConsole();
+        consoleManager.startFile("logs/log-%D.txt");
         cadibot = new TelegramBot(cmd.getOptionValue("token"));
         cadibot.getUpdatesPoller().setOwnerId(Long.parseLong(cmd.getOptionValue("owner")));
         
         try {
             moduleManager.loadModules();
         } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
-            logger.warning("Can't initialize directory modules!");
+            logger.warning("Can't load modules!");
             logger.warning(ex.getMessage());
         }
         
@@ -110,34 +111,12 @@ public class BotServer {
         cadibot.getUpdatesPoller().setHandler(events);
         
         commandManager.load(); //ToDo: ¿Pasar todos a módulos?
-        
 
-        while (isRunning()) {
-            System.out.println("Elige una opción numérica:"
-                + "\n- stop Salir"
-                + "\n- ping. Ping"
-            );
-            String respuesta = in.next();
-            switch (respuesta) {
-                case "stop":
-                    running = false;
-                    break;
-                case "ping":
-                    System.out.println("Estoy vivo");
-                    break;
-                case "version":
-                    System.out.println("Ejecutando versión " + VERSION);
-                    break;
-                default: 
-                    System.out.println("Opción no válida.\n");
-            }
-        }
-        close();
 
         logger.info("Bot " + VERSION + " iniciado");
     }
     
-    private void close() {
+    public void shutdown() {
         moduleManager.getModules().forEach(Module::onClose);
         try {
             mysql.closeConnection();
@@ -145,6 +124,7 @@ public class BotServer {
         }
 
         logger.info("Terminando...");
+        consoleManager.stop();
         System.exit(0);
     }
 }
