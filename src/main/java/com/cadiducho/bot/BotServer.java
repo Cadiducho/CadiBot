@@ -7,6 +7,7 @@ import com.cadiducho.telegrambotapi.TelegramBot;
 import lombok.Getter;
 import org.apache.commons.cli.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Logger;
@@ -73,8 +74,8 @@ public class BotServer {
     
     private BotServer() {
         instance = this;
-        moduleManager = new ModuleManager(instance, "modules");
         consoleManager = new ConsoleManager(instance);
+        moduleManager = new ModuleManager(instance, new File("modules"));
         commandManager = new CommandManager(instance);
     }
     
