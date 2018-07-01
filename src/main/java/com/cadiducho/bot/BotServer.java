@@ -24,17 +24,32 @@ public class BotServer {
      */
     public static final String VERSION = "2.1-beta";
 
-    @Getter private static BotServer instance;
+    /**
+     * The Module manager
+     */
     @Getter private final ModuleManager moduleManager;
+
+    /**
+     * The (Telegram) Command manager
+     */
     @Getter private final CommandManager commandManager;
+
+    /**
+     * The Console manager
+     */
     private final ConsoleManager consoleManager;
+
+    /**
+     * The database (MySQL) connector
+     */
     @Getter private MySQL mysql;
     @Getter private TelegramBot cadibot;
+    @Getter private static BotServer instance;
 
     public static void main(String[] args) {
         Options options = new Options();
 
-        Option token = new Option("t", "token", true, "telegram bot token");  
+        Option token = new Option("t", "token", true, "telegram bot token");
         Option dbh = new Option("dbh", "database-host", true, "database host");
         Option dbp = new Option("dbp", "database-port", true, "database port");
         Option dbn = new Option("dbn", "database-name", true, "database name");
@@ -58,7 +73,7 @@ public class BotServer {
         options.addOption(dbpa);
         options.addOption(owner);
         
-        CommandLine cmd;     
+        CommandLine cmd;
         try {
             cmd = new DefaultParser().parse(options, args);
         } catch (ParseException e) {
