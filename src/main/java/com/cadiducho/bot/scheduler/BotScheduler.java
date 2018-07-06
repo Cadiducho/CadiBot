@@ -1,7 +1,4 @@
-package com.cadiducho.bot;
-
-import com.cadiducho.bot.BotServer;
-import com.cadiducho.bot.scheduler.BotTask;
+package com.cadiducho.bot.scheduler;
 
 import java.util.Iterator;
 import java.util.concurrent.*;
@@ -13,6 +10,11 @@ public class BotScheduler {
      * The scheduled executor service
      */
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(BotThreadFactory.INSTANCE);
+
+    /**
+     * Executor to handle execution of async tasks
+     */
+    private final ExecutorService asyncTaskExecutor = Executors.newCachedThreadPool(BotThreadFactory.INSTANCE);
 
     /**
      * The primary thread in which pulse() is called
@@ -36,7 +38,11 @@ public class BotScheduler {
             BotTask task = it.next();
             switch (task.shouldExecute()) {
                 case RUN:
-                    task.run();
+                    if (task.isSync()) {
+                        task.run();
+                    } else {
+                        asyncTaskExecutor.submit(task);
+                    }
                     break;
                 case STOP:
                     it.remove();
