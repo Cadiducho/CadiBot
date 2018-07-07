@@ -3,6 +3,7 @@ package com.cadiducho.bot;
 import com.cadiducho.bot.api.command.CommandManager;
 import com.cadiducho.bot.api.module.Module;
 import com.cadiducho.bot.api.module.ModuleManager;
+import com.cadiducho.bot.scheduler.BotScheduler;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import lombok.Getter;
 import org.apache.commons.cli.*;

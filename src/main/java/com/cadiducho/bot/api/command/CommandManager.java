@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -38,7 +37,6 @@ public class CommandManager {
         register(new ChangelogCMD());
         register(new HoraCMD());
         register(new IntentarCMD());
-        register(new UpdateUsernameCMD());
         register(new BroadcastCMD());
         register(new CatCMD());
 
