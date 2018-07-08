@@ -58,8 +58,10 @@ public class PoleCacheManager {
                     while (rs.next()) {
                         poles.put(rs.getRow(), rs.getInt("userid"));
                     }
-                    PoleCollection polesHoy = new PoleCollection(poles.get(1), poles.get(2), poles.get(3));
-                    cachedGroup.getPolesMap().put(LocalDate.now(ZoneId.systemDefault()), polesHoy);
+                    if (!poles.isEmpty()) { //solo crear objeto PoleCollection si hay poles de verdad. Rellenar el optional con el objeto vacío repercutirá en /pole fuertemente
+                        PoleCollection polesHoy = new PoleCollection(poles.get(1), poles.get(2), poles.get(3));
+                        cachedGroup.getPolesMap().put(LocalDate.now(ZoneId.systemDefault()), polesHoy);
+                    }
                 } catch (SQLException ex) {
                     BotServer.logger.log(Level.WARNING, "No se ha podido cargar las poles en caché del grupo " + groupId, ex);
                 }
