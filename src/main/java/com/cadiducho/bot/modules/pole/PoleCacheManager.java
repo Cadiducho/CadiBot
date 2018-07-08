@@ -14,9 +14,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Level;
 
 @AllArgsConstructor
 public class PoleCacheManager {
@@ -33,7 +36,7 @@ public class PoleCacheManager {
         }
     }
 
-    public void initializeGroupCache(Long groupId, String title) {
+    public synchronized void initializeGroupCache(Long groupId, String title) {
         CachedGroup cachedGroup = null;
         File cacheFile = new File(BotServer.getInstance().getModuleManager().getModulesFolder() + "/poles", groupId.toString() + ".json");
 
@@ -42,12 +45,30 @@ public class PoleCacheManager {
             try {
                 cacheFile.createNewFile();
                 cachedGroup = new CachedGroup(groupId, title);
+                try {
+                    PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
+                            "SELECT * FROM `" + PoleModule.TABLA_POLES + "` WHERE "
+                                    + "DATE(time)=DATE(CURDATE()) AND "
+                                    + "`groupchat`=?"
+                                    + " ORDER BY `poleType`");
+                    statement.setLong(1, groupId);
+
+                    LinkedHashMap<Integer, Integer> poles = new LinkedHashMap<>();
+                    ResultSet rs = statement.executeQuery();
+                    while (rs.next()) {
+                        poles.put(rs.getRow(), rs.getInt("userid"));
+                    }
+                    PoleCollection polesHoy = new PoleCollection(poles.get(1), poles.get(2), poles.get(3));
+                    cachedGroup.getPolesMap().put(LocalDate.now(ZoneId.systemDefault()), polesHoy);
+                } catch (SQLException ex) {
+                    BotServer.logger.log(Level.WARNING, "No se ha podido cargar las poles en caché del grupo " + groupId, ex);
+                }
 
                 try (Writer writer = new FileWriter(cacheFile)) {
                     gson.toJson(cachedGroup, writer);
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ex) {
+                BotServer.logger.log(Level.WARNING, "No se ha podido crear el archivo de caché del grupo " + groupId, ex);
             }
         }
 
@@ -67,7 +88,7 @@ public class PoleCacheManager {
                 try {
                     initializeGroupCache(Long.parseLong(f.getName().replace(".json", "")), null); //el titulo es null porque lo leerá del archivo
                 } catch (NumberFormatException ignored) {
-                    System.out.println("El archivo " + f.getName() + " no tiene nombre válido para un grupo en cache");
+                    BotServer.logger.info("El archivo " + f.getName() + " no tiene nombre válido para un grupo en caché y ha sido saltado");
                 }
             }
         }
