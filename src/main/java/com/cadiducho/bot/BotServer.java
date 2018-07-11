@@ -3,34 +3,60 @@ package com.cadiducho.bot;
 import com.cadiducho.bot.api.command.CommandManager;
 import com.cadiducho.bot.api.module.Module;
 import com.cadiducho.bot.api.module.ModuleManager;
+import com.cadiducho.bot.scheduler.BotScheduler;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import lombok.Getter;
 import org.apache.commons.cli.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Scanner;
+import java.util.logging.Logger;
 
 public class BotServer {
 
-    public static final String VERSION = "2.0";
-    
-    @Getter static boolean running = true;
-    private static final Scanner in = new Scanner(System.in);
+    /**
+     * The logger for this server
+     */
+    public static final Logger logger = Logger.getLogger("Cadibot-Server");
 
-    @Getter private static BotServer instance;
+    /**
+     * Server / bot version
+     */
+    public static final String VERSION = "2.1";
+
+    /**
+     * The Module manager
+     */
     @Getter private final ModuleManager moduleManager;
+
+    /**
+     * The (Telegram) Command manager
+     */
     @Getter private final CommandManager commandManager;
+
+    /**
+     * The Console manager
+     */
+    private final ConsoleManager consoleManager;
+
+    /**
+     * The database (MySQL) connector
+     */
     @Getter private MySQL mysql;
+
+    /**
+     * The tasks/runnables manager
+     */
+    @Getter private final BotScheduler scheduler;
+
     @Getter private TelegramBot cadibot;
-    
-    public static final SimpleDateFormat fulltime = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    @Getter private static BotServer instance;
 
     public static void main(String[] args) {
         Options options = new Options();
 
-        Option token = new Option("t", "token", true, "telegram bot token");  
+        Option token = new Option("t", "token", true, "telegram bot token");
         Option dbh = new Option("dbh", "database-host", true, "database host");
         Option dbp = new Option("dbp", "database-port", true, "database port");
         Option dbn = new Option("dbn", "database-name", true, "database name");
@@ -54,7 +80,7 @@ public class BotServer {
         options.addOption(dbpa);
         options.addOption(owner);
         
-        CommandLine cmd;     
+        CommandLine cmd;
         try {
             cmd = new DefaultParser().parse(options, args);
         } catch (ParseException e) {
@@ -68,23 +94,27 @@ public class BotServer {
         bot.startServer(cmd);
     }
     
-    public BotServer() {
+    private BotServer() {
         instance = this;
-        moduleManager = new ModuleManager(instance, "modules");
+        consoleManager = new ConsoleManager(instance);
+        moduleManager = new ModuleManager(instance, new File("modules"));
         commandManager = new CommandManager(instance);
+        scheduler = new BotScheduler();
     }
     
     private void startServer(CommandLine cmd) {
-        System.out.println("Servidor arrancado");
-        
+        logger.info("Servidor arrancado");
+
+        consoleManager.startConsole();
+        consoleManager.startFile("logs/log-%D.txt");
         cadibot = new TelegramBot(cmd.getOptionValue("token"));
         cadibot.getUpdatesPoller().setOwnerId(Long.parseLong(cmd.getOptionValue("owner")));
         
         try {
             moduleManager.loadModules();
         } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
-            System.out.println("Can't load modules!");
-            System.out.println(ex.getMessage());
+            logger.warning("Can't load modules!");
+            logger.warning(ex.getMessage());
         }
         
         try {
@@ -96,50 +126,32 @@ public class BotServer {
                     cmd.getOptionValue("database-pass"));
             
             mysql.openConnection();
-            System.out.println("SQL connection established");
+            logger.info("SQL connection established");
         } catch (SQLException ex) {
-            System.out.println("Can't connect to database!");
-            System.out.println(ex.getMessage());
+            logger.warning("Can't connect to database!");
+            logger.warning(ex.getMessage());
         }
         UpdatesHandler events = new UpdatesHandler(cadibot, instance);
         cadibot.getUpdatesPoller().setHandler(events);
+
+        scheduler.start();
         
         commandManager.load(); //ToDo: ¿Pasar todos a módulos?
-        
 
-        System.out.println("Bot " + VERSION + " iniciado");
-        
-        while (isRunning()) {
-            System.out.println("Elige una opción numérica:"
-                + "\n- stop Salir"
-                + "\n- ping. Ping"
-            );
-            String respuesta = in.next();
-            switch (respuesta) {
-                case "stop":
-                    running = false;
-                    break;
-                case "ping":
-                    System.out.println("Estoy vivo");
-                    break;
-                case "version":
-                    System.out.println("Ejecutando versión " + VERSION);
-                    break;
-                default: 
-                    System.out.println("Opción no válida.\n");
-            }
-        }
-        close();
+
+        logger.info("Bot " + VERSION + " iniciado");
     }
     
-    private void close() {
+    public void shutdown() {
         moduleManager.getModules().forEach(Module::onClose);
         try {
             mysql.closeConnection();
         } catch (SQLException ignored) {
         }
 
-        System.out.println("Terminando...");
+        logger.info("Terminando...");
+        consoleManager.stop();
+        scheduler.stop();
         System.exit(0);
     }
 }

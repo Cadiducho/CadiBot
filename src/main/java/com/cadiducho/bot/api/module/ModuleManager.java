@@ -1,6 +1,7 @@
 package com.cadiducho.bot.api.module;
 
 import com.cadiducho.bot.BotServer;
+import com.cadiducho.bot.modules.pole.PoleModule;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -22,19 +23,18 @@ public class ModuleManager {
     @Getter private final List<Module> modules = new ArrayList<>();
     
     private final BotServer server;
-    private final String moduleFolderPathName;
+    @Getter private final File modulesFolder;
     
     private void addLocalModules() {
-        
+        modules.add(new PoleModule());
     }
     
     public void loadModules() throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException {
-        final File moduleFolder = new File(moduleFolderPathName);
-        if (Files.notExists(moduleFolder.toPath())) {
-            Files.createDirectories(moduleFolder.toPath());
+        if (Files.notExists(modulesFolder.toPath())) {
+            Files.createDirectories(modulesFolder.toPath());
         }
 
-        final File[] files = moduleFolder.listFiles(pathname -> !pathname.isDirectory() && pathname.getName().endsWith(".jar"));
+        final File[] files = modulesFolder.listFiles(pathname -> !pathname.isDirectory() && pathname.getName().endsWith(".jar"));
         if (files == null) {
             return;
         }

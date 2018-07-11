@@ -13,7 +13,6 @@ public class MySQL {
 
     @Getter protected Connection connection;
 
-    public static final String TABLE_POLES = "cadibot_poles";
     public static final String TABLE_USERS = "cadibot_users";
     public static final String TABLE_GRUPOS = "cadibot_grupos";
     public static final String TABLE_CHANGELOG = "cadibot_changelog";
@@ -72,7 +71,7 @@ public class MySQL {
         return grupos;
     }
     
-    public void updateUsername(int userid, String groupchat) throws SQLException {
+    public void updateUsername(int userid, Long groupchat) throws SQLException {
         Optional<User> user = Optional.empty();
         try {
             user = Optional.ofNullable(server.getCadibot().getChatMember(groupchat, userid).getUser());
