@@ -107,7 +107,7 @@ public class MySQL {
     
     public void disableGroup(Object groupId) {
         try {
-            PreparedStatement disableGroup = openConnection().prepareStatement("UPDATE `" + TABLE_GRUPOS + "` SET `valid`='1' WHERE  `groupid`=?");
+            PreparedStatement disableGroup = openConnection().prepareStatement("UPDATE `" + TABLE_GRUPOS + "` SET `valid`='0' WHERE  `groupid`=?");
             disableGroup.setObject(1, groupId);
             disableGroup.executeUpdate();
         } catch (SQLException ignored) {
