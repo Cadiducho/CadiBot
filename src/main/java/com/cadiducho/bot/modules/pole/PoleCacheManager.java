@@ -56,7 +56,7 @@ public class PoleCacheManager {
                 cachedGroup = new CachedGroup(groupId, title);
                 try {
                     PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
-                            "SELECT * FROM `" + PoleModule.TABLA_POLES + "` WHERE "
+                            "SELECT `userid`, `poleType` FROM `" + PoleModule.TABLA_POLES + "` WHERE "
                                     + "DATE(time)=DATE(CURDATE()) AND "
                                     + "`groupchat`=?"
                                     + " ORDER BY `poleType`");
@@ -65,7 +65,7 @@ public class PoleCacheManager {
                     LinkedHashMap<Integer, Integer> poles = new LinkedHashMap<>();
                     ResultSet rs = statement.executeQuery();
                     while (rs.next()) {
-                        poles.put(rs.getRow(), rs.getInt("userid"));
+                        poles.put(rs.getInt("poleType"), rs.getInt("userid"));
                     }
                     if (!poles.isEmpty()) { //solo crear objeto PoleCollection si hay poles de verdad. Rellenar el optional con el objeto vacío repercutirá en /pole fuertemente
                         PoleCollection polesHoy = new PoleCollection(poles.get(1), poles.get(2), poles.get(3));
