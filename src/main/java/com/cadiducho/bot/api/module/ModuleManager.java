@@ -1,7 +1,9 @@
 package com.cadiducho.bot.api.module;
 
 import com.cadiducho.bot.BotServer;
+import com.cadiducho.bot.modules.insultos.InsultosModule;
 import com.cadiducho.bot.modules.pole.PoleModule;
+import com.cadiducho.bot.modules.saludos.SaludosModule;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +29,8 @@ public class ModuleManager {
     
     private void addLocalModules() {
         modules.add(new PoleModule());
+        modules.add(new InsultosModule());
+        modules.add(new SaludosModule());
     }
     
     public void loadModules() throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException {
