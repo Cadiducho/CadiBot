@@ -2,11 +2,14 @@ package com.cadiducho.bot.modules.pole;
 
 import lombok.Builder;
 import lombok.Setter;
+import lombok.ToString;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Setter
 @Builder
+@ToString
 public class PoleCollection {
 
     private Integer first, second, third;
@@ -24,6 +27,6 @@ public class PoleCollection {
     }
 
     public boolean contains(Integer userId) {
-        return (userId.equals(first) || userId.equals(second) || userId.equals(third));
+        return (Objects.equals(userId, first) || Objects.equals(userId, second) || Objects.equals(userId, third));
     }
 }
