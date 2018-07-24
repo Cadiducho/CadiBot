@@ -89,15 +89,11 @@ public class CommandManager {
                 return false; // ni alias ni frase entera
             }
         }
-        
-        // Si el mensaje es respondiendo a alguien, dirigir respuesta a ese mensaje
-        Integer replyId = message.getMessage_id();
-        if (message.getReply_to_message() != null) {
-            replyId = message.getReply_to_message().getMessage_id();
-        }
 
         BotServer.logger.info(" # Ejecutando '" + target.get().getName() + "'");
-        target.get().execute(message.getChat(), from, sentLabel, Arrays.copyOfRange(rawcmd, 1, rawcmd.length), replyId, now);
+        target.get().execute(message.getChat(), from, sentLabel, Arrays.copyOfRange(rawcmd, 1, rawcmd.length), message.getMessage_id(), message.getReply_to_message().getMessage_id(), now);
+        target.get().execute(message.getChat(), from, sentLabel, Arrays.copyOfRange(rawcmd, 1, rawcmd.length), message.getMessage_id(), now);
+
         return true;
     }
 }
