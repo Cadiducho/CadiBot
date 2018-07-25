@@ -4,6 +4,7 @@ import com.cadiducho.bot.BotServer;
 import com.cadiducho.bot.MySQL;
 import com.cadiducho.bot.api.module.Module;
 import com.cadiducho.telegrambotapi.Chat;
+import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
@@ -40,11 +41,11 @@ public interface BotCommand {
      * @param label Primera palabra del comando ejecutado
      * @param args Argumentos del comando
      * @param messageId ID del mensaje del comando
-     * @param replyingTo ID del mensaje al que el comando respondía
+     * @param replyingTo Mensaje al que el comando respondía
      * @param instant Instante en el que el comando fue ejecutado
      * @throws TelegramException Excepción ocurrida
      */
-    default void execute(Chat chat, User from, String label, String[] args, Integer messageId, Integer replyingTo, Instant instant) throws TelegramException {
+    default void execute(Chat chat, User from, String label, String[] args, Integer messageId, Message replyingTo, Instant instant) throws TelegramException {
     }
     
     default Module getModule() {
