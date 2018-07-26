@@ -30,7 +30,9 @@ public interface BotCommand {
      * @param messageId ID del mensaje del comando
      * @param instant Instante en el que el comando fue ejecutado
      * @throws TelegramException Excepción ocurrida
+     * @deprecated Use by {@link #execute(Chat, User, String, String[], Integer, Message, Instant)}
      */
+    @Deprecated
     default void execute(Chat chat, User from, String label, String[] args, Integer messageId, Instant instant) throws TelegramException {
     }
 
@@ -45,7 +47,7 @@ public interface BotCommand {
      * @param instant Instante en el que el comando fue ejecutado
      * @throws TelegramException Excepción ocurrida
      */
-    default void execute(Chat chat, User from, String label, String[] args, Integer messageId, Message replyingTo, Instant instant) throws TelegramException {
+    default void execute(final Chat chat, final User from, final String label, final String[] args, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
     }
     
     default Module getModule() {
