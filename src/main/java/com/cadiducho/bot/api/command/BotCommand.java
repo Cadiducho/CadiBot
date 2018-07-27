@@ -30,7 +30,7 @@ public interface BotCommand {
      * @param messageId ID del mensaje del comando
      * @param instant Instante en el que el comando fue ejecutado
      * @throws TelegramException Excepción ocurrida
-     * @deprecated Use by {@link #execute(Chat, User, String, String[], Integer, Message, Instant)}
+     * @deprecated Will be removed in 2.4. Replaced by {@link #execute(Chat, User, String, String[], Integer, Message, Instant)}
      */
     @Deprecated
     default void execute(Chat chat, User from, String label, String[] args, Integer messageId, Instant instant) throws TelegramException {
