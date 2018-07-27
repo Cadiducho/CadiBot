@@ -4,6 +4,7 @@ import com.cadiducho.bot.BotServer;
 import com.cadiducho.bot.MySQL;
 import com.cadiducho.bot.api.module.Module;
 import com.cadiducho.telegrambotapi.Chat;
+import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
@@ -29,8 +30,24 @@ public interface BotCommand {
      * @param messageId ID del mensaje del comando
      * @param instant Instante en el que el comando fue ejecutado
      * @throws TelegramException Excepción ocurrida
+     * @deprecated Will be removed in 2.4. Replaced by {@link #execute(Chat, User, String, String[], Integer, Message, Instant)}
      */
+    @Deprecated
     default void execute(Chat chat, User from, String label, String[] args, Integer messageId, Instant instant) throws TelegramException {
+    }
+
+    /**
+     * Ejecutar un comando
+     * @param chat Chat donde el comando fue recibido
+     * @param from Usuario por el que el comando fue ejecutado
+     * @param label Primera palabra del comando ejecutado
+     * @param args Argumentos del comando
+     * @param messageId ID del mensaje del comando
+     * @param replyingTo Mensaje al que el comando respondía
+     * @param instant Instante en el que el comando fue ejecutado
+     * @throws TelegramException Excepción ocurrida
+     */
+    default void execute(final Chat chat, final User from, final String label, final String[] args, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
     }
     
     default Module getModule() {

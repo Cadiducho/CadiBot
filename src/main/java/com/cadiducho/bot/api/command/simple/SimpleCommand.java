@@ -11,11 +11,11 @@ import java.util.List;
 public abstract class SimpleCommand implements BotCommand {
 
     private final List<String> aliases;
-    protected final boolean isReplying;
-    
-    public SimpleCommand(List<String> aliases, boolean isReplying) {
+    protected final ReplyPattern replyPattern;
+
+    public SimpleCommand(List<String> aliases, ReplyPattern replyPattern) {
        this.aliases = aliases;
-       this.isReplying = isReplying;
+       this.replyPattern = replyPattern;
     }
     
     @Override
@@ -26,5 +26,18 @@ public abstract class SimpleCommand implements BotCommand {
     @Override
     public List<String> getAliases() {
         return aliases;
+    }
+
+    protected Integer replyTheCommandTo(Integer originalId, Integer replyingTo) {
+        Integer replyTheCommandTo = null;
+        switch (replyPattern) {
+            case TO_ANSWERED:
+                replyTheCommandTo = replyingTo;
+                break;
+            case TO_ORIGINAL:
+                replyTheCommandTo = originalId;
+                break;
+        }
+        return replyTheCommandTo;
     }
 }
