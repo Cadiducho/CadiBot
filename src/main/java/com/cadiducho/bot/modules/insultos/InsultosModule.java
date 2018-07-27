@@ -2,6 +2,7 @@ package com.cadiducho.bot.modules.insultos;
 
 import com.cadiducho.bot.BotServer;
 import com.cadiducho.bot.api.command.CommandManager;
+import com.cadiducho.bot.api.command.simple.ReplyPattern;
 import com.cadiducho.bot.api.command.simple.SimpleTextCMD;
 import com.cadiducho.bot.api.module.Module;
 import com.cadiducho.bot.api.module.ModuleInfo;
@@ -20,6 +21,6 @@ public class InsultosModule implements Module {
     public void onLoad() {
         CommandManager commandManager = BotServer.getInstance().getCommandManager();
 
-        commandManager.register(new SimpleTextCMD(insultos, insultos)); //todos los insultos de alias y te responde aleatoriamente uno de esos
+        commandManager.register(new SimpleTextCMD(insultos, ReplyPattern.TO_ORIGINAL, insultos)); //todos los insultos de alias y te responde aleatoriamente uno de esos
     }
 }
