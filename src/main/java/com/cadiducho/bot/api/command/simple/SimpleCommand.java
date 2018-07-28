@@ -1,6 +1,7 @@
 package com.cadiducho.bot.api.command.simple;
 
 import com.cadiducho.bot.api.command.BotCommand;
+import com.cadiducho.telegrambotapi.Message;
 
 import java.util.List;
 
@@ -28,11 +29,11 @@ public abstract class SimpleCommand implements BotCommand {
         return aliases;
     }
 
-    protected Integer replyTheCommandTo(Integer originalId, Integer replyingTo) {
+    Integer replyTheCommandTo(Integer originalId, Message replyingTo) {
         Integer replyTheCommandTo = null;
         switch (replyPattern) {
             case TO_ANSWERED:
-                replyTheCommandTo = replyingTo;
+                if (replyingTo != null) replyTheCommandTo = replyingTo.getMessage_id();
                 break;
             case TO_ORIGINAL:
                 replyTheCommandTo = originalId;
