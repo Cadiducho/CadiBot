@@ -6,6 +6,7 @@ import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.bot.modules.pole.PoleCacheManager;
 import com.cadiducho.bot.modules.pole.PoleModule;
 import com.cadiducho.telegrambotapi.Chat;
+import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 import com.vdurmont.emoji.Emoji;
@@ -28,7 +29,7 @@ public class PoleListCMD implements BotCommand {
     private final PoleModule module = (PoleModule) getModule();
 
     @Override
-    public void execute(Chat chat, User from, String label, String[] args, Integer messageId, Instant instant) throws TelegramException {
+    public void execute(final Chat chat, final User from, final String label, final String[] args, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         if (!module.isChatSafe(getBot(), chat, from)) return;
 
         LocalDateTime today = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
