@@ -96,7 +96,6 @@ public class CommandManager {
 
         BotServer.logger.info(" # Ejecutando '" + target.get().getName() + "'");
         target.get().execute(message.getChat(), from, sentLabel, Arrays.copyOfRange(rawcmd, 1, rawcmd.length), message.getMessage_id(), message.getReply_to_message(), now);
-        target.get().execute(message.getChat(), from, sentLabel, Arrays.copyOfRange(rawcmd, 1, rawcmd.length), message.getMessage_id(), now);
 
         return true;
     }
