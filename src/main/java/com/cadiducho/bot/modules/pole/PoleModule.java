@@ -7,6 +7,7 @@ import com.cadiducho.bot.api.module.ModuleInfo;
 import com.cadiducho.bot.modules.pole.cmds.PoleCMD;
 import com.cadiducho.bot.modules.pole.cmds.PoleListCMD;
 import com.cadiducho.bot.modules.pole.cmds.UpdateUsernameCMD;
+import com.cadiducho.telegrambotapi.CallbackQuery;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import com.cadiducho.telegrambotapi.User;
@@ -31,6 +32,18 @@ public class PoleModule implements Module {
         commandManager.register(new PoleCMD());
         commandManager.register(new PoleListCMD());
         commandManager.register(new UpdateUsernameCMD());
+    }
+
+    @Override
+    public void onCallbackQuery(CallbackQuery callbackQuery) {
+        try {
+            if (callbackQuery.getData().equals("mostrarMasPoles")) {
+                botServer.getCadibot().editMessageText(callbackQuery.getMessage().getChat().getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
+                        "Esta funcionalidad se encuentra en pruebas", null, null, null);
+            }
+        } catch (TelegramException ex) {
+            BotServer.logger.warning(ex.getMessage());
+        }
     }
 
     /**

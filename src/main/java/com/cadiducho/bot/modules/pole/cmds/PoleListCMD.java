@@ -9,6 +9,8 @@ import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
+import com.cadiducho.telegrambotapi.inline.InlineKeyboardButton;
+import com.cadiducho.telegrambotapi.inline.InlineKeyboardMarkup;
 import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
@@ -20,6 +22,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -78,7 +81,13 @@ public class PoleListCMD implements BotCommand {
             Map<Integer, Integer> topBronces = getTopPoles(Long.parseLong(chat.getId()), 3);
             parseTopToStringBuilder(manager, bronze.getUnicode() + " Bronces " + bronze.getUnicode(), body, topBronces);
 
-            getBot().sendMessage(chat.getId(), body.toString(), "html", null, null, null, null);
+            InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
+            InlineKeyboardButton showMore = new InlineKeyboardButton();
+            showMore.setText("Mostrar más");
+            showMore.setCallback_data("mostrarMasPoles");
+            inlineKeyboard.setInline_keyboard(Arrays.asList(Arrays.asList(showMore)));
+
+            getBot().sendMessage(chat.getId(), body.toString(), "html", null, null, null, inlineKeyboard);
         } catch (SQLException ex) {
             getBot().sendMessage(chat.getId(), "No se ha podido conectar a la base de datos: ```" + ex.getMessage() + "```", "markdown", null, null, null, null);
             BotServer.logger.warning(ex.getMessage());
