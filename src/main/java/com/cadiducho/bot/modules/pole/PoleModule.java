@@ -15,6 +15,13 @@ import com.cadiducho.telegrambotapi.exception.TelegramException;
 import com.vdurmont.emoji.EmojiManager;
 import lombok.Getter;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+
 @ModuleInfo(name = "Poles", description = "Módulo para hacer poles cada día")
 public class PoleModule implements Module {
 
@@ -44,6 +51,57 @@ public class PoleModule implements Module {
         } catch (TelegramException ex) {
             BotServer.logger.warning(ex.getMessage());
         }
+    }
+
+    /**
+     * Obtener el top de poles de un día y un chat concreto
+     * @param today El día
+     * @param chatId El chat
+     * @return Map de posición e ID del usuario que hizo una pole, plata o bronce
+     * @throws SQLException Si falla la conexión a la base de datos
+     */
+    public LinkedHashMap<Integer, Integer> getPolesOfToday(LocalDateTime today, long chatId) throws SQLException {
+        PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
+                "SELECT * FROM `" + PoleModule.TABLA_POLES + "` WHERE "
+                        + "DATE(time)=DATE(?) AND "
+                        + "`groupchat`=?"
+                        + " ORDER BY `poleType`");
+        statement.setTimestamp(1, Timestamp.valueOf(today));
+        statement.setLong(2, chatId);
+        ResultSet rs = statement.executeQuery();
+
+        LinkedHashMap<Integer, Integer> poles = new LinkedHashMap<>();
+        while (rs.next()) {
+            poles.put(rs.getRow(), rs.getInt("userid"));
+        }
+
+        return poles;
+    }
+
+    /**
+     * Obtener el top de poles global de un grupo, según su tipo
+     * El tipo puede ser:
+     *  1. Oro/Pole
+     *  2. Plata/Subpole
+     *  3. Bronce
+     * @param chatId El chat
+     * @param type El tipo
+     * @return Map de usuario y cantidad de poles de dicho tipo realizado en dicho grupo
+     * @throws SQLException
+     */
+    public LinkedHashMap<Integer, Integer> getTopPoles(long chatId, int type, int limit) throws SQLException {
+        PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement("SELECT count(*) AS `totales`,`userid` FROM `" + PoleModule.TABLA_POLES + "`"
+                + " WHERE `groupchat`=? AND `poleType`=? GROUP BY `userid` ORDER BY `totales` DESC LIMIT ?");
+        statement.setLong(1, chatId);
+        statement.setInt(2, type);
+        statement.setInt(3, limit);
+        ResultSet rs = statement.executeQuery();
+        LinkedHashMap<Integer, Integer> poles = new LinkedHashMap<>();
+        while (rs.next()) {
+            poles.put(rs.getInt("userid"), rs.getInt("totales"));
+        }
+
+        return poles;
     }
 
     /**

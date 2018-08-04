@@ -40,7 +40,7 @@ public class PoleListCMD implements BotCommand {
         Long groupId = Long.parseLong(chat.getId());
 
         try {
-            Map<Integer, Integer> poles = getPolesOfToday(today, groupId);
+            Map<Integer, Integer> poles = module.getPolesOfToday(today, groupId);
 
             StringBuilder body = new StringBuilder();
             if (poles.isEmpty()) {
@@ -72,13 +72,13 @@ public class PoleListCMD implements BotCommand {
             Emoji gold = EmojiManager.getForAlias("first_place_medal");
             Emoji silver = EmojiManager.getForAlias("second_place_medal");
             Emoji bronze = EmojiManager.getForAlias("third_place_medal");
-            Map<Integer, Integer> topPoles = getTopPoles(Long.parseLong(chat.getId()), 1);
+            Map<Integer, Integer> topPoles = module.getTopPoles(Long.parseLong(chat.getId()), 1, 100);
             parseTopToStringBuilder(manager, gold.getUnicode() + " Poles " + gold.getUnicode(), body, topPoles);
 
-            Map<Integer, Integer> topSubpoles = getTopPoles(Long.parseLong(chat.getId()), 2);
+            Map<Integer, Integer> topSubpoles = module.getTopPoles(Long.parseLong(chat.getId()), 2, 100);
             parseTopToStringBuilder(manager, silver.getUnicode() + " Subpoles " + silver.getUnicode(), body, topSubpoles);
 
-            Map<Integer, Integer> topBronces = getTopPoles(Long.parseLong(chat.getId()), 3);
+            Map<Integer, Integer> topBronces = module.getTopPoles(Long.parseLong(chat.getId()), 3, 100);
             parseTopToStringBuilder(manager, bronze.getUnicode() + " Bronces " + bronze.getUnicode(), body, topBronces);
 
             InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
@@ -103,37 +103,5 @@ public class PoleListCMD implements BotCommand {
                 body.append(pole_username).append(" => ").append(entry.getValue()).append("\n");
             }
         }
-    }
-
-    private LinkedHashMap<Integer, Integer> getPolesOfToday(LocalDateTime today, long chatId) throws SQLException {
-        PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
-                "SELECT * FROM `" + PoleModule.TABLA_POLES + "` WHERE "
-                        + "DATE(time)=DATE(?) AND "
-                        + "`groupchat`=?"
-                        + " ORDER BY `poleType`");
-        statement.setTimestamp(1, Timestamp.valueOf(today));
-        statement.setLong(2, chatId);
-        ResultSet rs = statement.executeQuery();
-
-        LinkedHashMap<Integer, Integer> poles = new LinkedHashMap<>();
-        while (rs.next()) {
-            poles.put(rs.getRow(), rs.getInt("userid"));
-        }
-
-        return poles;
-    }
-
-    private LinkedHashMap<Integer, Integer> getTopPoles(long chatId, int type) throws SQLException {
-        PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement("SELECT count(*) AS `totales`,`userid` FROM `" + PoleModule.TABLA_POLES + "`"
-                + " WHERE `groupchat`=? AND `poleType`=? GROUP BY `userid` ORDER BY `totales` DESC");
-        statement.setLong(1, chatId);
-        statement.setInt(2, type);
-        ResultSet rs = statement.executeQuery();
-        LinkedHashMap<Integer, Integer> poles = new LinkedHashMap<>();
-        while (rs.next()) {
-            poles.put(rs.getInt("userid"), rs.getInt("totales"));
-        }
-
-        return poles;
     }
 }
