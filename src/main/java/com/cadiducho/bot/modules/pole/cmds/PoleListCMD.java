@@ -5,6 +5,7 @@ import com.cadiducho.bot.api.command.BotCommand;
 import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.bot.modules.pole.PoleCacheManager;
 import com.cadiducho.bot.modules.pole.PoleModule;
+import com.cadiducho.bot.modules.pole.util.PoleMessengerUtil;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.User;
@@ -40,7 +41,7 @@ public class PoleListCMD implements BotCommand {
         Long groupId = Long.parseLong(chat.getId());
 
         try {
-            Map<Integer, Integer> poles = module.getPolesOfToday(today, groupId);
+            Map<Integer, Integer> poles =  PoleMessengerUtil.getPolesOfToday(today, groupId);
 
             StringBuilder body = new StringBuilder();
             if (poles.isEmpty()) {
@@ -72,14 +73,14 @@ public class PoleListCMD implements BotCommand {
             Emoji gold = EmojiManager.getForAlias("first_place_medal");
             Emoji silver = EmojiManager.getForAlias("second_place_medal");
             Emoji bronze = EmojiManager.getForAlias("third_place_medal");
-            Map<Integer, Integer> topPoles = module.getTopPoles(Long.parseLong(chat.getId()), 1, 100);
-            parseTopToStringBuilder(manager, gold.getUnicode() + " Poles " + gold.getUnicode(), body, topPoles);
+            Map<Integer, Integer> topPoles =  PoleMessengerUtil.getTopPoles(Long.parseLong(chat.getId()), 1, 5);
+            PoleMessengerUtil.parseTopToStringBuilder(manager, gold.getUnicode() + " Poles " + gold.getUnicode(), body, topPoles);
 
-            Map<Integer, Integer> topSubpoles = module.getTopPoles(Long.parseLong(chat.getId()), 2, 100);
-            parseTopToStringBuilder(manager, silver.getUnicode() + " Subpoles " + silver.getUnicode(), body, topSubpoles);
+            Map<Integer, Integer> topSubpoles =  PoleMessengerUtil.getTopPoles(Long.parseLong(chat.getId()), 2, 5);
+            PoleMessengerUtil.parseTopToStringBuilder(manager, silver.getUnicode() + " Subpoles " + silver.getUnicode(), body, topSubpoles);
 
-            Map<Integer, Integer> topBronces = module.getTopPoles(Long.parseLong(chat.getId()), 3, 100);
-            parseTopToStringBuilder(manager, bronze.getUnicode() + " Bronces " + bronze.getUnicode(), body, topBronces);
+            Map<Integer, Integer> topBronces =  PoleMessengerUtil.getTopPoles(Long.parseLong(chat.getId()), 3, 5);
+            PoleMessengerUtil.parseTopToStringBuilder(manager, bronze.getUnicode() + " Bronces " + bronze.getUnicode(), body, topBronces);
 
             InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
             InlineKeyboardButton showMore = new InlineKeyboardButton();
@@ -91,17 +92,6 @@ public class PoleListCMD implements BotCommand {
         } catch (SQLException ex) {
             getBot().sendMessage(chat.getId(), "No se ha podido conectar a la base de datos: ```" + ex.getMessage() + "```", "markdown", null, null, null, null);
             BotServer.logger.warning(ex.getMessage());
-        }
-
-    }
-
-    private void parseTopToStringBuilder(PoleCacheManager manager, String title, StringBuilder body, Map<Integer, Integer> top) throws SQLException {
-        if (!top.isEmpty()) {
-            body.append("\n").append(title).append("\n");
-            for (Map.Entry<Integer, Integer> entry : top.entrySet()) {
-                String pole_username = EmojiParser.parseToUnicode(manager.getUsername(entry.getKey()));
-                body.append(pole_username).append(" => ").append(entry.getValue()).append("\n");
-            }
         }
     }
 }
