@@ -54,12 +54,32 @@ public class PoleModule implements Module {
                 Chat chat = callbackQuery.getMessage().getChat();
                 String body;
                 try {
-                     body = PoleMessengerUtil.showPoleRank(chat, poleCacheManager, 100);
+                    body = PoleMessengerUtil.showPoleRank(chat, poleCacheManager, 100, false);
                 } catch (SQLException ex) {
                     body = "No se ha podido obtener el top de poles: " + ex.getMessage();
                 }
+                InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
+                InlineKeyboardButton showLess = new InlineKeyboardButton();
+                showLess.setText("Mostrar menos");
+                showLess.setCallback_data("mostrarMenosPoles");
+                inlineKeyboard.setInline_keyboard(Arrays.asList(Arrays.asList(showLess)));
                 botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
-                        body, null, null, null);
+                        body, "html", null, inlineKeyboard);
+            } else if (callbackQuery.getData().equals("mostrarMenosPoles")) {
+                Chat chat = callbackQuery.getMessage().getChat();
+                String body;
+                try {
+                    body = PoleMessengerUtil.showPoleRank(chat, poleCacheManager, 5, true);
+                } catch (SQLException ex) {
+                    body = "No se ha podido obtener el top de poles: " + ex.getMessage();
+                }
+                InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
+                InlineKeyboardButton showMore = new InlineKeyboardButton();
+                showMore.setText("Mostrar más");
+                showMore.setCallback_data("mostrarMasPoles");
+                inlineKeyboard.setInline_keyboard(Arrays.asList(Arrays.asList(showMore)));
+                botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
+                        body, null, null, inlineKeyboard);
             }
         } catch (TelegramException ex) {
             BotServer.logger.warning(ex.getMessage());

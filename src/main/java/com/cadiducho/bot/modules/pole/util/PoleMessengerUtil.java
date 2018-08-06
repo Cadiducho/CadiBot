@@ -14,7 +14,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -24,8 +26,38 @@ import java.util.Map;
  */
 public class PoleMessengerUtil {
 
-    public static String showPoleRank(Chat chat, PoleCacheManager manager, int limit) throws SQLException {
+    public static String showPoleRank(Chat chat, PoleCacheManager manager, int limit, boolean showToday) throws SQLException {
+
         StringBuilder body = new StringBuilder();
+        if (showToday) {
+            LocalDateTime today = LocalDateTime.now(ZoneId.systemDefault());
+            Map<Integer, Integer> poles =  getPolesOfToday(today, Long.parseLong(chat.getId()));
+            if (poles.isEmpty()) {
+                body.append("Nadie ha hecho hoy la pole :(");
+            } else {
+                body.append("Lista de poles del día <b>").append(today.getDayOfMonth()).append("/").append(today.getMonthValue()).append("/").append(today.getYear()).append("</b>\n");
+                for (Map.Entry<Integer, Integer> entry : poles.entrySet()) {
+                    String pole_username = manager.getUsername(entry.getValue());
+
+                    Emoji trophy = EmojiManager.getForAlias("trophy");
+                    Emoji medal = EmojiManager.getForAlias("sports_medal");
+                    Emoji dis = EmojiManager.getForAlias("disappointed_relieved");
+                    String puesto;
+                    switch (entry.getKey()) {
+                        case 1:
+                            puesto = trophy.getUnicode() + "<b>Pole</b>";
+                            break;
+                        case 2:
+                            puesto = medal.getUnicode() + "<b>Subpole</b>";
+                            break;
+                        default:
+                            puesto = dis.getUnicode() + "<b>Bronce</b>";
+                            break;
+                    }
+                    body.append(puesto).append(": ").append(EmojiParser.parseToUnicode(pole_username)).append("\n");
+                }
+            }
+        }
         body.append("\n\nRanking total: \n");
         Emoji gold = EmojiManager.getForAlias("first_place_medal");
         Emoji silver = EmojiManager.getForAlias("second_place_medal");
@@ -38,12 +70,6 @@ public class PoleMessengerUtil {
 
         Map<Integer, Integer> topBronces = getTopPoles(Long.parseLong(chat.getId()), 3, limit);
         parseTopToStringBuilder(manager, bronze.getUnicode() + " Bronces " + bronze.getUnicode(), body, topBronces);
-
-        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-        InlineKeyboardButton showLess = new InlineKeyboardButton();
-        showLess.setText("Mostrar menos");
-        showLess.setCallback_data("mostrarMenosPoles");
-        inlineKeyboard.setInline_keyboard(Arrays.asList(Arrays.asList(showLess)));
 
         return body.toString();
     }
