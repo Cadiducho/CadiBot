@@ -79,7 +79,7 @@ public class PoleModule implements Module {
                 showMore.setCallback_data("mostrarMasPoles");
                 inlineKeyboard.setInline_keyboard(Arrays.asList(Arrays.asList(showMore)));
                 botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
-                        body, null, null, inlineKeyboard);
+                        body, "html", null, inlineKeyboard);
             }
         } catch (TelegramException ex) {
             BotServer.logger.warning(ex.getMessage());
