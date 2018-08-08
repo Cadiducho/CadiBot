@@ -130,7 +130,7 @@ public class PoleMessengerUtil {
             body.append("\n").append(title).append("\n");
             for (Map.Entry<Integer, Integer> entry : top.entrySet()) {
                 String pole_username = EmojiParser.parseToUnicode(manager.getUsername(entry.getKey()));
-                body.append(pole_username).append(" => ").append(entry.getValue()).append("\n");
+                body.append(pole_username).append(" → ").append(entry.getValue()).append("\n");
             }
         }
     }
