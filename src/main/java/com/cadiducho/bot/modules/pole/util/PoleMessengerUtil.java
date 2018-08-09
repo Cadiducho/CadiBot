@@ -30,8 +30,8 @@ public class PoleMessengerUtil {
 
         StringBuilder body = new StringBuilder();
         if (showToday) {
-            LocalDateTime today = LocalDateTime.now(ZoneId.systemDefault());
-            Map<Integer, Integer> poles =  getPolesOfToday(today, Long.parseLong(chat.getId()));
+            LocalDate today = LocalDate.now(ZoneId.systemDefault());
+            Map<Integer, Integer> poles =  getPolesOfToday(today.atStartOfDay(), Long.parseLong(chat.getId()));
             if (poles.isEmpty()) {
                 body.append("Nadie ha hecho hoy la pole :(");
             } else {
