@@ -4,8 +4,6 @@ import com.cadiducho.bot.BotServer;
 import com.cadiducho.bot.modules.pole.PoleCacheManager;
 import com.cadiducho.bot.modules.pole.PoleModule;
 import com.cadiducho.telegrambotapi.Chat;
-import com.cadiducho.telegrambotapi.inline.InlineKeyboardButton;
-import com.cadiducho.telegrambotapi.inline.InlineKeyboardMarkup;
 import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
@@ -17,7 +15,6 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -26,8 +23,16 @@ import java.util.Map;
  */
 public class PoleMessengerUtil {
 
+    /**
+     * Mostrar el ranking de poles de un chat determinado
+     * @param chat El chat
+     * @param manager Manager del caché
+     * @param limit Limite del ranking total que quieras
+     * @param showToday Si mostrar las poles de hoy o no
+     * @return String con el ranking
+     * @throws SQLException Si falla la base de datos
+     */
     public static String showPoleRank(Chat chat, PoleCacheManager manager, int limit, boolean showToday) throws SQLException {
-
         StringBuilder body = new StringBuilder();
         if (showToday) {
             LocalDate today = LocalDate.now(ZoneId.systemDefault());
@@ -125,6 +130,14 @@ public class PoleMessengerUtil {
         return poles;
     }
 
+    /**
+     * Montar sobre un StringBuilder un Map con el top de Poles
+     * @param manager Manager del cache
+     * @param title Si son Poles, Subpoles o Bronces
+     * @param body El StringBuilder
+     * @param top El map
+     * @throws SQLException Si falla la base de datos
+     */
     public static void parseTopToStringBuilder(PoleCacheManager manager, String title, StringBuilder body, Map<Integer, Integer> top) throws SQLException {
         if (!top.isEmpty()) {
             body.append("\n").append(title).append("\n");
