@@ -20,21 +20,6 @@ import java.util.List;
  */
 public interface BotCommand {
     BotServer botServer = BotServer.getInstance();
-    
-    /**
-     * Ejecutar un comando
-     * @param chat Chat donde el comando fue recibido
-     * @param from Usuario por el que el comando fue ejecutado
-     * @param label Primera palabra del comando ejecutado
-     * @param args Argumentos del comando
-     * @param messageId ID del mensaje del comando
-     * @param instant Instante en el que el comando fue ejecutado
-     * @throws TelegramException Excepción ocurrida
-     * @deprecated Will be removed in 2.4. Replaced by {@link #execute(Chat, User, String, String[], Integer, Message, Instant)}
-     */
-    @Deprecated
-    default void execute(Chat chat, User from, String label, String[] args, Integer messageId, Instant instant) throws TelegramException {
-    }
 
     /**
      * Ejecutar un comando

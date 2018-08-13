@@ -37,6 +37,6 @@ public class SimpleVoiceCMD extends SimpleCommand {
         Random rand = new Random(instant.getNano());
         String voiceId = voices.get(rand.nextInt(voices.size()));
         
-        getBot().sendVoice(chat.getId(), voiceId, null, null, false, replyTheCommandTo(messageId, replyingTo.getMessage_id()), null);
+        getBot().sendVoice(chat.getId(), voiceId, null, null, false, replyTheCommandTo(messageId, replyingTo), null);
     }
 }

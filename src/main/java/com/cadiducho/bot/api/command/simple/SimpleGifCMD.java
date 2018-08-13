@@ -36,6 +36,6 @@ public class SimpleGifCMD extends SimpleCommand {
         Random rand = new Random(instant.getNano());
         String gifId = gifs.get(rand.nextInt(gifs.size()));
 
-        getBot().sendDocument(chat.getId(), gifId, false, replyTheCommandTo(messageId, replyingTo.getMessage_id()), null);
+        getBot().sendDocument(chat.getId(), gifId, false, replyTheCommandTo(messageId, replyingTo), null);
     }
 }

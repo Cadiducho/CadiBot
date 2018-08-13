@@ -37,6 +37,6 @@ public class SimplePhotoCMD extends SimpleCommand {
         Random rand = new Random(instant.getNano());
         String photoId = photos.get(rand.nextInt(photos.size()));
         
-        getBot().sendPhoto(chat.getId(), photoId, null, false, replyTheCommandTo(messageId, replyingTo.getMessage_id()), null);
+        getBot().sendPhoto(chat.getId(), photoId, null, false, replyTheCommandTo(messageId, replyingTo), null);
     }
 }

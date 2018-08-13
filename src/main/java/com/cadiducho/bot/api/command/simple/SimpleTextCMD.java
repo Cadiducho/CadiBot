@@ -38,7 +38,6 @@ public class SimpleTextCMD extends SimpleCommand {
         Random rand = new Random(instant.getNano());
         String reply = EmojiParser.parseToUnicode(replies.get(rand.nextInt(replies.size())));
 
-
-        getBot().sendMessage(chat.getId(), reply, null, null, false, replyTheCommandTo(messageId, replyingTo.getMessage_id()), null);
+        getBot().sendMessage(chat.getId(), reply, null, null, false, replyTheCommandTo(messageId, replyingTo), null);
     }
 }

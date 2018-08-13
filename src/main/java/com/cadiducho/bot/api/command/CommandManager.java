@@ -73,7 +73,11 @@ public class CommandManager {
         Message message = update.getMessage();
         User from = update.getMessage().getFrom();
 
-        BotServer.logger.info(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withZone(ZoneId.systemDefault()).format(now) + " " + (from.getUsername() == null ? from.getFirst_name() : ("@" + from.getUsername())) + ": " + message.getText());
+        BotServer.logger.info(
+                DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withZone(ZoneId.systemDefault()).format(now) + " " +
+                        (from.getUsername() == null ? from.getFirst_name() : ("@" + from.getUsername())) +
+                        "#" + message.getChat().getId() +
+                        ": " + message.getText());
 
         String[] rawcmd = message.getText().split(" ");
         if (rawcmd.length == 0) {
@@ -92,7 +96,6 @@ public class CommandManager {
 
         BotServer.logger.info(" # Ejecutando '" + target.get().getName() + "'");
         target.get().execute(message.getChat(), from, sentLabel, Arrays.copyOfRange(rawcmd, 1, rawcmd.length), message.getMessage_id(), message.getReply_to_message(), now);
-        target.get().execute(message.getChat(), from, sentLabel, Arrays.copyOfRange(rawcmd, 1, rawcmd.length), message.getMessage_id(), now);
 
         return true;
     }

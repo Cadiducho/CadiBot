@@ -3,6 +3,7 @@ package com.cadiducho.bot.cmds;
 import com.cadiducho.bot.api.command.BotCommand;
 import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.telegrambotapi.Chat;
+import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 
@@ -12,7 +13,7 @@ import java.time.Instant;
 public class BroadcastCMD implements BotCommand {
 
     @Override
-    public void execute(Chat chat, User from, String label, String[] args, Integer messageId, Instant instant) throws TelegramException {
+    public void execute(final Chat chat, final User from, final String label, final String[] args, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         if (!from.getUsername().equalsIgnoreCase("cadiducho")) {
             getBot().sendMessage(chat.getId(), "No tienes permiso para usar este comando", null, null, false, messageId, null);
             return;
