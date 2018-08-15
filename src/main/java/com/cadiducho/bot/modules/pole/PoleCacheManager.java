@@ -29,15 +29,6 @@ public class PoleCacheManager {
     private final HashMap<Long, CachedGroup> cacheMap = new HashMap<>();
     private final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateConverter()).create();
 
-    /**
-     * Crear directorio del caché de poles si este no existe
-     */
-    void initializeDirectory() {
-        File dataFolder = new File(BotServer.getInstance().getModuleManager().getModulesFolder(), "poles");
-        if (!dataFolder.exists()) {
-            dataFolder.mkdir();
-        }
-    }
 
     /**
      * Inicializar caché de un grupo al realizar una pole o para agilizarla después
@@ -125,17 +116,6 @@ public class PoleCacheManager {
      */
     public Optional<CachedGroup> getCachedGroup(Long groupId) {
         return Optional.ofNullable(cacheMap.getOrDefault(groupId, null));
-    }
-
-    /**
-     * Guardar el caché de un grupo en su archivo
-     * @param cachedGroup grupo a guardar
-     */
-    public void writeFile(CachedGroup cachedGroup) {
-        File cacheFile = new File(BotServer.getInstance().getModuleManager().getModulesFolder() + "/poles", cachedGroup.getId().toString() + ".json");
-        try (Writer writer = new FileWriter(cacheFile)) {
-            gson.toJson(cachedGroup, writer);
-        } catch (IOException ignored) { }
     }
 
     /**
