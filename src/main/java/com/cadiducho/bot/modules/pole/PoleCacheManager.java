@@ -2,14 +2,8 @@ package com.cadiducho.bot.modules.pole;
 
 import com.cadiducho.bot.BotServer;
 import com.cadiducho.bot.MySQL;
-import com.cadiducho.bot.modules.pole.util.LocalDateConverter;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import lombok.AllArgsConstructor;
 
-import java.io.*;
-import java.lang.reflect.Type;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,7 +11,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 
@@ -27,60 +20,34 @@ public class PoleCacheManager {
     private static final BotServer botServer = BotServer.getInstance();
     private final PoleModule module;
     private final HashMap<Long, CachedGroup> cacheMap = new HashMap<>();
-    private final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateConverter()).create();
-
 
     /**
      * Inicializar caché de un grupo al realizar una pole o para agilizarla después
      * synchronized porque dos personajes pueden realizar una pole *simultáneamente* y el caché del grupo se duplicaría
-     * @param groupId
-     * @param title
+     * @param groupId Id del grupo
+     * @param title Titulo del grupo
      */
     public synchronized void initializeGroupCache(Long groupId, String title) {
-        CachedGroup cachedGroup = null;
-        File cacheFile = new File(BotServer.getInstance().getModuleManager().getModulesFolder() + "/poles", groupId.toString() + ".json");
-
-        Type type = new TypeToken<CachedGroup>() {}.getType();
-        if (!cacheFile.exists()) {
-            try {
-                cacheFile.createNewFile();
-                cachedGroup = new CachedGroup(groupId, title);
-                try {
-                    PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
-                            "SELECT `userid`, `poleType` FROM `" + PoleModule.TABLA_POLES + "` WHERE "
+        CachedGroup cachedGroup = new CachedGroup(groupId, title);
+        try {
+            PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
+                "SELECT `userid`, `poleType` FROM `" + PoleModule.TABLA_POLES + "` WHERE "
                                     + "DATE(time)=DATE(CURDATE()) AND "
                                     + "`groupchat`=?"
                                     + " ORDER BY `poleType`");
-                    statement.setLong(1, groupId);
+            statement.setLong(1, groupId);
 
-                    LinkedHashMap<Integer, Integer> poles = new LinkedHashMap<>();
-                    ResultSet rs = statement.executeQuery();
-                    while (rs.next()) {
-                        poles.put(rs.getInt("poleType"), rs.getInt("userid"));
-                    }
-                    if (!poles.isEmpty()) { //solo crear objeto PoleCollection si hay poles de verdad. Rellenar el optional con el objeto vacío repercutirá en /pole fuertemente
-                        PoleCollection polesHoy = new PoleCollection(poles.get(1), poles.get(2), poles.get(3));
-                        cachedGroup.getPolesMap().put(LocalDate.now(ZoneId.systemDefault()), polesHoy);
-                    }
-                } catch (SQLException ex) {
-                    BotServer.logger.log(Level.WARNING, "No se ha podido cargar las poles en caché del grupo " + groupId, ex);
-                }
-
-                try (Writer writer = new FileWriter(cacheFile)) {
-                    gson.toJson(cachedGroup, writer);
-                }
-            } catch (IOException ex) {
-                BotServer.logger.log(Level.WARNING, "No se ha podido crear el archivo de caché del grupo " + groupId, ex);
+            LinkedHashMap<Integer, Integer> poles = new LinkedHashMap<>();
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                poles.put(rs.getInt("poleType"), rs.getInt("userid"));
             }
-        }
-
-        try {
-            if (cachedGroup == null) {
-                cachedGroup = gson.fromJson(new FileReader(cacheFile), type);
+            if (!poles.isEmpty()) { //solo crear objeto PoleCollection si hay poles de verdad. Rellenar el optional con el objeto vacío repercutirá en /pole fuertemente
+                PoleCollection polesHoy = new PoleCollection(poles.get(1), poles.get(2), poles.get(3));
+                cachedGroup.getPolesMap().put(LocalDate.now(ZoneId.systemDefault()), polesHoy);
             }
-            cacheMap.remove(cachedGroup.getId());
-            cacheMap.put(cachedGroup.getId(), cachedGroup);
-        } catch (FileNotFoundException ignore) {
+        } catch (SQLException ex) {
+            BotServer.logger.log(Level.WARNING, "No se ha podido cargar las poles en caché del grupo " + groupId, ex);
         }
     }
 
@@ -88,16 +55,16 @@ public class PoleCacheManager {
      * Comprobar todos los archivos dentro del directorio del caché y cargarlos en memoria si este archivo es válido
      */
     void loadCachedGroups() {
-        for (File f : Objects.requireNonNull(new File(BotServer.getInstance().getModuleManager().getModulesFolder() + "/poles").listFiles())) {
-            if (f != null && f.isFile() && f.getName().contains(".json")) {
-                try {
-                    initializeGroupCache(Long.parseLong(f.getName().replace(".json", "")), null); //el titulo es null porque lo leerá del archivo
-                } catch (NumberFormatException ignored) {
-                    BotServer.logger.info("El archivo " + f.getName() + " no tiene nombre válido para un grupo en caché y ha sido saltado");
-                }
+        try {
+            PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
+                    "SELECT groupchat FROM " + PoleModule.TABLA_POLES+ " WHERE DATE(time)=DATE(CURDATE()) GROUP BY groupchat"); //lista de grupos que han hecho HOY una pole para poner en cache
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                initializeGroupCache(rs.getLong("groupchat"), null);
             }
+        } catch (SQLException ex) {
+            BotServer.logger.log(Level.SEVERE, "No se han podido cargar los grupos en caché", ex);
         }
-
     }
 
     /**
