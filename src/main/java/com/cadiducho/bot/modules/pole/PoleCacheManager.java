@@ -46,8 +46,10 @@ public class PoleCacheManager {
                 PoleCollection polesHoy = new PoleCollection(poles.get(1), poles.get(2), poles.get(3));
                 cachedGroup.getPolesMap().put(LocalDate.now(ZoneId.systemDefault()), polesHoy);
             }
+
+            cacheMap.putIfAbsent(groupId, cachedGroup);
         } catch (SQLException ex) {
-            BotServer.logger.log(Level.WARNING, "No se ha podido cargar las poles en caché del grupo " + groupId, ex);
+            BotServer.logger.log(Level.WARNING, "[PoleModule] No se ha podido cargar las poles en caché del grupo " + groupId, ex);
         }
     }
 
@@ -55,6 +57,7 @@ public class PoleCacheManager {
      * Comprobar todos los archivos dentro del directorio del caché y cargarlos en memoria si este archivo es válido
      */
     void loadCachedGroups() {
+        BotServer.logger.log(Level.INFO, "[PoleModule] Iniciando caché de grupos");
         try {
             PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
                     "SELECT groupchat FROM " + PoleModule.TABLA_POLES+ " WHERE DATE(time)=DATE(CURDATE()) GROUP BY groupchat"); //lista de grupos que han hecho HOY una pole para poner en cache
