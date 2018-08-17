@@ -109,28 +109,29 @@ public class BotServer {
         consoleManager.startFile("logs/log-%D.txt");
         cadibot = new TelegramBot(cmd.getOptionValue("token"));
         cadibot.getUpdatesPoller().setOwnerId(Long.parseLong(cmd.getOptionValue("owner")));
-        
+
         try {
-            moduleManager.loadModules();
-        } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
-            logger.warning("Can't load modules!");
-            logger.warning(ex.getMessage());
-        }
-        
-        try {
-            mysql = new MySQL(instance, 
-                    cmd.getOptionValue("database-host"), 
-                    cmd.getOptionValue("database-port"), 
-                    cmd.getOptionValue("database-name"), 
-                    cmd.getOptionValue("database-user"), 
+            mysql = new MySQL(instance,
+                    cmd.getOptionValue("database-host"),
+                    cmd.getOptionValue("database-port"),
+                    cmd.getOptionValue("database-name"),
+                    cmd.getOptionValue("database-user"),
                     cmd.getOptionValue("database-pass"));
-            
+
             mysql.openConnection();
             logger.info("SQL connection established");
         } catch (SQLException ex) {
             logger.warning("Can't connect to database!");
             logger.warning(ex.getMessage());
         }
+
+        try {
+            moduleManager.loadModules();
+        } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
+            logger.warning("Can't load modules!");
+            logger.warning(ex.getMessage());
+        }
+
         UpdatesHandler events = new UpdatesHandler(cadibot, instance);
         cadibot.getUpdatesPoller().setHandler(events);
 
@@ -139,7 +140,7 @@ public class BotServer {
         commandManager.load(); //ToDo: ¿Pasar todos a módulos?
 
 
-        logger.info("Bot " + VERSION + " iniciado");
+        logger.info("Bot " + VERSION + " iniciado completamente");
     }
     
     public void shutdown() {
