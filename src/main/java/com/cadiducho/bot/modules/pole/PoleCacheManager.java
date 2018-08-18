@@ -66,7 +66,7 @@ public class PoleCacheManager {
                 initializeGroupCache(rs.getLong("groupchat"), null);
             }
         } catch (SQLException ex) {
-            BotServer.logger.log(Level.SEVERE, "No se han podido cargar los grupos en caché", ex);
+            BotServer.logger.log(Level.SEVERE, "[PoleModule] No se han podido cargar los grupos en caché", ex);
         }
     }
 
