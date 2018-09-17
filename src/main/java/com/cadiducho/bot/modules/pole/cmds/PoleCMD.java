@@ -74,7 +74,6 @@ public class PoleCMD implements BotCommand {
         manager.clearOldCache(group, today);
 
         botServer.getScheduler().schedule(BotTask.async(() -> {
-            manager.writeFile(group);
             manager.saveToDatabase(group, poles, updated);
         }));
     }

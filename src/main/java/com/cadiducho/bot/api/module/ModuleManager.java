@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
 
 @RequiredArgsConstructor
 public class ModuleManager {
@@ -34,6 +35,7 @@ public class ModuleManager {
     }
     
     public void loadModules() throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException {
+        BotServer.logger.log(Level.INFO, "Cargando módulos...");
         if (Files.notExists(modulesFolder.toPath())) {
             Files.createDirectories(modulesFolder.toPath());
         }
@@ -72,6 +74,7 @@ public class ModuleManager {
         addLocalModules();
 
         modules.forEach(Module::onLoad);
+        BotServer.logger.log(Level.INFO, "Módulos cargados.");
     }
     
     /**

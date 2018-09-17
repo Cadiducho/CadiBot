@@ -38,7 +38,6 @@ public class PoleModule implements Module {
     @Override
     public void onLoad() {
         poleCacheManager = new PoleCacheManager(this);
-        poleCacheManager.initializeDirectory();
         poleCacheManager.loadCachedGroups();
 
         CommandManager commandManager = BotServer.getInstance().getCommandManager();
