@@ -21,7 +21,19 @@ public class ChangelogCMD implements BotCommand {
     
     @Override
     public void execute(final Chat chat, final User from, final String label, final String[] args, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
-        List<String> cambios = getChangelog(5); //ToDo: /changelog <número>
+        int limit = 5;
+        if (args.length >= 1) {
+            try {
+                int newlimit = Integer.parseInt(args[0]);
+                if (newlimit < 50) { //evitar consultar cientos de versiones
+                    limit = newlimit;
+                }
+            } catch (NumberFormatException ex) {
+                getBot().sendMessage(chat.getId(), "Usa /changelog <número de versiones>");
+                return;
+            }
+        }
+        List<String> cambios = getChangelog(limit);
         if (cambios.isEmpty()) {
             getBot().sendMessage(chat.getId(), "No he podido cargar el changelog " + EmojiManager.getForAlias("scream_cat").getUnicode());
             return;
