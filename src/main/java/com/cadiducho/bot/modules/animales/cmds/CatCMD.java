@@ -1,4 +1,4 @@
-package com.cadiducho.bot.cmds;
+package com.cadiducho.bot.modules.animales.cmds;
 
 import com.cadiducho.bot.api.command.BotCommand;
 import com.cadiducho.bot.api.command.CommandInfo;

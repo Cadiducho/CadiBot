@@ -5,7 +5,6 @@ import com.cadiducho.bot.api.command.simple.SimpleGifCMD;
 import com.cadiducho.bot.api.command.simple.SimplePhotoCMD;
 import com.cadiducho.bot.api.command.simple.SimpleTextCMD;
 import com.cadiducho.bot.api.command.simple.SimpleVoiceCMD;
-import com.cadiducho.bot.cmds.*;
 import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import com.cadiducho.telegrambotapi.Update;
@@ -33,13 +32,6 @@ public class CommandManager {
     private final BotServer server;
 
     public void load() {
-        register(new VersionCMD());
-        register(new ChangelogCMD());
-        register(new HoraCMD());
-        register(new IntentarCMD());
-        register(new BroadcastCMD());
-        register(new CatCMD());
-
         register(new SimpleTextCMD(Arrays.asList(":("), Arrays.asList("Sonríe, princesa", "dont be sad bb", ":)", "no me calientes a ver si te voy a dar motivos para estar sad", "Sonríe, no cambiará nada pero te verás menos feo", "Yo también estaría triste si tuviese tu cara", "tampoco me llores crack")));
         register(new SimpleTextCMD(Arrays.asList(":)"), Arrays.asList(":)", ":D", ":smile:", ":smiley:", ":grinning:", ":blush:")));
         register(new SimpleTextCMD(Arrays.asList("haber si me muero"), "Ojalá"));
