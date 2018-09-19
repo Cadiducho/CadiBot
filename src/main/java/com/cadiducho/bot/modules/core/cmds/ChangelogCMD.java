@@ -1,4 +1,4 @@
-package com.cadiducho.bot.cmds;
+package com.cadiducho.bot.modules.core.cmds;
 
 import com.cadiducho.bot.MySQL;
 import com.cadiducho.bot.api.command.BotCommand;
