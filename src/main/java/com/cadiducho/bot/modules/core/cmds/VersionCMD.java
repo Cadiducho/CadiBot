@@ -1,4 +1,4 @@
-package com.cadiducho.bot.cmds;
+package com.cadiducho.bot.modules.core.cmds;
 
 import com.cadiducho.bot.BotServer;
 import com.cadiducho.bot.api.command.BotCommand;
@@ -10,11 +10,15 @@ import com.cadiducho.telegrambotapi.exception.TelegramException;
 
 import java.time.Instant;
 
-@CommandInfo(aliases = "/version")
+@CommandInfo(aliases = {"/cadibot", "/version", "/start", "/about"})
 public class VersionCMD implements BotCommand {
     
     @Override
     public void execute(final Chat chat, final User from, final String label, final String[] args, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
-        getBot().sendMessage(chat.getId(), "Ejecutando versión " + BotServer.VERSION, null, null, false, messageId, null);
+        String aboutme = "Hola! Soy Cadibot \n" +
+                "Se está ejecutando la versión _" + BotServer.VERSION + "_ \n" +
+                "Información y novedades: @Cadibotnews";
+
+        getBot().sendMessage(chat.getId(), aboutme, "markdown", null, false, messageId, null);
     }
 }

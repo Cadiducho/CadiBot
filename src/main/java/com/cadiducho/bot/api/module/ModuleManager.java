@@ -1,6 +1,8 @@
 package com.cadiducho.bot.api.module;
 
 import com.cadiducho.bot.BotServer;
+import com.cadiducho.bot.modules.animales.AnimalesModule;
+import com.cadiducho.bot.modules.core.CoreModule;
 import com.cadiducho.bot.modules.insultos.InsultosModule;
 import com.cadiducho.bot.modules.pole.PoleModule;
 import com.cadiducho.bot.modules.saludos.SaludosModule;
@@ -29,9 +31,11 @@ public class ModuleManager {
     @Getter private final File modulesFolder;
     
     private void addLocalModules() {
+        modules.add(new CoreModule());
         modules.add(new PoleModule());
         modules.add(new InsultosModule());
         modules.add(new SaludosModule());
+        modules.add(new AnimalesModule());
     }
     
     public void loadModules() throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException {
