@@ -40,7 +40,8 @@ public class PoleCMD implements BotCommand {
             manager.initializeGroupCache(groupId, chat.getTitle());
         }
 
-        CachedGroup cachedGroup =  manager.getCachedGroup(groupId).get();
+        CachedGroup cachedGroup = manager.getCachedGroup(groupId).get();
+        cachedGroup.setTitle(chat.getTitle());
         Optional<PoleCollection> poles = cachedGroup.getPolesOfADay(today.toLocalDate());
         if (!poles.isPresent()) {
             PoleCollection polesHoy = PoleCollection.builder().first(from.getId()).build();

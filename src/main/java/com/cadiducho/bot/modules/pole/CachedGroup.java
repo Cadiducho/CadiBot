@@ -1,18 +1,18 @@
 package com.cadiducho.bot.modules.pole;
 
+import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Optional;
 
 @Data
-@RequiredArgsConstructor
+@Builder
 public class CachedGroup {
 
     private final Long id;
-    private final String title;
+    private String title;
 
     private HashMap<LocalDate, PoleCollection> polesMap = new HashMap<>();
 

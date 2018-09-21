@@ -28,7 +28,7 @@ public class PoleCacheManager {
      * @param title Titulo del grupo
      */
     public synchronized void initializeGroupCache(Long groupId, String title) {
-        CachedGroup cachedGroup = new CachedGroup(groupId, title);
+        CachedGroup cachedGroup = CachedGroup.builder().id(groupId).title(title).build();
         try {
             PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
                 "SELECT `userid`, `poleType` FROM `" + PoleModule.TABLA_POLES + "` WHERE "
