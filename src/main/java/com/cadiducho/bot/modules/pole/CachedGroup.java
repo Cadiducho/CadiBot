@@ -14,7 +14,7 @@ public class CachedGroup {
     private final Long id;
     private String title;
 
-    private HashMap<LocalDate, PoleCollection> polesMap = new HashMap<>();
+    @Builder.Default private HashMap<LocalDate, PoleCollection> polesMap = new HashMap<>();
 
     public Optional<PoleCollection> getPolesOfADay(LocalDate day) {
         //poleMap puede ser null si ha sido cargado de un archivo malformado. Corregir en ese caso
