@@ -53,7 +53,7 @@ public class PoleModule implements Module {
                 Chat chat = callbackQuery.getMessage().getChat();
                 String body;
                 try {
-                    body = PoleMessengerUtil.showPoleRank(chat, poleCacheManager, 100, false);
+                    body = PoleMessengerUtil.showPoleRank(chat, 100, false);
                 } catch (SQLException ex) {
                     body = "No se ha podido obtener el top de poles: " + ex.getMessage();
                 }
@@ -68,7 +68,7 @@ public class PoleModule implements Module {
                 Chat chat = callbackQuery.getMessage().getChat();
                 String body;
                 try {
-                    body = PoleMessengerUtil.showPoleRank(chat, poleCacheManager, 5, true);
+                    body = PoleMessengerUtil.showPoleRank(chat, 5, true);
                 } catch (SQLException ex) {
                     body = "No se ha podido obtener el top de poles: " + ex.getMessage();
                 }

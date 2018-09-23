@@ -37,7 +37,7 @@ public class PoleListCMD implements BotCommand {
         if (!module.isChatSafe(getBot(), chat, from)) return;
 
         try {
-            String body = PoleMessengerUtil.showPoleRank(chat, module.getPoleCacheManager(), 5, true);
+            String body = PoleMessengerUtil.showPoleRank(chat, 5, true);
             InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
             InlineKeyboardButton showMore = new InlineKeyboardButton();
             showMore.setText("Mostrar más");
