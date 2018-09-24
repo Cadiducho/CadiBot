@@ -34,7 +34,7 @@ public class PoleMessengerUtil {
         StringBuilder body = new StringBuilder();
         if (showToday) {
             LocalDate today = LocalDate.now(ZoneId.systemDefault());
-            Map<Integer, PoleUser> poles =  getPolesOfToday(today.atStartOfDay(), Long.parseLong(chat.getId()));
+            Map<Integer, PoleUser> poles = getPolesOfToday(today.atStartOfDay(), Long.parseLong(chat.getId()));
             if (poles.isEmpty()) {
                 body.append("Nadie ha hecho hoy la pole :(");
             } else {
@@ -61,10 +61,13 @@ public class PoleMessengerUtil {
                 }
             }
         }
-        body.append("\n\nRanking total: \n");
+        Emoji chart = EmojiManager.getForAlias("chart_with_upwards_trend");
         Emoji gold = EmojiManager.getForAlias("first_place_medal");
         Emoji silver = EmojiManager.getForAlias("second_place_medal");
         Emoji bronze = EmojiManager.getForAlias("third_place_medal");
+
+        body.append("\n\n").append(chart.getUnicode()).append("Ranking: \n");
+
         Map<PoleUser, Integer> topPoles = getTopPoles(Long.parseLong(chat.getId()), 1, limit);
         parseTopToStringBuilder(gold.getUnicode() + " Poles " + gold.getUnicode(), body, topPoles);
 
