@@ -22,6 +22,11 @@ import java.util.Map;
  */
 public class PoleMessengerUtil {
 
+    private static Emoji chart = EmojiManager.getForAlias("chart_with_upwards_trend");
+    private static Emoji gold = EmojiManager.getForAlias("first_place_medal");
+    private static Emoji silver = EmojiManager.getForAlias("second_place_medal");
+    private static Emoji bronze =  EmojiManager.getForAlias("third_place_medal");
+
     /**
      * Mostrar el ranking de poles de un chat determinado
      * @param chat El chat
@@ -61,10 +66,6 @@ public class PoleMessengerUtil {
                 }
             }
         }
-        Emoji chart = EmojiManager.getForAlias("chart_with_upwards_trend");
-        Emoji gold = EmojiManager.getForAlias("first_place_medal");
-        Emoji silver = EmojiManager.getForAlias("second_place_medal");
-        Emoji bronze = EmojiManager.getForAlias("third_place_medal");
 
         body.append("\n\n").append(chart.getUnicode()).append("Ranking: \n");
 
@@ -75,6 +76,23 @@ public class PoleMessengerUtil {
         parseTopToStringBuilder(silver.getUnicode() + " Subpoles " + silver.getUnicode(), body, topSubpoles);
 
         Map<PoleUser, Integer> topBronces = getTopPoles(Long.parseLong(chat.getId()), 3, limit);
+        parseTopToStringBuilder(bronze.getUnicode() + " Bronces " + bronze.getUnicode(), body, topBronces);
+
+        return body.toString();
+    }
+
+    public static String showGlobalRank(int limit) throws SQLException {
+        StringBuilder body = new StringBuilder();
+        body.append("<i>Este ranking cuenta todas las poles \nde todos los grupos</i>");
+        body.append("\n\n").append(chart.getUnicode()).append("Ranking global individual: \n");
+
+        Map<PoleUser, Integer> topPoles = getTopPolesGlobal(1, limit);
+        parseTopToStringBuilder(gold.getUnicode() + " Poles " + gold.getUnicode(), body, topPoles);
+
+        Map<PoleUser, Integer> topSubpoles = getTopPolesGlobal(2, limit);
+        parseTopToStringBuilder(silver.getUnicode() + " Subpoles " + silver.getUnicode(), body, topSubpoles);
+
+        Map<PoleUser, Integer> topBronces = getTopPolesGlobal(3, limit);
         parseTopToStringBuilder(bronze.getUnicode() + " Bronces " + bronze.getUnicode(), body, topBronces);
 
         return body.toString();
@@ -138,7 +156,37 @@ public class PoleMessengerUtil {
                     .build();
             poles.put(user, rs.getInt("totales"));
         }
+        return poles;
+    }
 
+    /**
+     *
+     * @param type
+     * @param limit
+     * @return
+     * @throws SQLException
+     */
+    public static LinkedHashMap<PoleUser, Integer> getTopPolesGlobal(int type, int limit) throws SQLException {
+        PreparedStatement statement = BotServer.getInstance().getMysql().openConnection().prepareStatement("" +
+                "SELECT userid, COUNT(*) as totales, u.name, u.username " +
+                "FROM cadibot_poles p NATURAL JOIN cadibot_users u " +
+                "WHERE poleType=? " +
+                "GROUP BY userid " +
+                "HAVING COUNT(*) > 1 " +
+                "ORDER BY totales DESC LIMIT ?");
+        statement.setInt(1, type);
+        statement.setInt(2, limit);
+
+        ResultSet rs = statement.executeQuery();
+        LinkedHashMap<PoleUser, Integer> poles = new LinkedHashMap<>();
+        while (rs.next()) {
+            PoleUser user = PoleUser.builder()
+                    .id(rs.getInt("userid"))
+                    .name(rs.getString("u.name"))
+                    .username(rs.getString("username"))
+                    .build();
+            poles.put(user, rs.getInt("totales"));
+        }
         return poles;
     }
 

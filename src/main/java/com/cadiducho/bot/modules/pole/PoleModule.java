@@ -67,7 +67,11 @@ public class PoleModule implements Module {
                     break;
                 }
                 case "mostrarRankingGlobal":
-                    body = "En pruebas (1)";
+                    try {
+                        body = PoleMessengerUtil.showGlobalRank(5);
+                    } catch (SQLException ex) {
+                        body = "No se ha podido obtener el ranking global individual de poles: " + ex.getMessage();
+                    }
                     inlineKeyboard = InlineKeyboardUtil.getResumenesYTopGrupal();
                     botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
                             body, "html", null, inlineKeyboard);
