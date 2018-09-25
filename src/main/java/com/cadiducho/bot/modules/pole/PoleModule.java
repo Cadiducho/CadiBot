@@ -68,7 +68,7 @@ public class PoleModule implements Module {
                 }
                 case "mostrarRankingGlobal":
                     try {
-                        body = PoleMessengerUtil.showGlobalRank(5);
+                        body = PoleMessengerUtil.showGlobalRanking(5);
                     } catch (SQLException ex) {
                         body = "No se ha podido obtener el ranking global individual de poles: " + ex.getMessage();
                     }
@@ -77,7 +77,11 @@ public class PoleModule implements Module {
                             body, "html", null, inlineKeyboard);
                     break;
                 case "mostrarRankingPorGrupos":
-                    body = "En pruebas (2)";
+                    try {
+                        body = PoleMessengerUtil.showGroupalGlobalRanking(5);
+                    } catch (SQLException ex) {
+                        body = "No se ha podido obtener el ranking global por gurpos de poles: " + ex.getMessage();
+                    }
                     inlineKeyboard = InlineKeyboardUtil.getResumenesYTopGlobal();
                     botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
                             body, "html", null, inlineKeyboard);

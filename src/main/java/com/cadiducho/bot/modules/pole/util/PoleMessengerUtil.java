@@ -14,6 +14,8 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -81,7 +83,13 @@ public class PoleMessengerUtil {
         return body.toString();
     }
 
-    public static String showGlobalRank(int limit) throws SQLException {
+    /**
+     * Mostrar ranking global individual
+     * @param limit Limite del ranking
+     * @return String con el ranking
+     * @throws SQLException Si falla la base de datos
+     */
+    public static String showGlobalRanking(int limit) throws SQLException {
         StringBuilder body = new StringBuilder();
         body.append("<i>Este ranking cuenta todas las poles \nde todos los grupos</i>");
         body.append("\n\n").append(chart.getUnicode()).append("Ranking global individual: \n");
@@ -93,6 +101,29 @@ public class PoleMessengerUtil {
         parseTopToStringBuilder(silver.getUnicode() + " Subpoles " + silver.getUnicode(), body, topSubpoles);
 
         Map<PoleUser, Integer> topBronces = getTopPolesGlobal(3, limit);
+        parseTopToStringBuilder(bronze.getUnicode() + " Bronces " + bronze.getUnicode(), body, topBronces);
+
+        return body.toString();
+    }
+
+    /**
+     * Mostrar ranking global individual
+     * @param limit Limite del ranking
+     * @return String con el ranking
+     * @throws SQLException Si falla la base de datos
+     */
+    public static String showGroupalGlobalRanking(int limit) throws SQLException {
+        StringBuilder body = new StringBuilder();
+        body.append("<i>Este ranking cuenta los mejores registros\nde poles por grupos</i>");
+        body.append("\n\n").append(chart.getUnicode()).append("Ranking global de grupos: \n");
+
+        Map<PoleUser, Integer> topPoles = getTopPolesGrupal(1, limit);
+        parseTopToStringBuilder(gold.getUnicode() + " Poles " + gold.getUnicode(), body, topPoles);
+
+        Map<PoleUser, Integer> topSubpoles = getTopPolesGrupal(2, limit);
+        parseTopToStringBuilder(silver.getUnicode() + " Subpoles " + silver.getUnicode(), body, topSubpoles);
+
+        Map<PoleUser, Integer> topBronces = getTopPolesGrupal(3, limit);
         parseTopToStringBuilder(bronze.getUnicode() + " Bronces " + bronze.getUnicode(), body, topBronces);
 
         return body.toString();
@@ -129,7 +160,7 @@ public class PoleMessengerUtil {
     }
 
     /**
-     * Obtener el top de poles global de un grupo, según su tipo
+     * Obtener el top de poles de un grupo, según su tipo
      * El tipo puede ser:
      *  1. Oro/Pole
      *  2. Plata/Subpole
@@ -160,11 +191,14 @@ public class PoleMessengerUtil {
     }
 
     /**
-     *
-     * @param type
-     * @param limit
-     * @return
-     * @throws SQLException
+     * Obtener el top de poles global, según su tipo
+     * El tipo puede ser:
+     *  1. Oro/Pole
+     *  2. Plata/Subpole
+     *  3. Bronce
+     * @param type El tipo
+     * @return Map de usuario y cantidad de poles
+     * @throws SQLException Si falla la base de datos
      */
     public static LinkedHashMap<PoleUser, Integer> getTopPolesGlobal(int type, int limit) throws SQLException {
         PreparedStatement statement = BotServer.getInstance().getMysql().openConnection().prepareStatement("" +
@@ -191,6 +225,41 @@ public class PoleMessengerUtil {
     }
 
     /**
+     * Obtener el top de poles global clasificado por grupos, según su tipo
+     * El tipo puede ser:
+     *  1. Oro/Pole
+     *  2. Plata/Subpole
+     *  3. Bronce
+     * @param type El tipo
+     * @return Map de usuario y cantidad de poles
+     * @throws SQLException Si falla la base de datos
+     */
+    public static LinkedHashMap<PoleUser, Integer> getTopPolesGrupal(int type, int limit) throws SQLException {
+        PreparedStatement statement = BotServer.getInstance().getMysql().openConnection().prepareStatement("" +
+                "SELECT userid, COUNT(*) as totales, u.name, u.username, groupchat, g.name " +
+                "FROM cadibot_poles p NATURAL JOIN cadibot_users u JOIN cadibot_grupos g ON (p.groupchat = g.groupid) " +
+                "WHERE poleType=? " +
+                "GROUP BY userid, groupchat " +
+                "HAVING COUNT(*) > 1 " +
+                "ORDER BY totales DESC LIMIT ?");
+        statement.setInt(1, type);
+        statement.setInt(2, limit);
+
+        ResultSet rs = statement.executeQuery();
+        LinkedHashMap<PoleUser, Integer> poles = new LinkedHashMap<>();
+        while (rs.next()) {
+            PoleUser user = PoleUser.builder()
+                    .id(rs.getInt("userid"))
+                    .name(rs.getString("u.name"))
+                    .username(rs.getString("username"))
+                    .groupname(rs.getString("g.name"))
+                    .build();
+            poles.put(user, rs.getInt("totales"));
+        }
+        return poles;
+    }
+
+    /**
      * Montar sobre un StringBuilder un Map con el top de Poles
      * @param title Si son Poles, Subpoles o Bronces
      * @param body El StringBuilder
@@ -201,7 +270,11 @@ public class PoleMessengerUtil {
             body.append("\n").append(title).append("\n");
             for (Map.Entry<PoleUser, Integer> entry : top.entrySet()) {
                 String pole_user_name = EmojiParser.parseToUnicode(entry.getKey().getName());
-                body.append(pole_user_name).append(" → ").append(entry.getValue()).append("\n");
+                body.append(pole_user_name).append(" → ").append(entry.getValue());
+                if (entry.getKey().groupname().isPresent()) {
+                    body.append("<i> en ").append(entry.getKey().groupname().get()).append("</i>");
+                }
+                body.append("\n");
             }
         }
     }
