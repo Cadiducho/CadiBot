@@ -1,7 +1,6 @@
 package com.cadiducho.bot.modules.pole;
 
 import com.cadiducho.bot.BotServer;
-import com.cadiducho.bot.MySQL;
 import lombok.AllArgsConstructor;
 
 import java.sql.PreparedStatement;
@@ -28,7 +27,7 @@ public class PoleCacheManager {
      * @param title Titulo del grupo
      */
     public synchronized void initializeGroupCache(Long groupId, String title) {
-        CachedGroup cachedGroup = new CachedGroup(groupId, title);
+        CachedGroup cachedGroup = CachedGroup.builder().id(groupId).title(title).build();
         try {
             PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
                 "SELECT `userid`, `poleType` FROM `" + PoleModule.TABLA_POLES + "` WHERE "
@@ -134,23 +133,5 @@ public class PoleCacheManager {
         } catch (SQLException ex) {
             BotServer.logger.severe(ex.getMessage());
         }
-    }
-
-    /**
-     * Obtener un nombre de usuario a partir de su ID desde la base de datos
-     *  La API de Telegram nos permite obtener este dato, pero sólo si el usuario se encuentra en el grupo.
-     *  Si el usuario dejó el grupo, la API nos daría una excepción y no se podría generar la lista de poles
-     * @param id ID del usuario
-     * @return Nombre del usuario
-     * @throws SQLException Excepción de la base de datos
-     */
-    public String getUsername(int id) throws SQLException {
-        PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement("SELECT `name` FROM `" + MySQL.TABLE_USERS + "` WHERE `userid`=?");
-        statement.setInt(1, id);
-        ResultSet rs = statement.executeQuery();
-        if (rs.next()) {
-            return rs.getString("name");
-        }
-        return "/WTF (Usuario desconocido)";
     }
 }

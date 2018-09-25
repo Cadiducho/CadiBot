@@ -5,6 +5,7 @@ import com.cadiducho.bot.api.command.BotCommand;
 import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.bot.modules.pole.PoleCacheManager;
 import com.cadiducho.bot.modules.pole.PoleModule;
+import com.cadiducho.bot.modules.pole.util.InlineKeyboardUtil;
 import com.cadiducho.bot.modules.pole.util.PoleMessengerUtil;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
@@ -37,12 +38,8 @@ public class PoleListCMD implements BotCommand {
         if (!module.isChatSafe(getBot(), chat, from)) return;
 
         try {
-            String body = PoleMessengerUtil.showPoleRank(chat, module.getPoleCacheManager(), 5, true);
-            InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-            InlineKeyboardButton showMore = new InlineKeyboardButton();
-            showMore.setText("Mostrar más");
-            showMore.setCallback_data("mostrarMasPoles");
-            inlineKeyboard.setInline_keyboard(Arrays.asList(Arrays.asList(showMore)));
+            final String body = PoleMessengerUtil.showPoleRank(chat, 5, true);
+            final InlineKeyboardMarkup inlineKeyboard = InlineKeyboardUtil.getMostrarTops();
 
             getBot().sendMessage(chat.getId(), body, "html", null, null, null, inlineKeyboard);
         } catch (SQLException ex) {

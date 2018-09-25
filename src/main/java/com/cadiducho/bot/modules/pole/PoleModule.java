@@ -7,26 +7,18 @@ import com.cadiducho.bot.api.module.ModuleInfo;
 import com.cadiducho.bot.modules.pole.cmds.PoleCMD;
 import com.cadiducho.bot.modules.pole.cmds.PoleListCMD;
 import com.cadiducho.bot.modules.pole.cmds.UpdateUsernameCMD;
+import com.cadiducho.bot.modules.pole.util.InlineKeyboardUtil;
 import com.cadiducho.bot.modules.pole.util.PoleMessengerUtil;
 import com.cadiducho.telegrambotapi.CallbackQuery;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
-import com.cadiducho.telegrambotapi.inline.InlineKeyboardButton;
 import com.cadiducho.telegrambotapi.inline.InlineKeyboardMarkup;
-import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
 import lombok.Getter;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @ModuleInfo(name = "Poles", description = "Módulo para hacer poles cada día")
 public class PoleModule implements Module {
@@ -49,36 +41,51 @@ public class PoleModule implements Module {
     @Override
     public void onCallbackQuery(CallbackQuery callbackQuery) {
         try {
-            if (callbackQuery.getData().equals("mostrarMasPoles")) {
-                Chat chat = callbackQuery.getMessage().getChat();
-                String body;
-                try {
-                    body = PoleMessengerUtil.showPoleRank(chat, poleCacheManager, 100, false);
-                } catch (SQLException ex) {
-                    body = "No se ha podido obtener el top de poles: " + ex.getMessage();
+            Chat chat = callbackQuery.getMessage().getChat();
+            String body;
+            InlineKeyboardMarkup inlineKeyboard;
+            switch (callbackQuery.getData()) {
+                case "mostrarTopGrupo":
+                    try {
+                        body = PoleMessengerUtil.showPoleRank(chat, 100, false);
+                    } catch (SQLException ex) {
+                        body = "No se ha podido obtener el top de poles: " + ex.getMessage();
+                    }
+                    inlineKeyboard = InlineKeyboardUtil.getMostrarResumen();
+                    botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
+                            body, "html", null, inlineKeyboard);
+                    break;
+                case "mostrarResumenGrupo": {
+                    try {
+                        body = PoleMessengerUtil.showPoleRank(chat, 5, true);
+                    } catch (SQLException ex) {
+                        body = "No se ha podido obtener el top de poles: " + ex.getMessage();
+                    }
+                    inlineKeyboard = InlineKeyboardUtil.getMostrarTops();
+                    botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
+                            body, "html", null, inlineKeyboard);
+                    break;
                 }
-                InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-                InlineKeyboardButton showLess = new InlineKeyboardButton();
-                showLess.setText("Mostrar menos");
-                showLess.setCallback_data("mostrarMenosPoles");
-                inlineKeyboard.setInline_keyboard(Arrays.asList(Arrays.asList(showLess)));
-                botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
-                        body, "html", null, inlineKeyboard);
-            } else if (callbackQuery.getData().equals("mostrarMenosPoles")) {
-                Chat chat = callbackQuery.getMessage().getChat();
-                String body;
-                try {
-                    body = PoleMessengerUtil.showPoleRank(chat, poleCacheManager, 5, true);
-                } catch (SQLException ex) {
-                    body = "No se ha podido obtener el top de poles: " + ex.getMessage();
-                }
-                InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-                InlineKeyboardButton showMore = new InlineKeyboardButton();
-                showMore.setText("Mostrar más");
-                showMore.setCallback_data("mostrarMasPoles");
-                inlineKeyboard.setInline_keyboard(Arrays.asList(Arrays.asList(showMore)));
-                botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
-                        body, "html", null, inlineKeyboard);
+                case "mostrarRankingGlobal":
+                    try {
+                        body = PoleMessengerUtil.showGlobalRanking(5);
+                    } catch (SQLException ex) {
+                        body = "No se ha podido obtener el ranking global individual de poles: " + ex.getMessage();
+                    }
+                    inlineKeyboard = InlineKeyboardUtil.getResumenesYTopGrupal();
+                    botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
+                            body, "html", null, inlineKeyboard);
+                    break;
+                case "mostrarRankingPorGrupos":
+                    try {
+                        body = PoleMessengerUtil.showGroupalGlobalRanking(5);
+                    } catch (SQLException ex) {
+                        body = "No se ha podido obtener el ranking global por gurpos de poles: " + ex.getMessage();
+                    }
+                    inlineKeyboard = InlineKeyboardUtil.getResumenesYTopGlobal();
+                    botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
+                            body, "html", null, inlineKeyboard);
+                    break;
             }
         } catch (TelegramException ex) {
             BotServer.logger.warning(ex.getMessage());
