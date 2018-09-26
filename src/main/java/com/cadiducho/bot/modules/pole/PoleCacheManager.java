@@ -2,6 +2,7 @@ package com.cadiducho.bot.modules.pole;
 
 import com.cadiducho.bot.BotServer;
 import lombok.AllArgsConstructor;
+import lombok.extern.java.Log;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.logging.Level;
 
+@Log
 @AllArgsConstructor
 public class PoleCacheManager {
 
@@ -48,7 +50,7 @@ public class PoleCacheManager {
 
             cacheMap.putIfAbsent(groupId, cachedGroup);
         } catch (SQLException ex) {
-            BotServer.logger.log(Level.WARNING, "[PoleModule] No se ha podido cargar las poles en caché del grupo " + groupId, ex);
+            log.log(Level.WARNING, "No se ha podido cargar las poles en caché del grupo " + groupId, ex);
         }
     }
 
@@ -56,7 +58,7 @@ public class PoleCacheManager {
      * Comprobar todos los archivos dentro del directorio del caché y cargarlos en memoria si este archivo es válido
      */
     void loadCachedGroups() {
-        BotServer.logger.log(Level.INFO, "[PoleModule] Iniciando caché de grupos");
+        log.info("Iniciando caché de grupos");
         try {
             PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
                     "SELECT groupchat FROM " + PoleModule.TABLA_POLES+ " WHERE DATE(time)=DATE(CURDATE()) GROUP BY groupchat"); //lista de grupos que han hecho HOY una pole para poner en cache
@@ -65,7 +67,7 @@ public class PoleCacheManager {
                 initializeGroupCache(rs.getLong("groupchat"), null);
             }
         } catch (SQLException ex) {
-            BotServer.logger.log(Level.SEVERE, "[PoleModule] No se han podido cargar los grupos en caché", ex);
+            log.log(Level.SEVERE, "No se han podido cargar los grupos en caché", ex);
         }
     }
 
@@ -131,7 +133,8 @@ public class PoleCacheManager {
             insert.setInt(3, updated);
             insert.executeUpdate();
         } catch (SQLException ex) {
-            BotServer.logger.severe(ex.getMessage());
+            log.severe("Error insertando una colección de poles en la base de datos: ");
+            log.severe(ex.getMessage());
         }
     }
 }

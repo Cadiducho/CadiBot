@@ -17,9 +17,11 @@ import com.cadiducho.telegrambotapi.exception.TelegramException;
 import com.cadiducho.telegrambotapi.inline.InlineKeyboardMarkup;
 import com.vdurmont.emoji.EmojiManager;
 import lombok.Getter;
+import lombok.extern.java.Log;
 
 import java.sql.SQLException;
 
+@Log
 @ModuleInfo(name = "Poles", description = "Módulo para hacer poles cada día")
 public class PoleModule implements Module {
 
@@ -29,6 +31,7 @@ public class PoleModule implements Module {
 
     @Override
     public void onLoad() {
+        log.info("Cargando módulo de poles");
         poleCacheManager = new PoleCacheManager(this);
         poleCacheManager.loadCachedGroups();
 
@@ -36,6 +39,7 @@ public class PoleModule implements Module {
         commandManager.register(new PoleCMD());
         commandManager.register(new PoleListCMD());
         commandManager.register(new UpdateUsernameCMD());
+        log.info("Módulo de poles cargado");
     }
 
     @Override
@@ -88,7 +92,6 @@ public class PoleModule implements Module {
                     break;
             }
         } catch (TelegramException ex) {
-            BotServer.logger.warning(ex.getMessage());
         }
     }
 

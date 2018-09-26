@@ -1,13 +1,14 @@
 package com.cadiducho.bot.scheduler;
 
-import com.cadiducho.bot.BotServer;
 import lombok.Getter;
+import lombok.extern.java.Log;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
+@Log
 public class BotTask extends FutureTask<Void> {
 
     /**
@@ -126,7 +127,7 @@ public class BotTask extends FutureTask<Void> {
         try {
             get();
         } catch (ExecutionException ex) {
-            BotServer.logger.log(Level.SEVERE, "Error while executing {0}: {1}", new Object[]{this, ex.toString()});
+            log.log(Level.SEVERE, "Error while executing {0}: {1}", new Object[]{this, ex.toString()});
         } catch (InterruptedException e) {
             // Task is already done, see the fact that we're in done() method
         }

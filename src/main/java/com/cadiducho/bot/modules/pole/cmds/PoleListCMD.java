@@ -16,6 +16,7 @@ import com.cadiducho.telegrambotapi.inline.InlineKeyboardMarkup;
 import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
+import lombok.extern.java.Log;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,6 +29,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Log
 @CommandInfo(module = PoleModule.class, aliases = {"/poles", "/polelist"})
 public class PoleListCMD implements BotCommand {
 
@@ -44,7 +46,8 @@ public class PoleListCMD implements BotCommand {
             getBot().sendMessage(chat.getId(), body, "html", null, null, null, inlineKeyboard);
         } catch (SQLException ex) {
             getBot().sendMessage(chat.getId(), "No se ha podido conectar a la base de datos: ```" + ex.getMessage() + "```", "markdown", null, null, null, null);
-            BotServer.logger.warning(ex.getMessage());
+            log.warning("Error generando respuesta para /polelist");
+            log.warning(ex.getMessage());
         }
     }
 }

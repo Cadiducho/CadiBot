@@ -12,6 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -25,12 +26,15 @@ import java.util.Optional;
  *
  * @author Cadiducho
  */
+@Log
 @RequiredArgsConstructor
 public class CommandManager {
 
     private final Map<String, BotCommand> commandMap = new HashMap<>();
     private final Map<String, CallbackListenerInstance> callbackListenersMap = new HashMap<>();
     private final BotServer server;
+
+    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withZone(ZoneId.systemDefault());
 
     public void load() {
         register(new SimpleTextCMD(Arrays.asList(":("), Arrays.asList("Sonríe, princesa", "dont be sad bb", ":)", "no me calientes a ver si te voy a dar motivos para estar sad", "Sonríe, no cambiará nada pero te verás menos feo", "Yo también estaría triste si tuviese tu cara", "tampoco me llores crack")));
@@ -76,7 +80,7 @@ public class CommandManager {
     /**
      * Ejecutar un comando
      *
-     * @param bot    Bot que recibe la update
+     * @param bot Bot que recibe la update
      * @param update Update del comando
      * @return Verdadero si se ha ejecutado, falso si no
      * @throws com.cadiducho.telegrambotapi.exception.TelegramException Excepcion
@@ -86,8 +90,7 @@ public class CommandManager {
         Message message = update.getMessage();
         User from = update.getMessage().getFrom();
 
-        BotServer.logger.info(
-                DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withZone(ZoneId.systemDefault()).format(now) + " " +
+        log.info(dateTimeFormatter.format(now) + " " +
                         (from.getUsername() == null ? from.getFirst_name() : ("@" + from.getUsername())) +
                         "#" + message.getChat().getId() +
                         ": " + message.getText());
@@ -107,21 +110,31 @@ public class CommandManager {
             }
         }
 
-        BotServer.logger.info(" # Ejecutando '" + target.get().getName() + "'");
+        log.info(" # Ejecutando '" + target.get().getName() + "'");
         target.get().execute(message.getChat(), from, sentLabel, Arrays.copyOfRange(rawcmd, 1, rawcmd.length), message.getMessage_id(), message.getReply_to_message(), now);
 
         return true;
     }
 
-    public void onCallbackQuery(CallbackQuery callbackQuery) {
+    public void onCallbackQuery(Update update) {
+        Instant now = Instant.now();
+        CallbackQuery callbackQuery = update.getCallback_query();
+        User from = update.getMessage().getFrom();
+
+        log.info(dateTimeFormatter.format(now) + " InlineCallbackQuery: " +
+                (from.getUsername() == null ? from.getFirst_name() : ("@" + from.getUsername())) +
+                "#" + (callbackQuery.getMessage() != null ? callbackQuery.getMessage().getChat().getId() : "") +
+                ": " + callbackQuery.getData());
+
         Optional<CallbackListenerInstance> target = getCallbackListener(callbackQuery.getData());
         if (target.isPresent()) {
             CallbackListenerInstance instance = target.get();
             try {
-                BotServer.logger.info(" # Ejecutando callback listener para '" + callbackQuery.getData() + "'");
+                log.info(" # Ejecutando callback listener para '" + callbackQuery.getData() + "'");
                 instance.method.invoke(instance.commandInstance, callbackQuery);
             } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+                log.severe("Error respondiendo a un CallbackQuery: ");
+                log.severe(e.getMessage());
             }
         }
     }
