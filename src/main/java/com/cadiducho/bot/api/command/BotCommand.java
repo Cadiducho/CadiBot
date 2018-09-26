@@ -64,7 +64,6 @@ public interface BotCommand {
     }
     
     default TelegramBot getBot() {
-        //TODO: Multi bots? via annotation
         return botServer.getCadibot();
     }
     

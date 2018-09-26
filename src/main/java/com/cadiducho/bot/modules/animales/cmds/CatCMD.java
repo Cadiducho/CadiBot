@@ -26,7 +26,6 @@ public class CatCMD implements BotCommand {
         voteDown.setText(EmojiManager.getForAlias("thumbsdown").getUnicode());
         voteDown.setCallback_data("catVoteDown()");
         inlineKeyboard.setInline_keyboard(Arrays.asList(Arrays.asList(voteUp, voteDown)));*/
-        //ToDo: Guardar puntuación de gatos para enviar esos en caso de error
         
         String catFile = catApi + "?" + instant.getNano(); //añadir numero para tener variación
         getBot().sendPhoto(chat.getId(), catFile, null, false, null, inlineKeyboard);

@@ -23,7 +23,7 @@ public class BotServer {
     /**
      * Server / bot version
      */
-    public static final String VERSION = "2.8";
+    public static final String VERSION = "2.9-beta";
 
     /**
      * The Module manager
@@ -137,8 +137,7 @@ public class BotServer {
 
         scheduler.start();
         
-        commandManager.load(); //ToDo: ¿Pasar todos a módulos?
-
+        commandManager.load();
 
         logger.info("Bot " + VERSION + " iniciado completamente");
     }

@@ -26,6 +26,7 @@ public class UpdatesHandler implements LongPollingHandler {
     @Override
     public void handleUpdate(Update update) {
         if (update.getCallback_query() != null) {
+            server.getCommandManager().onCallbackQuery(update.getCallback_query());
             server.getModuleManager().getModules().forEach(m -> m.onCallbackQuery(update.getCallback_query()));
         }
         
