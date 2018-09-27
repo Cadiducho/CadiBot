@@ -116,10 +116,9 @@ public class CommandManager {
         return true;
     }
 
-    public void onCallbackQuery(Update update) {
+    public void onCallbackQuery(CallbackQuery callbackQuery) {
         Instant now = Instant.now();
-        CallbackQuery callbackQuery = update.getCallback_query();
-        User from = update.getMessage().getFrom();
+        User from = callbackQuery.getFrom();
 
         log.info(dateTimeFormatter.format(now) + " InlineCallbackQuery: " +
                 (from.getUsername() == null ? from.getFirst_name() : ("@" + from.getUsername())) +
