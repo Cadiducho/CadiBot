@@ -42,59 +42,6 @@ public class PoleModule implements Module {
         log.info("Módulo de poles cargado");
     }
 
-    @Override
-    public void onCallbackQuery(CallbackQuery callbackQuery) {
-        try {
-            Chat chat = callbackQuery.getMessage().getChat();
-            String body;
-            InlineKeyboardMarkup inlineKeyboard;
-            switch (callbackQuery.getData()) {
-                case "mostrarTopGrupo":
-                    try {
-                        body = PoleMessengerUtil.showPoleRank(chat, 100, false);
-                    } catch (SQLException ex) {
-                        body = "No se ha podido obtener el top de poles: " + ex.getMessage();
-                    }
-                    inlineKeyboard = InlineKeyboardUtil.getMostrarResumen();
-                    botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
-                            body, "html", null, inlineKeyboard);
-                    break;
-                case "mostrarResumenGrupo": {
-                    try {
-                        body = PoleMessengerUtil.showPoleRank(chat, 5, true);
-                    } catch (SQLException ex) {
-                        body = "No se ha podido obtener el top de poles: " + ex.getMessage();
-                    }
-                    inlineKeyboard = InlineKeyboardUtil.getMostrarTops();
-                    botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
-                            body, "html", null, inlineKeyboard);
-                    break;
-                }
-                case "mostrarRankingGlobal":
-                    try {
-                        body = PoleMessengerUtil.showGlobalRanking(5);
-                    } catch (SQLException ex) {
-                        body = "No se ha podido obtener el ranking global individual de poles: " + ex.getMessage();
-                    }
-                    inlineKeyboard = InlineKeyboardUtil.getResumenesYTopGrupal();
-                    botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
-                            body, "html", null, inlineKeyboard);
-                    break;
-                case "mostrarRankingPorGrupos":
-                    try {
-                        body = PoleMessengerUtil.showGroupalGlobalRanking(5);
-                    } catch (SQLException ex) {
-                        body = "No se ha podido obtener el ranking global por gurpos de poles: " + ex.getMessage();
-                    }
-                    inlineKeyboard = InlineKeyboardUtil.getResumenesYTopGlobal();
-                    botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
-                            body, "html", null, inlineKeyboard);
-                    break;
-            }
-        } catch (TelegramException ex) {
-        }
-    }
-
     /**
      * Comprobar si un chat está autorizado a hacer poles
      * @param bot Instancia del bot para mandar los mensajes de error

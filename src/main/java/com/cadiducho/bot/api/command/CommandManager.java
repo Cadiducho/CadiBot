@@ -131,8 +131,13 @@ public class CommandManager {
             try {
                 log.info(" # Ejecutando callback listener para '" + callbackQuery.getData() + "'");
                 instance.method.invoke(instance.commandInstance, callbackQuery);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                log.severe("Error respondiendo a un CallbackQuery: ");
+            } catch (InvocationTargetException invocationException) {
+                if (invocationException.getCause() instanceof TelegramException) { // los métodos de listener pueden lanzar TelegramException
+                    log.severe("Error respondiendo a un CallbackQuery en la API de Telegram: ");
+                    log.severe(invocationException.getCause().getMessage());
+                }
+            } catch (IllegalAccessException e) {
+                log.severe("Error accediendo a un CallbackListener: ");
                 log.severe(e.getMessage());
             }
         }
