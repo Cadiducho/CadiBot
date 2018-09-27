@@ -1,0 +1,9 @@
+language: java
+sudo: false
+jdk:
+- oraclejdk8
+script:
+  - ./mvnw clean install -Dmaven.javadoc.skip=true -B -V
+cache:
+  directories:
+  - $HOME/.m2
