@@ -2,6 +2,8 @@ package com.cadiducho.bot.api.command;
 
 import com.cadiducho.bot.BotServer;
 import com.cadiducho.bot.MySQL;
+import com.cadiducho.bot.api.command.args.Argument;
+import com.cadiducho.bot.api.command.args.CommandArguments;
 import com.cadiducho.bot.api.module.Module;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
@@ -10,9 +12,7 @@ import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Comando para el bot
@@ -61,6 +61,14 @@ public interface BotCommand {
             return null;
         }
         return Arrays.asList(this.getClass().getAnnotation(CommandInfo.class).aliases());
+    }
+
+    default List<Argument> getArguments() {
+        if (!this.getClass().isAnnotationPresent(CommandArguments.class)) {
+            return null;
+        }
+        Argument[] arguments = this.getClass().getAnnotationsByType(Argument.class);
+        return Arrays.asList(arguments);
     }
     
     default TelegramBot getBot() {

@@ -2,10 +2,7 @@ package com.cadiducho.bot.api.command;
 
 import com.cadiducho.bot.api.module.Module;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Anotación para construir los parámetros de un {@link BotCommand}
