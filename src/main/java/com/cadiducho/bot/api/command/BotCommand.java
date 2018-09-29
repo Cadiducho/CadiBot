@@ -34,6 +34,10 @@ public interface BotCommand {
      */
     default void execute(final Chat chat, final User from, final String label, final String[] args, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
     }
+
+    default void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
+
+    }
     
     default Module getModule() {
         if (!this.getClass().isAnnotationPresent(CommandInfo.class)) {
