@@ -7,6 +7,7 @@ import com.cadiducho.telegrambotapi.exception.TelegramException;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -19,7 +20,7 @@ public class SimpleGifCMD extends SimpleCommand {
     private final List<String> gifs;
 
     public SimpleGifCMD(List<String> aliases, String gifId) {
-        this(aliases, ReplyPattern.TO_ANSWERED, Arrays.asList(gifId));
+        this(aliases, ReplyPattern.TO_ANSWERED, Collections.singletonList(gifId));
     }
     
     public SimpleGifCMD(List<String> aliases, List<String> gifs) {

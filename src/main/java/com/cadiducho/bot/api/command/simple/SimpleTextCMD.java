@@ -5,10 +5,10 @@ import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 import com.vdurmont.emoji.EmojiParser;
-import java.time.Instant;
 
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -21,7 +21,7 @@ public class SimpleTextCMD extends SimpleCommand {
     private final List<String> replies;
 
     public SimpleTextCMD(List<String> aliases, String text) {
-        this(aliases, ReplyPattern.TO_ANSWERED, Arrays.asList(text));
+        this(aliases, ReplyPattern.TO_ANSWERED, Collections.singletonList(text));
     }
     
     public SimpleTextCMD(List<String> aliases, List<String> replies) {

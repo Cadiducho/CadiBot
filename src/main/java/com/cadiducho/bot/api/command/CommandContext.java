@@ -14,7 +14,7 @@ public class CommandContext {
 
     final Map<String, String> rawArguments;
     final Map<String, Class<?>> rawTypes;
-    static Map<Class<?>, ArgumentType> parsers = new HashMap<>();
+    private static final Map<Class<?>, ArgumentType> parsers = new HashMap<>();
     static {
         parsers.put(String.class, new StringArgumentType());
         parsers.put(Integer.class, new IntegerArgumentType());
