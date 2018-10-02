@@ -12,8 +12,10 @@ import java.util.Optional;
  */
 public class CommandContext {
 
-    final Map<String, String> rawArguments;
-    final Map<String, Class<?>> rawTypes;
+    private final Map<String, String> rawArguments;
+    private final Map<String, Class<?>> rawTypes;
+    private String lastArgument;
+
     private static final Map<Class<?>, ArgumentType> parsers = new HashMap<>();
     static {
         parsers.put(String.class, new StringArgumentType());
@@ -28,6 +30,17 @@ public class CommandContext {
             if (sendedArguments.length > i) {
                 rawArguments.put(argument.name(), sendedArguments[i]);
                 rawTypes.put(argument.name(), argument.type());
+
+                if (desiredArguments.size() == (i + 1)) { //si es el ultimo argumento esperado
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for (int k = i; k < sendedArguments.length; ++k) {
+                        if (k > i) {
+                            stringBuilder.append(" ");
+                        }
+                        stringBuilder.append(sendedArguments[k]);
+                    }
+                    this.lastArgument = stringBuilder.toString();
+                }
             }
             ++i;
         }
@@ -46,7 +59,17 @@ public class CommandContext {
             return Optional.empty();
         }
 
+        if (!parsers.containsKey(rawTypes.get(argName))) {
+            throw new CommandParseException("There is no serializer defined to the type '" + rawTypes.get(argName) + "'");
+        }
         ArgumentType<T> parser = (ArgumentType<T>) parsers.get(rawTypes.get(argName));
         return Optional.of(parser.parse(rawArguments.get(argName)));
+    }
+
+    public Optional<String> getLastArguments() {
+        if (rawArguments.size() == 0) {
+            return Optional.empty();
+        }
+        return Optional.of(lastArgument);
     }
 }
