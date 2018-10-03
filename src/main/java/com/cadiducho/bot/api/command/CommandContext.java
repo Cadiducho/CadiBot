@@ -2,6 +2,8 @@ package com.cadiducho.bot.api.command;
 
 import com.cadiducho.bot.api.command.args.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +20,16 @@ public class CommandContext {
 
     private static final Map<Class<?>, ArgumentType> parsers = new HashMap<>();
     static {
+        //primitives
         parsers.put(String.class, new StringArgumentType());
         parsers.put(Integer.class, new IntegerArgumentType());
+        parsers.put(Double.class, new DoubleArgumentType());
+        parsers.put(Long.class, new LongArgumentType());
+        parsers.put(Boolean.class, new BoolArgumentType());
+
+        //dates
+        parsers.put(LocalDate.class, new LocalDateArgumentType());
+        parsers.put(LocalDateTime.class, new LocalDateTimeArgumentType());
     }
 
     public CommandContext(List<Argument> desiredArguments, String[] sendedArguments) {
