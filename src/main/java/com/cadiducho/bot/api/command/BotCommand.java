@@ -74,6 +74,40 @@ public interface BotCommand {
         Argument[] arguments = this.getClass().getAnnotationsByType(Argument.class);
         return Arrays.asList(arguments);
     }
+
+    default String getDescription() {
+        if (!this.getClass().isAnnotationPresent(CommandInfo.class)) {
+            return null;
+        }
+        return this.getClass().getAnnotation(CommandInfo.class).description();
+    }
+
+    default String getUsage() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append(this.getName());
+        for (Argument argument : this.getArguments()) {
+            char open = '<';
+            char close = '>';
+            if (!argument.required()) {
+                open = '[';
+                close = ']';
+            }
+            stringBuilder.append(' ').append(open).append(argument.name()).append(close);
+        }
+        stringBuilder.append(" : ").append(this.getDescription());
+        for (Argument argument : this.getArguments()) {
+            char open = '<';
+            char close = '>';
+            if (!argument.required()) {
+                open = '[';
+                close = ']';
+            }
+            stringBuilder.append("\n - ").append(open).append(argument.name()).append(close)
+                    .append(" (").append(argument.type().getSimpleName()).append("): ").append(argument.description());
+        }
+        return stringBuilder.toString();
+    }
     
     default TelegramBot getBot() {
         return botServer.getCadibot();

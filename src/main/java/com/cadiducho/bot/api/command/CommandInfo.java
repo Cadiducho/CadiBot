@@ -22,4 +22,10 @@ public @interface CommandInfo {
      * @return lista de alias
      */
     String[] aliases();
+
+    /**
+     * Descripción breve de lo que hace el comando
+     * @return descripción deol comando
+     */
+    String description() default "";
 }

@@ -28,6 +28,11 @@ public class TestArgument implements Argument {
     }
 
     @Override
+    public String description() {
+        return null;
+    }
+
+    @Override
     public Class<? extends Annotation> annotationType() {
         return null;
     }
