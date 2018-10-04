@@ -47,23 +47,27 @@ public class PoleCMD implements BotCommand {
         if (!poles.isPresent()) {
             PoleCollection polesHoy = PoleCollection.builder().first(from.getId()).build();
             cachedGroup.getPolesMap().put(today.toLocalDate(), polesHoy);
-            save(manager, cachedGroup, today.toLocalDate(), polesHoy, 1);
+            save(manager, cachedGroup, today.toLocalDate(), polesHoy);
+            saveToDatabase(manager, cachedGroup, polesHoy, 1);
             getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b>!!!", "html", null, false, messageId, null);
             log.info("Pole otorgado a " + from.getId() + " en " + chat.getId());
         } else if (!poles.get().contains(from.getId())) {
             if (!poles.get().getFirst().isPresent()) { //fixbug a si el objeto PolleCollection existe en memoria pero realmente no se han realizado poles
                 poles.get().setFirst(from.getId());
-                save(manager, cachedGroup, today.toLocalDate(), poles.get(), 1);
+                save(manager, cachedGroup, today.toLocalDate(), poles.get());
+                saveToDatabase(manager, cachedGroup, poles.get(), 1);
                 getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b>!!!", "html", null, false, messageId, null);
                 log.info("Pole (fixbug) otorgado a " + from.getId() + " en " + chat.getId());
             } else if (!poles.get().getSecond().isPresent()) {
                 poles.get().setSecond(from.getId());
-                save(manager, cachedGroup, today.toLocalDate(), poles.get(), 2);
+                save(manager, cachedGroup, today.toLocalDate(), poles.get());
+                saveToDatabase(manager, cachedGroup, poles.get(), 2);
                 getBot().sendMessage(chat.getId(), base + " ha hecho la <b>subpole</b>, meh", "html", null, false, messageId, null);
                 log.info("Plata otorgado a " + from.getId() + " en " + chat.getId());
             } else if (!poles.get().getThird().isPresent()) {
                 poles.get().setThird(from.getId());
-                save(manager, cachedGroup, today.toLocalDate(), poles.get(), 3);
+                save(manager, cachedGroup, today.toLocalDate(), poles.get());
+                saveToDatabase(manager, cachedGroup, poles.get(), 3);
                 getBot().sendMessage(chat.getId(), base + " ha hecho la <b>bronce</b> (cual perdedor)", "html", null, false, messageId, null);
                 log.info("Bronce otorgado a " + from.getId() + " en " + chat.getId());
             }
@@ -71,12 +75,14 @@ public class PoleCMD implements BotCommand {
 
     }
 
-    private void save(PoleCacheManager manager, CachedGroup group, LocalDate today, PoleCollection poles, int updated) {
+    private void save(PoleCacheManager manager, CachedGroup group, LocalDate today, PoleCollection poles) {
         group.updatePoles(today, poles);
         manager.clearOldCache(group, today);
+    }
 
+    private void saveToDatabase(PoleCacheManager manager, CachedGroup group, PoleCollection poles, int updated) {
         botServer.getScheduler().schedule(BotTask.async(() -> {
-            manager.saveToDatabase(group, poles, updated);
+            manager.savePoleToDatabase(group, poles, updated);
         }));
     }
 }

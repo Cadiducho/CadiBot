@@ -1,9 +1,9 @@
 package com.cadiducho.bot.modules.pole.cmds;
 
-import com.cadiducho.bot.api.command.*;
-import com.cadiducho.bot.api.command.args.Argument;
-import com.cadiducho.bot.api.command.args.CommandArguments;
-import com.cadiducho.bot.api.command.args.CommandParseException;
+import com.cadiducho.bot.api.command.BotCommand;
+import com.cadiducho.bot.api.command.CallbackListener;
+import com.cadiducho.bot.api.command.CommandInfo;
+import com.cadiducho.bot.api.command.ListenTo;
 import com.cadiducho.bot.modules.pole.PoleModule;
 import com.cadiducho.bot.modules.pole.util.InlineKeyboardUtil;
 import com.cadiducho.bot.modules.pole.util.PoleMessengerUtil;
@@ -17,8 +17,6 @@ import lombok.extern.java.Log;
 
 import java.sql.SQLException;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 @Log
@@ -98,7 +96,6 @@ public class PoleListCMD implements BotCommand {
     }
 
     private void editPoleListMessage(CallbackQuery callbackQuery, Supplier<String> bodySupplier, InlineKeyboardMarkup inlineKeyboard) throws TelegramException {
-        log.info("Editando");
         botServer.getCadibot().editMessageText(callbackQuery.getMessage().getChat().getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
                 bodySupplier.get(), "html", false, inlineKeyboard);
     }
