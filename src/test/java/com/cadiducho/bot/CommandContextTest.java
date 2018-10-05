@@ -76,7 +76,13 @@ public class CommandContextTest {
     }
 
     @Test
-    public void testUnknownParser() throws Exception {
+    public void testCustomParser() throws Exception {
+        int i = context.get("numero", (str -> Integer.parseInt(str) + 3)).get(); //el parser pasa a int y suma 3
+        assertEquals(i, 6);
+    }
+
+    @Test
+    public void testUnknownParser() {
         assertThrows(CommandParseException.class, () -> context.get("unknown"));
     }
 }

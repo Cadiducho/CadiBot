@@ -59,12 +59,13 @@ public class CommandContext {
     /**
      * Obten un argumento según su nombre
      * @param argName Nombre del argumento
+     * @param type El {@link ArgumentType} para transformar el argumento en T
      * @param <T> Tipo del argumento
      * @return El argumento enviado por el usuario
      * @throws CommandParseException Si el argumento falla al ser trasformado a T
      */
     @SuppressWarnings("unchecked")
-    public <T> Optional<T> get(String argName) throws CommandParseException {
+    public <T> Optional<T> get(String argName, ArgumentType<T> type) throws CommandParseException {
         if (!rawArguments.containsKey(argName)) {
             return Optional.empty();
         }
@@ -72,8 +73,24 @@ public class CommandContext {
         if (!parsers.containsKey(rawTypes.get(argName))) {
             throw new CommandParseException("There is no serializer defined to the type '" + rawTypes.get(argName) + "'");
         }
-        ArgumentType<T> parser = (ArgumentType<T>) parsers.get(rawTypes.get(argName));
+        ArgumentType<T> parser;
+        if (type != null) {
+            parser = type;
+        } else {
+            parser = (ArgumentType<T>) parsers.get(rawTypes.get(argName));
+        }
         return Optional.of(parser.parse(rawArguments.get(argName)));
+    }
+
+    /**
+     * Obten un argumento según su nombre
+     * @param argName Nombre del argumento
+     * @param <T> Tipo del argumento
+     * @return El argumento enviado por el usuario
+     * @throws CommandParseException Si el argumento falla al ser trasformado a T
+     */
+    public <T> Optional<T> get(String argName) throws CommandParseException {
+        return get(argName, null);
     }
 
     public Optional<String> getLastArguments() {
