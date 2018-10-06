@@ -55,21 +55,21 @@ public interface BotCommand {
     //la primera aliase de la anotación
     default String getName() {
         if (!this.getClass().isAnnotationPresent(CommandInfo.class)) {
-            return null;
+            return "";
         }
         return this.getClass().getAnnotation(CommandInfo.class).aliases()[0];
     }
 
     default List<String> getAliases() {
         if (!this.getClass().isAnnotationPresent(CommandInfo.class)) {
-            return null;
+            return new ArrayList<>();
         }
         return Arrays.asList(this.getClass().getAnnotation(CommandInfo.class).aliases());
     }
 
     default List<Argument> getArguments() {
         if (!this.getClass().isAnnotationPresent(CommandArguments.class)) {
-            return null;
+            return new ArrayList<>();
         }
         Argument[] arguments = this.getClass().getAnnotationsByType(Argument.class);
         return Arrays.asList(arguments);
@@ -77,7 +77,7 @@ public interface BotCommand {
 
     default String getDescription() {
         if (!this.getClass().isAnnotationPresent(CommandInfo.class)) {
-            return null;
+            return "";
         }
         return this.getClass().getAnnotation(CommandInfo.class).description();
     }
