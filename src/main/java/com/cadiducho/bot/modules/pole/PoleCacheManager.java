@@ -1,8 +1,6 @@
 package com.cadiducho.bot.modules.pole;
 
 import com.cadiducho.bot.BotServer;
-import com.cadiducho.bot.scheduler.BotTask;
-import com.cadiducho.telegrambotapi.Chat;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 

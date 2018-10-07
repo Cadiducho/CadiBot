@@ -6,7 +6,6 @@ import com.cadiducho.bot.modules.pole.CachedGroup;
 import com.cadiducho.bot.modules.pole.PoleCacheManager;
 import com.cadiducho.bot.modules.pole.PoleCollection;
 import com.cadiducho.bot.modules.pole.PoleModule;
-import com.cadiducho.bot.scheduler.BotTask;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.User;
@@ -19,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Log
 @CommandInfo(module = PoleModule.class, aliases = "pole")
@@ -81,8 +81,6 @@ public class PoleCMD implements BotCommand {
     }
 
     private void saveToDatabase(PoleCacheManager manager, CachedGroup group, PoleCollection poles, int updated) {
-        botServer.getScheduler().schedule(BotTask.async(() -> {
-            manager.savePoleToDatabase(group, poles, updated);
-        }));
+        CompletableFuture.runAsync(() -> manager.savePoleToDatabase(group, poles, updated));
     }
 }

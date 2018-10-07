@@ -3,7 +3,6 @@ package com.cadiducho.bot;
 import com.cadiducho.bot.api.command.CommandManager;
 import com.cadiducho.bot.api.module.Module;
 import com.cadiducho.bot.api.module.ModuleManager;
-import com.cadiducho.bot.scheduler.BotScheduler;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import lombok.Getter;
 import lombok.extern.java.Log;
@@ -40,11 +39,6 @@ public class BotServer {
      * The database (MySQL) connector
      */
     @Getter private MySQL mysql;
-
-    /**
-     * The tasks/runnables manager
-     */
-    @Getter private final BotScheduler scheduler;
 
     @Getter private TelegramBot cadibot;
     @Getter private static BotServer instance;
@@ -95,7 +89,6 @@ public class BotServer {
         consoleManager = new ConsoleManager(instance);
         moduleManager = new ModuleManager(instance, new File("modules"));
         commandManager = new CommandManager(instance);
-        scheduler = new BotScheduler();
     }
     
     private void startServer(CommandLine cmd) {
@@ -130,8 +123,6 @@ public class BotServer {
 
         UpdatesHandler events = new UpdatesHandler(cadibot, instance);
         cadibot.getUpdatesPoller().setHandler(events);
-
-        scheduler.start();
         
         commandManager.load();
 
@@ -147,7 +138,6 @@ public class BotServer {
 
         log.info("Terminando...");
         consoleManager.stop();
-        scheduler.stop();
         System.exit(0);
     }
 }
