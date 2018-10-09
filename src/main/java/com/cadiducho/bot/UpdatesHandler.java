@@ -33,8 +33,8 @@ public class UpdatesHandler implements LongPollingHandler {
                 server.getModuleManager().getModules().forEach(m -> m.onPostCommand(update, success));
             }
         } catch (TelegramException ex) {
-            log.severe("Fallo procesando una Update de la API de Telegram");
-            log.severe(ex.getMessage());
+            log.severe("Fallo procesando una Update de la API de Telegram: " + ex.getMessage());
+            log.severe(ex.getCause().getMessage());
         }
     }
 }

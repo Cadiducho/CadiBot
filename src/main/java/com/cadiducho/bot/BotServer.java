@@ -123,8 +123,7 @@ public class BotServer {
 
         UpdatesHandler events = new UpdatesHandler(cadibot, instance);
         cadibot.getUpdatesPoller().setHandler(events);
-        
-        commandManager.load();
+
 
         log.info("Bot " + VERSION + " iniciado completamente");
     }
