@@ -33,8 +33,8 @@ public class CommandContextTest {
                 new TestArgument("fechaHora", LocalDateTime.class, false),
                 new TestArgument("ultimo", String.class, false)
         );
-        context = new CommandContext(arguments, new String[]{"primero", "", "3", "38", "10000000", "true", "01/10/2018",
-                "02/02/2002/20:30", "hola", "qué", "tal"});
+        context = new CommandContext(arguments, new String[]{"primero", "", "3", "38", "10000000", "true", "1/10/2018",
+                "2/2/2002/20:30", "hola", "qué", "tal"});
     }
 
     @Test
@@ -72,7 +72,10 @@ public class CommandContextTest {
         assertEquals(context.get("fecha").get(), LocalDate.of(2018, 10, 1));
         assertEquals(context.get("fechaHora").get(), LocalDateTime.of(2002, 2, 2, 20, 30));
 
-        assertThrows(CommandParseException.class, () -> new LocalDateArgumentType().parse("malFormato"));
+        LocalDateArgumentType argumentType = new LocalDateArgumentType();
+        assertEquals(argumentType.parse("20/2/2010"), argumentType.parse("20/02/2010"));
+
+        assertThrows(CommandParseException.class, () -> argumentType.parse("malFormato"));
     }
 
     @Test
