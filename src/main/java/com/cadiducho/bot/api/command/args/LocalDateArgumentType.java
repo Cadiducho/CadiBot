@@ -6,7 +6,7 @@ import java.time.format.DateTimeParseException;
 
 public class LocalDateArgumentType implements ArgumentType<LocalDate> {
 
-    final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
 
     @Override
     public LocalDate parse(String str) throws CommandParseException {
