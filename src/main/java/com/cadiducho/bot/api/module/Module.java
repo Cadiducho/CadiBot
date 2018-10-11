@@ -55,8 +55,4 @@ public interface Module {
     
     default void onPostCommand(Update update, boolean success) {
     }
-
-    @Deprecated
-    default void onCallbackQuery(CallbackQuery callbackQuery) {  
-    }
 }
