@@ -3,27 +3,22 @@ package com.cadiducho.bot;
 import com.cadiducho.bot.api.command.CommandManager;
 import com.cadiducho.bot.api.module.Module;
 import com.cadiducho.bot.api.module.ModuleManager;
-import com.cadiducho.bot.scheduler.BotScheduler;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import lombok.Getter;
+import lombok.extern.java.Log;
 import org.apache.commons.cli.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.logging.Logger;
 
+@Log
 public class BotServer {
-
-    /**
-     * The logger for this server
-     */
-    public static final Logger logger = Logger.getLogger("Cadibot-Server");
 
     /**
      * Server / bot version
      */
-    public static final String VERSION = "2.8";
+    public static final String VERSION = "2.9";
 
     /**
      * The Module manager
@@ -44,11 +39,6 @@ public class BotServer {
      * The database (MySQL) connector
      */
     @Getter private MySQL mysql;
-
-    /**
-     * The tasks/runnables manager
-     */
-    @Getter private final BotScheduler scheduler;
 
     @Getter private TelegramBot cadibot;
     @Getter private static BotServer instance;
@@ -99,11 +89,10 @@ public class BotServer {
         consoleManager = new ConsoleManager(instance);
         moduleManager = new ModuleManager(instance, new File("modules"));
         commandManager = new CommandManager(instance);
-        scheduler = new BotScheduler();
     }
     
     private void startServer(CommandLine cmd) {
-        logger.info("Servidor arrancado");
+        log.info("Servidor arrancado");
 
         consoleManager.startConsole();
         consoleManager.startFile("logs/log-%D.txt");
@@ -119,28 +108,24 @@ public class BotServer {
                     cmd.getOptionValue("database-pass"));
 
             mysql.openConnection();
-            logger.info("SQL connection established");
+            log.info("SQL connection established");
         } catch (SQLException ex) {
-            logger.warning("Can't connect to database!");
-            logger.warning(ex.getMessage());
+            log.warning("Can't connect to database!");
+            log.warning(ex.getMessage());
         }
 
         try {
             moduleManager.loadModules();
         } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
-            logger.warning("Can't load modules!");
-            logger.warning(ex.getMessage());
+            log.warning("Can't load modules!");
+            log.warning(ex.getMessage());
         }
 
         UpdatesHandler events = new UpdatesHandler(cadibot, instance);
         cadibot.getUpdatesPoller().setHandler(events);
 
-        scheduler.start();
-        
-        commandManager.load(); //ToDo: ¿Pasar todos a módulos?
 
-
-        logger.info("Bot " + VERSION + " iniciado completamente");
+        log.info("Bot " + VERSION + " iniciado completamente");
     }
     
     public void shutdown() {
@@ -150,9 +135,8 @@ public class BotServer {
         } catch (SQLException ignored) {
         }
 
-        logger.info("Terminando...");
+        log.info("Terminando...");
         consoleManager.stop();
-        scheduler.stop();
         System.exit(0);
     }
 }

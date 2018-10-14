@@ -17,9 +17,11 @@ import com.cadiducho.telegrambotapi.exception.TelegramException;
 import com.cadiducho.telegrambotapi.inline.InlineKeyboardMarkup;
 import com.vdurmont.emoji.EmojiManager;
 import lombok.Getter;
+import lombok.extern.java.Log;
 
 import java.sql.SQLException;
 
+@Log
 @ModuleInfo(name = "Poles", description = "Módulo para hacer poles cada día")
 public class PoleModule implements Module {
 
@@ -29,6 +31,7 @@ public class PoleModule implements Module {
 
     @Override
     public void onLoad() {
+        log.info("Cargando módulo de poles");
         poleCacheManager = new PoleCacheManager(this);
         poleCacheManager.loadCachedGroups();
 
@@ -36,60 +39,7 @@ public class PoleModule implements Module {
         commandManager.register(new PoleCMD());
         commandManager.register(new PoleListCMD());
         commandManager.register(new UpdateUsernameCMD());
-    }
-
-    @Override
-    public void onCallbackQuery(CallbackQuery callbackQuery) {
-        try {
-            Chat chat = callbackQuery.getMessage().getChat();
-            String body;
-            InlineKeyboardMarkup inlineKeyboard;
-            switch (callbackQuery.getData()) {
-                case "mostrarTopGrupo":
-                    try {
-                        body = PoleMessengerUtil.showPoleRank(chat, 100, false);
-                    } catch (SQLException ex) {
-                        body = "No se ha podido obtener el top de poles: " + ex.getMessage();
-                    }
-                    inlineKeyboard = InlineKeyboardUtil.getMostrarResumen();
-                    botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
-                            body, "html", null, inlineKeyboard);
-                    break;
-                case "mostrarResumenGrupo": {
-                    try {
-                        body = PoleMessengerUtil.showPoleRank(chat, 5, true);
-                    } catch (SQLException ex) {
-                        body = "No se ha podido obtener el top de poles: " + ex.getMessage();
-                    }
-                    inlineKeyboard = InlineKeyboardUtil.getMostrarTops();
-                    botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
-                            body, "html", null, inlineKeyboard);
-                    break;
-                }
-                case "mostrarRankingGlobal":
-                    try {
-                        body = PoleMessengerUtil.showGlobalRanking(5);
-                    } catch (SQLException ex) {
-                        body = "No se ha podido obtener el ranking global individual de poles: " + ex.getMessage();
-                    }
-                    inlineKeyboard = InlineKeyboardUtil.getResumenesYTopGrupal();
-                    botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
-                            body, "html", null, inlineKeyboard);
-                    break;
-                case "mostrarRankingPorGrupos":
-                    try {
-                        body = PoleMessengerUtil.showGroupalGlobalRanking(5);
-                    } catch (SQLException ex) {
-                        body = "No se ha podido obtener el ranking global por gurpos de poles: " + ex.getMessage();
-                    }
-                    inlineKeyboard = InlineKeyboardUtil.getResumenesYTopGlobal();
-                    botServer.getCadibot().editMessageText(chat.getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
-                            body, "html", null, inlineKeyboard);
-                    break;
-            }
-        } catch (TelegramException ex) {
-            BotServer.logger.warning(ex.getMessage());
-        }
+        log.info("Módulo de poles cargado");
     }
 
     /**

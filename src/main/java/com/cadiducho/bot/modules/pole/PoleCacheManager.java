@@ -2,6 +2,7 @@ package com.cadiducho.bot.modules.pole;
 
 import com.cadiducho.bot.BotServer;
 import lombok.AllArgsConstructor;
+import lombok.extern.java.Log;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.logging.Level;
 
+@Log
 @AllArgsConstructor
 public class PoleCacheManager {
 
@@ -26,37 +28,45 @@ public class PoleCacheManager {
      * @param groupId Id del grupo
      * @param title Titulo del grupo
      */
-    public synchronized void initializeGroupCache(Long groupId, String title) {
+    public synchronized void initializeGroupCache(Long groupId, String title, LinkedHashMap<Integer, Integer> poles) {
         CachedGroup cachedGroup = CachedGroup.builder().id(groupId).title(title).build();
+        if (!poles.isEmpty()) { //solo crear objeto PoleCollection si hay poles de verdad. Rellenar el optional con el objeto vacío repercutirá en /pole fuertemente
+            PoleCollection polesHoy = new PoleCollection(poles.get(1), poles.get(2), poles.get(3));
+            cachedGroup.getPolesMap().put(LocalDate.now(ZoneId.systemDefault()), polesHoy);
+        }
+
+        cacheMap.putIfAbsent(groupId, cachedGroup);
+    }
+
+    public synchronized void initializeGroupCache(Long groupId, String title) {
+        initializeGroupCache(groupId, title, getPolesOfGroupchat(groupId));
+    }
+
+    private LinkedHashMap<Integer, Integer> getPolesOfGroupchat(Long groupId) {
+        LinkedHashMap<Integer, Integer> poles = new LinkedHashMap<>();
         try {
             PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
-                "SELECT `userid`, `poleType` FROM `" + PoleModule.TABLA_POLES + "` WHERE "
-                                    + "DATE(time)=DATE(CURDATE()) AND "
-                                    + "`groupchat`=?"
-                                    + " ORDER BY `poleType`");
+                    "SELECT `userid`, `poleType` FROM `" + PoleModule.TABLA_POLES + "` WHERE "
+                            + "DATE(time)=DATE(CURDATE()) AND "
+                            + "`groupchat`=?"
+                            + " ORDER BY `poleType`");
             statement.setLong(1, groupId);
-
-            LinkedHashMap<Integer, Integer> poles = new LinkedHashMap<>();
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 poles.put(rs.getInt("poleType"), rs.getInt("userid"));
             }
-            if (!poles.isEmpty()) { //solo crear objeto PoleCollection si hay poles de verdad. Rellenar el optional con el objeto vacío repercutirá en /pole fuertemente
-                PoleCollection polesHoy = new PoleCollection(poles.get(1), poles.get(2), poles.get(3));
-                cachedGroup.getPolesMap().put(LocalDate.now(ZoneId.systemDefault()), polesHoy);
-            }
-
-            cacheMap.putIfAbsent(groupId, cachedGroup);
         } catch (SQLException ex) {
-            BotServer.logger.log(Level.WARNING, "[PoleModule] No se ha podido cargar las poles en caché del grupo " + groupId, ex);
+            log.log(Level.WARNING, "No se ha podido cargar las poles en caché del grupo " + groupId, ex);
         }
+
+        return poles;
     }
 
     /**
      * Comprobar todos los archivos dentro del directorio del caché y cargarlos en memoria si este archivo es válido
      */
     void loadCachedGroups() {
-        BotServer.logger.log(Level.INFO, "[PoleModule] Iniciando caché de grupos");
+        log.info("Iniciando caché de grupos");
         try {
             PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
                     "SELECT groupchat FROM " + PoleModule.TABLA_POLES+ " WHERE DATE(time)=DATE(CURDATE()) GROUP BY groupchat"); //lista de grupos que han hecho HOY una pole para poner en cache
@@ -65,7 +75,7 @@ public class PoleCacheManager {
                 initializeGroupCache(rs.getLong("groupchat"), null);
             }
         } catch (SQLException ex) {
-            BotServer.logger.log(Level.SEVERE, "[PoleModule] No se han podido cargar los grupos en caché", ex);
+            log.log(Level.SEVERE, "No se han podido cargar los grupos en caché", ex);
         }
     }
 
@@ -107,7 +117,7 @@ public class PoleCacheManager {
      * @param updated La posición que se ha actualizado
      */
     @SuppressWarnings("ConstantConditions")
-    public void saveToDatabase(CachedGroup group, PoleCollection poles, int updated) {
+    public void savePoleToDatabase(CachedGroup group, PoleCollection poles, int updated) {
         try {
             Integer userid;
             switch (updated) {
@@ -131,7 +141,8 @@ public class PoleCacheManager {
             insert.setInt(3, updated);
             insert.executeUpdate();
         } catch (SQLException ex) {
-            BotServer.logger.severe(ex.getMessage());
+            log.severe("Error insertando una colección de poles en la base de datos: ");
+            log.severe(ex.getMessage());
         }
     }
 }

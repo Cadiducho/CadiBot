@@ -53,11 +53,6 @@ public interface Module {
     default void onClose() {
     }
     
-    //ToDo: Mejorar API de módulos, no ejecutar todos los listeners en todos los modulos
-    
     default void onPostCommand(Update update, boolean success) {
-    }
-    
-    default void onCallbackQuery(CallbackQuery callbackQuery) {  
     }
 }

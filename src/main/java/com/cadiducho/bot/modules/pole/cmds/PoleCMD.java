@@ -1,17 +1,16 @@
 package com.cadiducho.bot.modules.pole.cmds;
 
-import com.cadiducho.bot.BotServer;
 import com.cadiducho.bot.api.command.BotCommand;
 import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.bot.modules.pole.CachedGroup;
 import com.cadiducho.bot.modules.pole.PoleCacheManager;
 import com.cadiducho.bot.modules.pole.PoleCollection;
 import com.cadiducho.bot.modules.pole.PoleModule;
-import com.cadiducho.bot.scheduler.BotTask;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
+import lombok.extern.java.Log;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -19,7 +18,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+@Log
 @CommandInfo(module = PoleModule.class, aliases = "pole")
 public class PoleCMD implements BotCommand {
 
@@ -46,36 +47,40 @@ public class PoleCMD implements BotCommand {
         if (!poles.isPresent()) {
             PoleCollection polesHoy = PoleCollection.builder().first(from.getId()).build();
             cachedGroup.getPolesMap().put(today.toLocalDate(), polesHoy);
-            save(manager, cachedGroup, today.toLocalDate(), polesHoy, 1);
+            save(manager, cachedGroup, today.toLocalDate(), polesHoy);
+            saveToDatabase(manager, cachedGroup, polesHoy, 1);
             getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b>!!!", "html", null, false, messageId, null);
-            BotServer.logger.info("Pole otorgado a " + from.getId() + " en " + chat.getId());
+            log.info("Pole otorgado a " + from.getId() + " en " + chat.getId());
         } else if (!poles.get().contains(from.getId())) {
             if (!poles.get().getFirst().isPresent()) { //fixbug a si el objeto PolleCollection existe en memoria pero realmente no se han realizado poles
                 poles.get().setFirst(from.getId());
-                save(manager, cachedGroup, today.toLocalDate(), poles.get(), 1);
+                save(manager, cachedGroup, today.toLocalDate(), poles.get());
+                saveToDatabase(manager, cachedGroup, poles.get(), 1);
                 getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b>!!!", "html", null, false, messageId, null);
-                BotServer.logger.info("Pole (fixbug) otorgado a " + from.getId() + " en " + chat.getId());
+                log.info("Pole (fixbug) otorgado a " + from.getId() + " en " + chat.getId());
             } else if (!poles.get().getSecond().isPresent()) {
                 poles.get().setSecond(from.getId());
-                save(manager, cachedGroup, today.toLocalDate(), poles.get(), 2);
+                save(manager, cachedGroup, today.toLocalDate(), poles.get());
+                saveToDatabase(manager, cachedGroup, poles.get(), 2);
                 getBot().sendMessage(chat.getId(), base + " ha hecho la <b>subpole</b>, meh", "html", null, false, messageId, null);
-                BotServer.logger.info("Plata otorgado a " + from.getId() + " en " + chat.getId());
+                log.info("Plata otorgado a " + from.getId() + " en " + chat.getId());
             } else if (!poles.get().getThird().isPresent()) {
                 poles.get().setThird(from.getId());
-                save(manager, cachedGroup, today.toLocalDate(), poles.get(), 3);
+                save(manager, cachedGroup, today.toLocalDate(), poles.get());
+                saveToDatabase(manager, cachedGroup, poles.get(), 3);
                 getBot().sendMessage(chat.getId(), base + " ha hecho la <b>bronce</b> (cual perdedor)", "html", null, false, messageId, null);
-                BotServer.logger.info("Bronce otorgado a " + from.getId() + " en " + chat.getId());
+                log.info("Bronce otorgado a " + from.getId() + " en " + chat.getId());
             }
         }
 
     }
 
-    private void save(PoleCacheManager manager, CachedGroup group, LocalDate today, PoleCollection poles, int updated) {
+    private void save(PoleCacheManager manager, CachedGroup group, LocalDate today, PoleCollection poles) {
         group.updatePoles(today, poles);
         manager.clearOldCache(group, today);
+    }
 
-        botServer.getScheduler().schedule(BotTask.async(() -> {
-            manager.saveToDatabase(group, poles, updated);
-        }));
+    private void saveToDatabase(PoleCacheManager manager, CachedGroup group, PoleCollection poles, int updated) {
+        CompletableFuture.runAsync(() -> manager.savePoleToDatabase(group, poles, updated));
     }
 }

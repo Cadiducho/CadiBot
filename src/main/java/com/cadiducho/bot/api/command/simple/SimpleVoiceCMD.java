@@ -4,10 +4,10 @@ import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
-import java.time.Instant;
 
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -20,7 +20,7 @@ public class SimpleVoiceCMD extends SimpleCommand {
     private final List<String> voices;
 
     public SimpleVoiceCMD(List<String> aliases, String voiceId) {
-        this(aliases, ReplyPattern.TO_ANSWERED, Arrays.asList(voiceId));
+        this(aliases, ReplyPattern.TO_ANSWERED, Collections.singletonList(voiceId));
     }
     
     public SimpleVoiceCMD(List<String> aliases, List<String> voices) {

@@ -6,17 +6,11 @@ import com.cadiducho.telegrambotapi.Update;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 import com.cadiducho.telegrambotapi.handlers.LongPollingHandler;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 
 import java.time.Instant;
-import java.time.LocalTime;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalUnit;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+@Log
 @RequiredArgsConstructor
 public class UpdatesHandler implements LongPollingHandler {
 
@@ -26,7 +20,7 @@ public class UpdatesHandler implements LongPollingHandler {
     @Override
     public void handleUpdate(Update update) {
         if (update.getCallback_query() != null) {
-            server.getModuleManager().getModules().forEach(m -> m.onCallbackQuery(update.getCallback_query()));
+            server.getCommandManager().onCallbackQuery(update.getCallback_query());
         }
         
         try {
@@ -38,7 +32,8 @@ public class UpdatesHandler implements LongPollingHandler {
                 server.getModuleManager().getModules().forEach(m -> m.onPostCommand(update, success));
             }
         } catch (TelegramException ex) {
-            Logger.getLogger(UpdatesHandler.class.getName()).log(Level.SEVERE, null, ex);
+            log.severe("Fallo procesando una Update de la API de Telegram: " + ex.getMessage());
+            log.severe(ex.getCause().getMessage());
         }
     }
 }
