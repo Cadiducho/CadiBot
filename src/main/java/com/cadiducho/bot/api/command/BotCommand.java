@@ -87,21 +87,21 @@ public interface BotCommand {
 
         stringBuilder.append(this.getName());
         for (Argument argument : this.getArguments()) {
-            char open = '<';
-            char close = '>';
+            String open = "&lt;"; // <
+            String close = "&gt;"; // >
             if (!argument.required()) {
-                open = '[';
-                close = ']';
+                open = "[";
+                close = "]";
             }
             stringBuilder.append(' ').append(open).append(argument.name()).append(close);
         }
         stringBuilder.append(" : ").append(this.getDescription());
         for (Argument argument : this.getArguments()) {
-            char open = '<';
-            char close = '>';
+            String open = "&lt;"; // <
+            String close = "&gt;"; // >
             if (!argument.required()) {
-                open = '[';
-                close = ']';
+                open = "[";
+                close = "]";
             }
             stringBuilder.append("\n - ").append(open).append(argument.name()).append(close)
                     .append(" (").append(argument.type().getSimpleName()).append("): ").append(argument.description());
