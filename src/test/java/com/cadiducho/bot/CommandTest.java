@@ -34,8 +34,8 @@ public class CommandTest {
         BotCommand command = new TestCommandWithArguments();
 
         String usoEsperado = "<code>/commandWithArgs &lt;nombre&gt; [cantidad]</code>: resumen del comando con argumentos";
-        usoEsperado += "\n · &lt;nombre&gt; (<i>Texto</i>): Nombre del usuario";
-        usoEsperado += "\n · [cantidad] (<i>Número</i>, opcional): Cantidad a asignar";
+        usoEsperado += "\n <b>·</b> &lt;nombre&gt; (<i>Texto</i>): Nombre del usuario";
+        usoEsperado += "\n <b>·</b> [cantidad] (<i>Número</i>, opcional): Cantidad a asignar";
 
         assertEquals(usoEsperado, command.getUsage());
     }

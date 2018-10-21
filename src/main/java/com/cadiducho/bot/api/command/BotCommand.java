@@ -106,7 +106,7 @@ public interface BotCommand {
                 close = "]";
                 opcional = ", opcional";
             }
-            stringBuilder.append("\n · ")
+            stringBuilder.append("\n <b>·</b> ")
                     .append(open).append(argument.name()).append(close)
                     .append(" (<i>").append(getArgumentName(argument)).append("</i>").append(opcional)
                     .append("): ").append(argument.description());
