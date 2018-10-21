@@ -85,7 +85,8 @@ public interface BotCommand {
     default String getUsage() {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append(this.getName());
+        stringBuilder.append("<code>")
+            .append(this.getName());
         for (Argument argument : this.getArguments()) {
             String open = "&lt;"; // <
             String close = "&gt;"; // >
@@ -95,18 +96,34 @@ public interface BotCommand {
             }
             stringBuilder.append(' ').append(open).append(argument.name()).append(close);
         }
-        stringBuilder.append(" : ").append(this.getDescription());
+        stringBuilder.append("</code>").append(": ").append(this.getDescription());
         for (Argument argument : this.getArguments()) {
             String open = "&lt;"; // <
             String close = "&gt;"; // >
+            String opcional = "";
             if (!argument.required()) {
                 open = "[";
                 close = "]";
+                opcional = ", opcional";
             }
-            stringBuilder.append("\n - ").append(open).append(argument.name()).append(close)
-                    .append(" (").append(argument.type().getSimpleName()).append("): ").append(argument.description());
+            stringBuilder.append("\n · ")
+                    .append(open).append(argument.name()).append(close)
+                    .append(" (<i>").append(getArgumentName(argument)).append("</i>").append(opcional)
+                    .append("): ").append(argument.description());
         }
         return stringBuilder.toString();
+    }
+
+    default String getArgumentName(Argument argument) {
+        switch (argument.type().getSimpleName()) {
+            case "String": return "Texto";
+            case "Integer":
+            case "Long": return "Número";
+            case "Double": return "Número con decimales";
+            case "LocalDate": return "Fecha";
+            case "LocalDateTime": return "Fecha y hora";
+            default: return argument.type().getSimpleName();
+        }
     }
     
     default TelegramBot getBot() {
