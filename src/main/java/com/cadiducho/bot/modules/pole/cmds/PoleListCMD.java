@@ -96,7 +96,7 @@ public class PoleListCMD implements BotCommand {
     }
 
     private void editPoleListMessage(CallbackQuery callbackQuery, Supplier<String> bodySupplier, InlineKeyboardMarkup inlineKeyboard) throws TelegramException {
-        botServer.getCadibot().editMessageText(callbackQuery.getMessage().getChat().getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
+        botServer.getCadibot().editMessageText(callbackQuery.getMessage().getChat().getId(), callbackQuery.getMessage().getMessageId(), callbackQuery.getInlineMessageId(),
                 bodySupplier.get(), "html", false, inlineKeyboard);
     }
 }

@@ -97,7 +97,6 @@ public class BotServer {
         consoleManager.startConsole();
         consoleManager.startFile("logs/log-%D.txt");
         cadibot = new TelegramBot(cmd.getOptionValue("token"));
-        cadibot.getUpdatesPoller().setOwnerId(Long.parseLong(cmd.getOptionValue("owner")));
 
         try {
             mysql = new MySQL(instance,
@@ -123,12 +122,14 @@ public class BotServer {
 
         UpdatesHandler events = new UpdatesHandler(cadibot, instance);
         cadibot.getUpdatesPoller().setHandler(events);
-
+        //cadibot.getUpdatesPoller().setOwnerId(Long.parseLong(cmd.getOptionValue("owner")));
+        cadibot.startUpdatesPoller();
 
         log.info("Bot " + VERSION + " iniciado completamente");
     }
     
     public void shutdown() {
+        cadibot.stopUpdatesPoller();
         moduleManager.getModules().forEach(Module::onClose);
         try {
             mysql.closeConnection();

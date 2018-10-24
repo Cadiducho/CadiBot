@@ -21,7 +21,7 @@ public class InlineKeyboardUtil {
     private static InlineKeyboardButton rankingGlobal() {
         InlineKeyboardButton rankingGlobal = new InlineKeyboardButton();
         rankingGlobal.setText("Top global");
-        rankingGlobal.setCallback_data("mostrarRankingGlobal");
+        rankingGlobal.setCallbackData("mostrarRankingGlobal");
         return rankingGlobal;
     }
 
@@ -32,7 +32,7 @@ public class InlineKeyboardUtil {
     private static InlineKeyboardButton topGrupo() {
         InlineKeyboardButton topGrupo = new InlineKeyboardButton();
         topGrupo.setText("Top del grupo");
-        topGrupo.setCallback_data("mostrarTopGrupo");
+        topGrupo.setCallbackData("mostrarTopGrupo");
         return topGrupo;
     }
 
@@ -43,7 +43,7 @@ public class InlineKeyboardUtil {
     private static InlineKeyboardButton rankingPorGrupos() {
         InlineKeyboardButton rankingPorGrupos = new InlineKeyboardButton();
         rankingPorGrupos.setText("Top por grupos");
-        rankingPorGrupos.setCallback_data("mostrarRankingPorGrupos");
+        rankingPorGrupos.setCallbackData("mostrarRankingPorGrupos");
         return rankingPorGrupos;
     }
 
@@ -54,7 +54,7 @@ public class InlineKeyboardUtil {
     private static InlineKeyboardButton resumenDia() {
         InlineKeyboardButton resumenDia = new InlineKeyboardButton();
         resumenDia.setText("Resumen del día");
-        resumenDia.setCallback_data("mostrarResumenGrupo");
+        resumenDia.setCallbackData("mostrarResumenGrupo");
         return resumenDia;
     }
 
@@ -64,7 +64,7 @@ public class InlineKeyboardUtil {
      */
     public static InlineKeyboardMarkup getMostrarTops() {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-        inlineKeyboard.setInline_keyboard(Arrays.asList(Arrays.asList(topGrupo()), Arrays.asList(rankingGlobal(), rankingPorGrupos())));
+        inlineKeyboard.setInlineKeyboard(Arrays.asList(Arrays.asList(topGrupo()), Arrays.asList(rankingGlobal(), rankingPorGrupos())));
         return inlineKeyboard;
     }
 
@@ -74,7 +74,7 @@ public class InlineKeyboardUtil {
      */
     public static InlineKeyboardMarkup getMostrarResumen() {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-        inlineKeyboard.setInline_keyboard(Arrays.asList(Arrays.asList(resumenDia()), Arrays.asList(rankingGlobal(), rankingPorGrupos())));
+        inlineKeyboard.setInlineKeyboard(Arrays.asList(Arrays.asList(resumenDia()), Arrays.asList(rankingGlobal(), rankingPorGrupos())));
         return inlineKeyboard;
     }
 
@@ -84,7 +84,7 @@ public class InlineKeyboardUtil {
      */
     public static InlineKeyboardMarkup getResumenesYTopGrupal() {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-        inlineKeyboard.setInline_keyboard(Arrays.asList(Arrays.asList(resumenDia(), topGrupo()), Arrays.asList(rankingPorGrupos())));
+        inlineKeyboard.setInlineKeyboard(Arrays.asList(Arrays.asList(resumenDia(), topGrupo()), Arrays.asList(rankingPorGrupos())));
         return inlineKeyboard;
     }
 
@@ -94,7 +94,7 @@ public class InlineKeyboardUtil {
      */
     public static InlineKeyboardMarkup getResumenesYTopGlobal() {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-        inlineKeyboard.setInline_keyboard(Arrays.asList(Arrays.asList(resumenDia(), topGrupo()), Arrays.asList(rankingGlobal())));
+        inlineKeyboard.setInlineKeyboard(Arrays.asList(Arrays.asList(resumenDia(), topGrupo()), Arrays.asList(rankingGlobal())));
         return inlineKeyboard;
     }
 }

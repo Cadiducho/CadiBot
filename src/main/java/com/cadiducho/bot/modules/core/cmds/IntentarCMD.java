@@ -25,6 +25,6 @@ public class IntentarCMD implements BotCommand {
             tried = "intentó";
             end = "pero falló";
         }
-        getBot().sendMessage(chat.getId(), EmojiManager.getForAlias("game_die").getUnicode() + " " + from.getFirst_name() + " " + tried + " " + String.join(" ", args) + " " + end);
+        getBot().sendMessage(chat.getId(), EmojiManager.getForAlias("game_die").getUnicode() + " " + from.getFirstName() + " " + tried + " " + String.join(" ", args) + " " + end);
     }
 }

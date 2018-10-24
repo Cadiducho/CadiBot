@@ -21,7 +21,7 @@ public class HolaCMD implements BotCommand {
     @Override
     public void execute(final Chat chat, final User from, final String label, final String[] args, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         Random rand = new Random(instant.getEpochSecond());
-        String reponse = saludos.get(rand.nextInt(saludos.size())).replace("@user", from.getFirst_name());
+        String reponse = saludos.get(rand.nextInt(saludos.size())).replace("@user", from.getFirstName());
         getBot().sendMessage(chat.getId(), reponse, null, null, false, messageId, null);
     }
 }
