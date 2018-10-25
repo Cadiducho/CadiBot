@@ -1,6 +1,7 @@
 package com.cadiducho.bot.modules.pole.cmds;
 
 import com.cadiducho.bot.api.command.BotCommand;
+import com.cadiducho.bot.api.command.CommandContext;
 import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.bot.modules.pole.CachedGroup;
 import com.cadiducho.bot.modules.pole.PoleCacheManager;
@@ -28,7 +29,7 @@ public class PoleCMD implements BotCommand {
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public void execute(final Chat chat, final User from, final String label, final String[] args, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
+    public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         if (!module.isChatSafe(getBot(), chat, from)) return;
 
         LocalDateTime today = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());

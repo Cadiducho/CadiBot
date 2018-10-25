@@ -49,6 +49,9 @@ public class CommandTest {
 
     @CommandInfo(aliases = {"/comando", "/alias", "/alternativa"}, description = "descripción de prueba")
     private class TestCommand implements BotCommand {
+        @Override
+        public void execute(Chat chat, User from, CommandContext context, Integer messageId, Message replyingTo, Instant instant) throws TelegramException {
+        }
     }
 
     @CommandInfo(aliases = "/commandWithArgs", description = "resumen del comando con argumentos")

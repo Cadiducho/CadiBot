@@ -1,6 +1,7 @@
 package com.cadiducho.bot.modules.animales.cmds;
 
 import com.cadiducho.bot.api.command.BotCommand;
+import com.cadiducho.bot.api.command.CommandContext;
 import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
@@ -16,7 +17,7 @@ public class CatCMD implements BotCommand {
     private static final String catApi = "https://cataas.com/cat/cute";
 
     @Override
-    public void execute(final Chat chat, final User from, final String label, final String[] args, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
+    public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
 
         /*InlineKeyboardButton voteUp = new InlineKeyboardButton();

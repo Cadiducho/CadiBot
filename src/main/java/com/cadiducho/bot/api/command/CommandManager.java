@@ -100,9 +100,7 @@ public class CommandManager {
         CommandContext context = new CommandContext(target.get().getArguments(), Arrays.copyOfRange(rawcmd, 1, rawcmd.length));
 
         log.info(" # Ejecutando '" + target.get().getName() + "'");
-        target.get().execute(message.getChat(), from, sentLabel, Arrays.copyOfRange(rawcmd, 1, rawcmd.length), message.getMessageId(), message.getReplyToMessage(), now);
         target.get().execute(message.getChat(), from, context, message.getMessageId(), message.getReplyToMessage(), now);
-        target.get().execute(message.getChat(), from, context, message.getMessage_id(), message.getReply_to_message(), now);
 
         return true;
     }

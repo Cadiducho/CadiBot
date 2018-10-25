@@ -1,6 +1,7 @@
 package com.cadiducho.bot.modules.pole.cmds;
 
 import com.cadiducho.bot.api.command.BotCommand;
+import com.cadiducho.bot.api.command.CommandContext;
 import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.bot.modules.pole.PoleModule;
 import com.cadiducho.telegrambotapi.Chat;
@@ -17,7 +18,7 @@ import java.util.logging.Logger;
 public class UpdateUsernameCMD implements BotCommand {
 
     @Override
-    public void execute(final Chat chat, final User from, final String label, final String[] args, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
+    public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         try {
             getMySQL().updateUsername(from.getId(), Long.parseLong(chat.getId()));
             if (chat.isGroupChat()) {
