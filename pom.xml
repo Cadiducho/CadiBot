@@ -26,8 +26,24 @@
             <id>cadi-repo</id>
             <url>https://cadiducho.com/repo/</url>
         </repository>
+        <repository>
+            <id>moshi-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/com/squareup/moshi/</url>
+            <snapshots><enabled>true</enabled><updatePolicy>always</updatePolicy></snapshots>
+        </repository>
     </repositories>
     <dependencies>
+        <dependency>
+            <groupId>com.cadiducho</groupId>
+            <artifactId>TelegramBotAPI</artifactId>
+            <version>4.1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.vdurmont</groupId>
+            <artifactId>emoji-java</artifactId>
+            <version>4.0.0</version>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -44,16 +60,17 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>6.0.6</version>
         </dependency>
+
+        <!-- Json related -->
         <dependency>
-            <groupId>com.vdurmont</groupId>
-            <artifactId>emoji-java</artifactId>
-            <version>4.0.0</version>
+            <groupId>com.squareup.moshi</groupId>
+            <artifactId>moshi</artifactId>
+            <version>1.8.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.cadiducho</groupId>
-            <artifactId>TelegramBotAPI</artifactId>
-            <version>4.1</version>
-            <type>jar</type>
+            <groupId>com.squareup.moshi</groupId>
+            <artifactId>moshi-adapters</artifactId>
+            <version>1.8.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Tests -->

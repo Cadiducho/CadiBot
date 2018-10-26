@@ -36,7 +36,6 @@ public class CommandManager {
 
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withZone(ZoneId.systemDefault());
 
-
     /**
      * Registrar un comando y, si contiene, sus listener de CallbackQuery
      * @param cmd El comando a registrar
