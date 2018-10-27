@@ -36,7 +36,7 @@ public class PoleCMD implements BotCommand {
         PoleCacheManager manager = module.getPoleCacheManager();
         Long groupId = Long.parseLong(chat.getId());
         String currentname = from.getFirstName();
-        String base = "<i>" + DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault()).format(instant) + "</i>: " + currentname;
+        String base = "<i>" + DateTimeFormatter.ofPattern("HH:mm:ss.SSS").withZone(ZoneId.systemDefault()).format(instant) + "</i>: " + currentname;
 
         if (!manager.isCached(groupId)) {
             manager.initializeGroupCache(groupId, chat.getTitle());
