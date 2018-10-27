@@ -153,7 +153,7 @@ public class PoleMessengerUtil {
                     .name(rs.getString("name"))
                     .username(rs.getString("username"))
                     .build();
-            poles.put(rs.getRow(), user);
+            poles.put(rs.getInt("poleType"), user);
         }
 
         return poles;
