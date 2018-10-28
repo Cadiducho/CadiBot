@@ -24,6 +24,12 @@ public class UpdatesHandler implements LongPollingHandler {
         }
         
         try {
+            if (update.getMessage().getType().equals(Message.Type.NEW_CHAT_MEMBERS)) {
+                server.getModuleManager().getModules().forEach(m -> m.onNewChatMembers(update.getMessage().getChat(), update.getMessage().getNewChatMembers()));
+            }
+            if (update.getMessage().getType().equals(Message.Type.LEFT_CHAT_MEMBER)) {
+                server.getModuleManager().getModules().forEach(m -> m.onLeftChatMember(update.getMessage().getChat(), update.getMessage().getLeftChatMember()));
+            }
             if (update.getMessage().getType().equals(Message.Type.TEXT)) {
                 //Si la update fue recibida hace más de 10 minutos, ignorarla
                 if (Instant.ofEpochSecond(update.getMessage().getDate().longValue()).isBefore(Instant.now().minusSeconds(10 * 60))) return;
@@ -33,7 +39,7 @@ public class UpdatesHandler implements LongPollingHandler {
             }
         } catch (TelegramException ex) {
             log.severe("Fallo procesando una Update de la API de Telegram: " + ex.getMessage());
-            log.severe(ex.getCause().getMessage());
+            if (ex.getCause() != null) log.severe("Causa: " + ex.getCause().getMessage());
         }
     }
 }
