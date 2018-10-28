@@ -1,9 +1,6 @@
 package com.cadiducho.bot.modules.pole.cmds;
 
-import com.cadiducho.bot.api.command.BotCommand;
-import com.cadiducho.bot.api.command.CallbackListener;
-import com.cadiducho.bot.api.command.CommandInfo;
-import com.cadiducho.bot.api.command.ListenTo;
+import com.cadiducho.bot.api.command.*;
 import com.cadiducho.bot.modules.pole.PoleModule;
 import com.cadiducho.bot.modules.pole.util.InlineKeyboardUtil;
 import com.cadiducho.bot.modules.pole.util.PoleMessengerUtil;
@@ -27,7 +24,7 @@ public class PoleListCMD implements BotCommand {
     private final PoleModule module = (PoleModule) getModule();
 
     @Override
-    public void execute(final Chat chat, final User from, final String label, final String[] args, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
+    public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         if (!module.isChatSafe(getBot(), chat, from)) return;
 
         try {
@@ -96,7 +93,7 @@ public class PoleListCMD implements BotCommand {
     }
 
     private void editPoleListMessage(CallbackQuery callbackQuery, Supplier<String> bodySupplier, InlineKeyboardMarkup inlineKeyboard) throws TelegramException {
-        botServer.getCadibot().editMessageText(callbackQuery.getMessage().getChat().getId(), callbackQuery.getMessage().getMessage_id(), callbackQuery.getInline_message_id(),
+        botServer.getCadibot().editMessageText(callbackQuery.getMessage().getChat().getId(), callbackQuery.getMessage().getMessageId(), callbackQuery.getInlineMessageId(),
                 bodySupplier.get(), "html", false, inlineKeyboard);
     }
 }

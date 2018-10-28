@@ -1,6 +1,7 @@
 package com.cadiducho.bot.modules.saludos.cmds;
 
 import com.cadiducho.bot.api.command.BotCommand;
+import com.cadiducho.bot.api.command.CommandContext;
 import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.bot.modules.saludos.SaludosModule;
 import com.cadiducho.telegrambotapi.Chat;
@@ -19,9 +20,9 @@ public class HolaCMD implements BotCommand {
     private final List<String> saludos = Arrays.asList("Buenos días, @user!", "Hola bb", "Ya era hora de levantarse", "van siendo horas de ponerse a trabajar desgraciao");
 
     @Override
-    public void execute(final Chat chat, final User from, final String label, final String[] args, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
+    public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         Random rand = new Random(instant.getEpochSecond());
-        String reponse = saludos.get(rand.nextInt(saludos.size())).replace("@user", from.getFirst_name());
+        String reponse = saludos.get(rand.nextInt(saludos.size())).replace("@user", from.getFirstName());
         getBot().sendMessage(chat.getId(), reponse, null, null, false, messageId, null);
     }
 }

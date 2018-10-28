@@ -25,19 +25,13 @@ public interface BotCommand {
      * Ejecutar un comando
      * @param chat Chat donde el comando fue recibido
      * @param from Usuario por el que el comando fue ejecutado
-     * @param label Primera palabra del comando ejecutado
-     * @param args Argumentos del comando
+     * @param context El {@link CommandContext} en el que ha sido ejecutado el comando
      * @param messageId ID del mensaje del comando
      * @param replyingTo Mensaje al que el comando respondía
      * @param instant Instante en el que el comando fue ejecutado
      * @throws TelegramException Excepción ocurrida
      */
-    default void execute(final Chat chat, final User from, final String label, final String[] args, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
-    }
-
-    default void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
-
-    }
+    void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException;
     
     default Module getModule() {
         if (!this.getClass().isAnnotationPresent(CommandInfo.class)) {
@@ -85,28 +79,45 @@ public interface BotCommand {
     default String getUsage() {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append(this.getName());
+        stringBuilder.append("<code>")
+            .append(this.getName());
         for (Argument argument : this.getArguments()) {
-            char open = '<';
-            char close = '>';
+            String open = "&lt;"; // <
+            String close = "&gt;"; // >
             if (!argument.required()) {
-                open = '[';
-                close = ']';
+                open = "[";
+                close = "]";
             }
             stringBuilder.append(' ').append(open).append(argument.name()).append(close);
         }
-        stringBuilder.append(" : ").append(this.getDescription());
+        stringBuilder.append("</code>").append(": ").append(this.getDescription());
         for (Argument argument : this.getArguments()) {
-            char open = '<';
-            char close = '>';
+            String open = "&lt;"; // <
+            String close = "&gt;"; // >
+            String opcional = "";
             if (!argument.required()) {
-                open = '[';
-                close = ']';
+                open = "[";
+                close = "]";
+                opcional = ", opcional";
             }
-            stringBuilder.append("\n - ").append(open).append(argument.name()).append(close)
-                    .append(" (").append(argument.type().getSimpleName()).append("): ").append(argument.description());
+            stringBuilder.append("\n <b>·</b> ")
+                    .append(open).append(argument.name()).append(close)
+                    .append(" (<i>").append(getArgumentName(argument)).append("</i>").append(opcional)
+                    .append("): ").append(argument.description());
         }
         return stringBuilder.toString();
+    }
+
+    default String getArgumentName(Argument argument) {
+        switch (argument.type().getSimpleName()) {
+            case "String": return "Texto";
+            case "Integer":
+            case "Long": return "Número";
+            case "Double": return "Número con decimales";
+            case "LocalDate": return "Fecha";
+            case "LocalDateTime": return "Fecha y hora";
+            default: return argument.type().getSimpleName();
+        }
     }
     
     default TelegramBot getBot() {

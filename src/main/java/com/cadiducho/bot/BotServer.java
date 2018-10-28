@@ -18,7 +18,7 @@ public class BotServer {
     /**
      * Server / bot version
      */
-    public static final String VERSION = "2.9";
+    public static final String VERSION = "2.10";
 
     /**
      * The Module manager
@@ -70,9 +70,9 @@ public class BotServer {
         options.addOption(dbpa);
         options.addOption(owner);
         
-        CommandLine cmd;
+        CommandLine commandLine;
         try {
-            cmd = new DefaultParser().parse(options, args);
+            commandLine = new DefaultParser().parse(options, args);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
             new HelpFormatter().printHelp("cadibot", options);
@@ -81,7 +81,7 @@ public class BotServer {
             return;
         }
         BotServer bot = new BotServer();
-        bot.startServer(cmd);
+        bot.startServer(commandLine);
     }
     
     private BotServer() {
@@ -97,7 +97,6 @@ public class BotServer {
         consoleManager.startConsole();
         consoleManager.startFile("logs/log-%D.txt");
         cadibot = new TelegramBot(cmd.getOptionValue("token"));
-        cadibot.getUpdatesPoller().setOwnerId(Long.parseLong(cmd.getOptionValue("owner")));
 
         try {
             mysql = new MySQL(instance,
@@ -123,12 +122,14 @@ public class BotServer {
 
         UpdatesHandler events = new UpdatesHandler(cadibot, instance);
         cadibot.getUpdatesPoller().setHandler(events);
-
+        //cadibot.getUpdatesPoller().setOwnerId(Long.parseLong(cmd.getOptionValue("owner")));
+        cadibot.startUpdatesPoller();
 
         log.info("Bot " + VERSION + " iniciado completamente");
     }
     
     public void shutdown() {
+        cadibot.stopUpdatesPoller();
         moduleManager.getModules().forEach(Module::onClose);
         try {
             mysql.closeConnection();

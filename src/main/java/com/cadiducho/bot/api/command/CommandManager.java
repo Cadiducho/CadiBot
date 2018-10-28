@@ -36,7 +36,6 @@ public class CommandManager {
 
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withZone(ZoneId.systemDefault());
 
-
     /**
      * Registrar un comando y, si contiene, sus listener de CallbackQuery
      * @param cmd El comando a registrar
@@ -78,7 +77,7 @@ public class CommandManager {
         User from = update.getMessage().getFrom();
 
         log.info(dateTimeFormatter.format(now) + " " +
-                        (from.getUsername() == null ? from.getFirst_name() : ("@" + from.getUsername())) +
+                        (from.getUsername() == null ? from.getFirstName() : ("@" + from.getUsername())) +
                         "#" + message.getChat().getId() +
                         ": " + message.getText());
 
@@ -100,8 +99,7 @@ public class CommandManager {
         CommandContext context = new CommandContext(target.get().getArguments(), Arrays.copyOfRange(rawcmd, 1, rawcmd.length));
 
         log.info(" # Ejecutando '" + target.get().getName() + "'");
-        target.get().execute(message.getChat(), from, sentLabel, Arrays.copyOfRange(rawcmd, 1, rawcmd.length), message.getMessage_id(), message.getReply_to_message(), now);
-        target.get().execute(message.getChat(), from, context, message.getMessage_id(), message.getReply_to_message(), now);
+        target.get().execute(message.getChat(), from, context, message.getMessageId(), message.getReplyToMessage(), now);
 
         return true;
     }
@@ -111,7 +109,7 @@ public class CommandManager {
         User from = callbackQuery.getFrom();
 
         log.info(dateTimeFormatter.format(now) + " InlineCallbackQuery: " +
-                (from.getUsername() == null ? from.getFirst_name() : ("@" + from.getUsername())) +
+                (from.getUsername() == null ? from.getFirstName() : ("@" + from.getUsername())) +
                 "#" + (callbackQuery.getMessage() != null ? callbackQuery.getMessage().getChat().getId() : "") +
                 ": " + callbackQuery.getData());
 

@@ -2,7 +2,11 @@ package com.cadiducho.bot.modules.core.cmds;
 
 import com.cadiducho.bot.MySQL;
 import com.cadiducho.bot.api.command.BotCommand;
+import com.cadiducho.bot.api.command.CommandContext;
 import com.cadiducho.bot.api.command.CommandInfo;
+import com.cadiducho.bot.api.command.args.Argument;
+import com.cadiducho.bot.api.command.args.CommandArguments;
+import com.cadiducho.bot.api.command.args.CommandParseException;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.User;
@@ -15,23 +19,26 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 @CommandInfo(aliases = "/changelog")
+@CommandArguments(@Argument(name = "cantidad", type = Integer.class, description = "Número de versiones a visualizar"))
 public class ChangelogCMD implements BotCommand {
     
     @Override
-    public void execute(final Chat chat, final User from, final String label, final String[] args, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
+    public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         int limit = 5;
-        if (args.length >= 1) {
-            try {
-                int newlimit = Integer.parseInt(args[0]);
+        try {
+            Optional<Integer> cantidad = context.get("cantidad");
+            if (cantidad.isPresent()) {
+                int newlimit = cantidad.get();
                 if (newlimit < 50) { //evitar consultar cientos de versiones
                     limit = newlimit;
                 }
-            } catch (NumberFormatException ex) {
-                getBot().sendMessage(chat.getId(), "Usa /changelog <número de versiones>");
-                return;
             }
+        } catch (CommandParseException ex) {
+            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(), "html", null, false, messageId, null);
+            return;
         }
         List<String> cambios = getChangelog(limit);
         if (cambios.isEmpty()) {

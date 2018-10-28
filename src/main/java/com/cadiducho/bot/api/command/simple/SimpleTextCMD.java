@@ -1,5 +1,6 @@
 package com.cadiducho.bot.api.command.simple;
 
+import com.cadiducho.bot.api.command.CommandContext;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.User;
@@ -34,7 +35,7 @@ public class SimpleTextCMD extends SimpleCommand {
     }
 
     @Override
-    public void execute(final Chat chat, final User from, final String label, final String[] args, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
+    public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         Random rand = new Random(instant.getNano());
         String reply = EmojiParser.parseToUnicode(replies.get(rand.nextInt(replies.size())));
 

@@ -2,7 +2,11 @@ package com.cadiducho.bot.api.module;
 
 import com.cadiducho.bot.BotServer;
 import com.cadiducho.telegrambotapi.CallbackQuery;
+import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Update;
+import com.cadiducho.telegrambotapi.User;
+
+import java.util.List;
 
 /**
  * Modulo para funcionalidades del bot
@@ -51,6 +55,12 @@ public interface Module {
     }
 
     default void onClose() {
+    }
+
+    default void onNewChatMembers(Chat chat, List<User> newChatMembers) {
+    }
+
+    default void onLeftChatMember(Chat chat, User leftChatMember) {
     }
     
     default void onPostCommand(Update update, boolean success) {

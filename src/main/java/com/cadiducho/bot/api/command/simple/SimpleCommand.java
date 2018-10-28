@@ -33,7 +33,7 @@ public abstract class SimpleCommand implements BotCommand {
         Integer replyTheCommandTo = null;
         switch (replyPattern) {
             case TO_ANSWERED:
-                if (replyingTo != null) replyTheCommandTo = replyingTo.getMessage_id();
+                if (replyingTo != null) replyTheCommandTo = replyingTo.getMessageId();
                 break;
             case TO_ORIGINAL:
                 replyTheCommandTo = originalId;

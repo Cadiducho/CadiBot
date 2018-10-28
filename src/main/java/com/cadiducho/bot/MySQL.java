@@ -6,6 +6,7 @@ import com.vdurmont.emoji.EmojiParser;
 import lombok.Getter;
 
 import java.sql.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -78,31 +79,31 @@ public class MySQL {
         } catch (TelegramException ignored) {
         }
         if (user.isPresent()) {
-            String currentname = user.get().getFirst_name();
+            String currentname = user.get().getFirstName();
             String safe = EmojiParser.parseToAliases(currentname);
             PreparedStatement update_user_name = openConnection().prepareStatement("INSERT INTO `" + TABLE_USERS + "` (`userid`, `name`, `username`, `lang`) VALUES(?, ?, ?, ?) " +
                     "ON DUPLICATE KEY UPDATE `name`=?, `username`=?, `lang`=?");
             update_user_name.setInt(1, user.get().getId());
             update_user_name.setString(2, safe);
             update_user_name.setString(3, user.get().getUsername());
-            update_user_name.setString(4, user.get().getLanguage_code());
+            update_user_name.setString(4, user.get().getLanguageCode());
             update_user_name.setString(5, safe);
             update_user_name.setString(6, user.get().getUsername());
-            update_user_name.setString(7, user.get().getLanguage_code());
+            update_user_name.setString(7, user.get().getLanguageCode());
             update_user_name.executeUpdate();
         }
     }    
     
-    public void updateGroup(Object groupId, String groupName) {
+    public void updateGroup(Object groupId, String groupName, boolean addedNow) {
         try {
             PreparedStatement registerGroup = openConnection().prepareStatement("INSERT INTO `" + TABLE_GRUPOS + "` (`groupid`, `name`) VALUES (?, ?) "
-                    + "ON DUPLICATE KEY UPDATE `name`=?");
+                    + "ON DUPLICATE KEY UPDATE `name`=? " + (addedNow ? ", `lastAdded`=?" : ""));
             registerGroup.setObject(1, groupId);
             registerGroup.setString(2, groupName);
             registerGroup.setString(3, groupName);
+            if (addedNow) registerGroup.setTimestamp(4, Timestamp.from(Instant.now()));
             registerGroup.executeUpdate();
-        } catch (SQLException ignored) {
-        }
+        } catch (SQLException ignored) { }
     }
     
     public void disableGroup(Object groupId) {

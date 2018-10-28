@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.Optional;
 
@@ -32,7 +33,7 @@ public class PoleTest {
         Integer thirdUserId = 3;
         LocalDateTime today = LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
 
-        manager.initializeGroupCache(groupId, "Chat test", new LinkedHashMap<>());
+        manager.initializeGroupCache(groupId, "Chat test", new LinkedHashMap<>(), today.toLocalDate().minusDays(1));
 
         CachedGroup cachedGroup = manager.getCachedGroup(groupId).get();
         Optional<PoleCollection> poles = cachedGroup.getPolesOfADay(today.toLocalDate());
@@ -69,7 +70,7 @@ public class PoleTest {
         LocalDate unoOctubre = LocalDate.of(2018, 10, 1);
         LocalDate dosOctubre = LocalDate.of(2018, 10, 2);
 
-        manager.initializeGroupCache(groupId, "Chat test", new LinkedHashMap<>());
+        manager.initializeGroupCache(groupId, "Chat test", new LinkedHashMap<>(), treintaSeptiembre.minusDays(1));
 
         CachedGroup cachedGroup = manager.getCachedGroup(groupId).get();
         PoleCollection polesTreinta = PoleCollection.builder().first(1).build();
@@ -105,5 +106,16 @@ public class PoleTest {
             assertEquals(polesC.get().getSecond().get(), (Integer) 858);
             assertEquals(polesC.get().getThird().get(), (Integer) 7896);
         });
+    }
+
+    @Test
+    @DisplayName("No hacer poles justo al añadir al bot")
+    public void testNoHacerPolesElDiaDeInstalacion() {
+        Long groupId = 1000L;
+
+        manager.initializeGroupCache(groupId, "Chat test", new LinkedHashMap<>(), LocalDate.now().minusDays(1));
+
+        CachedGroup cachedGroup = manager.getCachedGroup(groupId).get();
+        assertNotEquals(LocalDate.now(), cachedGroup.getLastAdded());
     }
 }
