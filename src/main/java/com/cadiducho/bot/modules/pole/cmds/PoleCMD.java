@@ -27,7 +27,7 @@ public class PoleCMD implements BotCommand {
 
     private final PoleModule module = (PoleModule) getModule();
 
-    @SuppressWarnings("ConstantConditions")
+    @SuppressWarnings({"ConstantConditions", "OptionalGetWithoutIsPresent"})
     @Override
     public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         if (!module.isChatSafe(getBot(), chat, from)) return;
@@ -38,14 +38,23 @@ public class PoleCMD implements BotCommand {
         String currentname = from.getFirstName();
         String base = "<i>" + DateTimeFormatter.ofPattern("HH:mm:ss.SSS").withZone(ZoneId.systemDefault()).format(instant) + "</i>: " + currentname;
 
+        // Obtener grupo del caché y/o cargar este
         if (!manager.isCached(groupId)) {
-            manager.initializeGroupCache(groupId, chat.getTitle());
+            manager.initializeGroupCache(groupId, chat.getTitle(), manager.getChatLastAdded(groupId));
+        }
+        CachedGroup cachedGroup = manager.getCachedGroup(groupId).get();
+
+        // Si el bot ha sido añadido hoy, no se podrán hacer poles hasta el siguiente 00:00:00
+        if (today.toLocalDate().isEqual(cachedGroup.getLastAdded())) {
+            getBot().sendMessage(chat.getId(), "Lo siento, pero he sido añadido al grupo hoy.\nNo se podrán realizar poles hasta la siguiente medianoche");
+            return;
         }
 
-        CachedGroup cachedGroup = manager.getCachedGroup(groupId).get();
-        cachedGroup.setTitle(chat.getTitle());
+        cachedGroup.setTitle(chat.getTitle()); //actualizar titulo del grupo
+
+        // Obtener lista de poles hechas hoy y gestionar la posición de el intento actual
         Optional<PoleCollection> poles = cachedGroup.getPolesOfADay(today.toLocalDate());
-        if (!poles.isPresent()) {
+        if (!poles.isPresent()) { // si no hay lista, es el primer puesto
             PoleCollection polesHoy = PoleCollection.builder().first(from.getId()).build();
             cachedGroup.getPolesMap().put(today.toLocalDate(), polesHoy);
             save(manager, cachedGroup, today.toLocalDate(), polesHoy);
@@ -59,13 +68,15 @@ public class PoleCMD implements BotCommand {
                 saveToDatabase(manager, cachedGroup, poles.get(), 1);
                 getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b>!!!", "html", null, false, messageId, null);
                 log.info("Pole (fixbug) otorgado a " + from.getId() + " en " + chat.getId());
-            } else if (!poles.get().getSecond().isPresent()) {
+
+            } else if (!poles.get().getSecond().isPresent()) { // si hay lista y el segundo no está presente, es plata
                 poles.get().setSecond(from.getId());
                 save(manager, cachedGroup, today.toLocalDate(), poles.get());
                 saveToDatabase(manager, cachedGroup, poles.get(), 2);
                 getBot().sendMessage(chat.getId(), base + " ha hecho la <b>subpole</b>, meh", "html", null, false, messageId, null);
                 log.info("Plata otorgado a " + from.getId() + " en " + chat.getId());
-            } else if (!poles.get().getThird().isPresent()) {
+
+            } else if (!poles.get().getThird().isPresent()) { // si hay lista y el tercero no está presente, es plata
                 poles.get().setThird(from.getId());
                 save(manager, cachedGroup, today.toLocalDate(), poles.get());
                 saveToDatabase(manager, cachedGroup, poles.get(), 3);

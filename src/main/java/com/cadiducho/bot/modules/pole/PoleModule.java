@@ -7,19 +7,15 @@ import com.cadiducho.bot.api.module.ModuleInfo;
 import com.cadiducho.bot.modules.pole.cmds.PoleCMD;
 import com.cadiducho.bot.modules.pole.cmds.PoleListCMD;
 import com.cadiducho.bot.modules.pole.cmds.UpdateUsernameCMD;
-import com.cadiducho.bot.modules.pole.util.InlineKeyboardUtil;
-import com.cadiducho.bot.modules.pole.util.PoleMessengerUtil;
-import com.cadiducho.telegrambotapi.CallbackQuery;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
-import com.cadiducho.telegrambotapi.inline.InlineKeyboardMarkup;
 import com.vdurmont.emoji.EmojiManager;
 import lombok.Getter;
 import lombok.extern.java.Log;
 
-import java.sql.SQLException;
+import java.util.List;
 
 @Log
 @ModuleInfo(name = "Poles", description = "Módulo para hacer poles cada día")
@@ -40,6 +36,18 @@ public class PoleModule implements Module {
         commandManager.register(new PoleListCMD());
         commandManager.register(new UpdateUsernameCMD());
         log.info("Módulo de poles cargado");
+    }
+
+    @Override
+    public void onNewChatMembers(Chat chat, List<User> newChatMembers) {
+        try {
+            Integer botId = botServer.getCadibot().getMe().getId();
+            if (newChatMembers.stream().anyMatch(user -> user.getId().equals(botId))) {
+                log.info("Me han añadido al grupo " + chat.getTitle());
+                botServer.getMysql().updateGroup(chat.getId(), chat.getTitle(), true);
+                poleCacheManager.setGroupLastAdded(Long.parseLong(chat.getId()));
+            }
+        } catch (TelegramException ignored) { }
     }
 
     /**

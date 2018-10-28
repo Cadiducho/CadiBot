@@ -6,6 +6,7 @@ import com.vdurmont.emoji.EmojiParser;
 import lombok.Getter;
 
 import java.sql.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -93,16 +94,16 @@ public class MySQL {
         }
     }    
     
-    public void updateGroup(Object groupId, String groupName) {
+    public void updateGroup(Object groupId, String groupName, boolean addedNow) {
         try {
             PreparedStatement registerGroup = openConnection().prepareStatement("INSERT INTO `" + TABLE_GRUPOS + "` (`groupid`, `name`) VALUES (?, ?) "
-                    + "ON DUPLICATE KEY UPDATE `name`=?");
+                    + "ON DUPLICATE KEY UPDATE `name`=? " + (addedNow ? ", `lastAdded`=?" : ""));
             registerGroup.setObject(1, groupId);
             registerGroup.setString(2, groupName);
             registerGroup.setString(3, groupName);
+            if (addedNow) registerGroup.setTimestamp(4, Timestamp.from(Instant.now()));
             registerGroup.executeUpdate();
-        } catch (SQLException ignored) {
-        }
+        } catch (SQLException ignored) { }
     }
     
     public void disableGroup(Object groupId) {

@@ -13,6 +13,7 @@ public class CachedGroup {
 
     private final Long id;
     private String title;
+    private LocalDate lastAdded;
 
     @Builder.Default private HashMap<LocalDate, PoleCollection> polesMap = new HashMap<>();
 

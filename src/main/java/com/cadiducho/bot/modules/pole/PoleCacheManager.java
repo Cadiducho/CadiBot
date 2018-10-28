@@ -27,9 +27,10 @@ public class PoleCacheManager {
      * synchronized porque dos personajes pueden realizar una pole *simultáneamente* y el caché del grupo se duplicaría
      * @param groupId Id del grupo
      * @param title Titulo del grupo
+     * @param lastAdded Fecha en la que el bot ha sido añadido al grupo
      */
-    public synchronized void initializeGroupCache(Long groupId, String title, LinkedHashMap<Integer, Integer> poles) {
-        CachedGroup cachedGroup = CachedGroup.builder().id(groupId).title(title).build();
+    public synchronized void initializeGroupCache(Long groupId, String title, LinkedHashMap<Integer, Integer> poles, LocalDate lastAdded) {
+        CachedGroup cachedGroup = CachedGroup.builder().id(groupId).title(title).lastAdded(lastAdded).build();
         if (!poles.isEmpty()) { //solo crear objeto PoleCollection si hay poles de verdad. Rellenar el optional con el objeto vacío repercutirá en /pole fuertemente
             PoleCollection polesHoy = new PoleCollection(poles.get(1), poles.get(2), poles.get(3));
             cachedGroup.getPolesMap().put(LocalDate.now(ZoneId.systemDefault()), polesHoy);
@@ -38,8 +39,8 @@ public class PoleCacheManager {
         cacheMap.putIfAbsent(groupId, cachedGroup);
     }
 
-    public synchronized void initializeGroupCache(Long groupId, String title) {
-        initializeGroupCache(groupId, title, getPolesOfGroupchat(groupId));
+    public synchronized void initializeGroupCache(Long groupId, String title, LocalDate lastAdded) {
+        initializeGroupCache(groupId, title, getPolesOfGroupchat(groupId), lastAdded);
     }
 
     private LinkedHashMap<Integer, Integer> getPolesOfGroupchat(Long groupId) {
@@ -69,10 +70,15 @@ public class PoleCacheManager {
         log.info("Iniciando caché de grupos");
         try {
             PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
-                    "SELECT groupchat FROM " + PoleModule.TABLA_POLES+ " WHERE DATE(time)=DATE(CURDATE()) GROUP BY groupchat"); //lista de grupos que han hecho HOY una pole para poner en cache
-            ResultSet rs = statement.executeQuery();
+                    "SELECT p.groupchat, g.name, g.lastAdded FROM cadibot_poles p " +
+                            "JOIN cadibot_grupos g ON (p.groupchat = g.groupid) " +
+                            "WHERE DATE(time)=DATE(CURDATE()) " +
+                            "GROUP BY groupchat");
+            ResultSet rs = statement.executeQuery(); //lista de grupos que han hecho HOY una pole para poner en cache
             while (rs.next()) {
-                initializeGroupCache(rs.getLong("groupchat"), null);
+                initializeGroupCache(rs.getLong("groupchat"),
+                        rs.getString("name"),
+                        rs.getTimestamp("lastAdded").toLocalDateTime().toLocalDate());
             }
         } catch (SQLException ex) {
             log.log(Level.SEVERE, "No se han podido cargar los grupos en caché", ex);
@@ -132,7 +138,7 @@ public class PoleCacheManager {
                     break;
             }
             botServer.getMysql().updateUsername(userid, group.getId());
-            botServer.getMysql().updateGroup(group.getId(), group.getTitle());
+            botServer.getMysql().updateGroup(group.getId(), group.getTitle(), false);
 
             PreparedStatement insert = botServer.getMysql().openConnection().prepareStatement("INSERT INTO `" + PoleModule.TABLA_POLES + "` (`userid`, `groupchat`, `poleType`) VALUES (?, ?, ?)");
 
@@ -144,5 +150,25 @@ public class PoleCacheManager {
             log.severe("Error insertando una colección de poles en la base de datos: ");
             log.severe(ex.getMessage());
         }
+    }
+
+    public LocalDate getChatLastAdded(Long groupId) {
+        try {
+            PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
+                    "SELECT lastAdded FROM cadibot_grupos WHERE groupid=?");
+            statement.setLong(1, groupId);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getTimestamp("lastAdded").toLocalDateTime().toLocalDate();
+            }
+        } catch (SQLException ex) {
+            log.severe("Error obteniendo la fecha de agreción del bot en el grupo " + groupId);
+            log.severe(ex.getMessage());
+        }
+        return null;
+    }
+
+    public void setGroupLastAdded(Long chatId) {
+        getCachedGroup(chatId).ifPresent(cachedGroup -> cachedGroup.setLastAdded(LocalDate.now()));
     }
 }

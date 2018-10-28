@@ -22,7 +22,7 @@ public class UpdateUsernameCMD implements BotCommand {
         try {
             getMySQL().updateUsername(from.getId(), Long.parseLong(chat.getId()));
             if (chat.isGroupChat()) {
-                getMySQL().updateGroup(chat.getId(), chat.getTitle());
+                getMySQL().updateGroup(chat.getId(), chat.getTitle(), false);
             }
             getBot().sendMessage(chat.getId(), "Tu información ha sido actualizada/registrada", null, null, false, messageId, null);
         } catch (SQLException ex) {
