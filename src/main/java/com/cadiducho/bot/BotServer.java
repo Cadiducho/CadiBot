@@ -18,7 +18,7 @@ public class BotServer {
     /**
      * Server / bot version
      */
-    public static final String VERSION = "2.10-beta";
+    public static final String VERSION = "2.10";
 
     /**
      * The Module manager
@@ -70,9 +70,9 @@ public class BotServer {
         options.addOption(dbpa);
         options.addOption(owner);
         
-        CommandLine cmd;
+        CommandLine commandLine;
         try {
-            cmd = new DefaultParser().parse(options, args);
+            commandLine = new DefaultParser().parse(options, args);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
             new HelpFormatter().printHelp("cadibot", options);
@@ -81,7 +81,7 @@ public class BotServer {
             return;
         }
         BotServer bot = new BotServer();
-        bot.startServer(cmd);
+        bot.startServer(commandLine);
     }
     
     private BotServer() {
