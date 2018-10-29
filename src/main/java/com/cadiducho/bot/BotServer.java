@@ -4,6 +4,7 @@ import com.cadiducho.bot.api.command.CommandManager;
 import com.cadiducho.bot.api.module.Module;
 import com.cadiducho.bot.api.module.ModuleManager;
 import com.cadiducho.telegrambotapi.TelegramBot;
+import com.cadiducho.telegrambotapi.handlers.ExceptionHandler;
 import lombok.Getter;
 import lombok.extern.java.Log;
 import org.apache.commons.cli.*;
@@ -122,7 +123,10 @@ public class BotServer {
 
         UpdatesHandler events = new UpdatesHandler(cadibot, instance);
         cadibot.getUpdatesPoller().setHandler(events);
-        //cadibot.getUpdatesPoller().setOwnerId(Long.parseLong(cmd.getOptionValue("owner")));
+
+        ExceptionHandler exceptionHandler = new TelegramExceptionHandler(cadibot, Long.parseLong(cmd.getOptionValue("owner")));
+        cadibot.getUpdatesPoller().setExceptionHandler(exceptionHandler);
+
         cadibot.startUpdatesPoller();
 
         log.info("Bot " + VERSION + " iniciado completamente");
