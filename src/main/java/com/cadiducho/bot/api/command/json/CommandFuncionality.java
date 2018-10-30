@@ -9,6 +9,10 @@ import com.cadiducho.telegrambotapi.exception.TelegramException;
 
 import java.time.Instant;
 
+/**
+ * Funcionalidad (o una de las funcionalidades) de un comando creado por Json
+ */
 public interface CommandFuncionality {
+
     void execute(TelegramBot bot, Chat chat, User from, CommandContext context, Integer messageId, Message replyingTo, Instant instant) throws TelegramException;
 }

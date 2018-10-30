@@ -4,6 +4,7 @@ import com.cadiducho.bot.BotServer;
 import com.cadiducho.bot.modules.animales.AnimalesModule;
 import com.cadiducho.bot.modules.core.CoreModule;
 import com.cadiducho.bot.modules.insultos.InsultosModule;
+import com.cadiducho.bot.modules.json.JsonModule;
 import com.cadiducho.bot.modules.pole.PoleModule;
 import com.cadiducho.bot.modules.saludos.SaludosModule;
 import lombok.Getter;
@@ -34,6 +35,7 @@ public class ModuleManager {
     
     private void addLocalModules() {
         modules.add(new CoreModule());
+        modules.add(new JsonModule());
         modules.add(new PoleModule());
         modules.add(new InsultosModule());
         modules.add(new SaludosModule());
