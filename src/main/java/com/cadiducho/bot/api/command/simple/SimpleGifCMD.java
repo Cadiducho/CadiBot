@@ -16,6 +16,7 @@ import java.util.Random;
  * Comando que responde con un gif
  * @author Cadiducho
  */
+@Deprecated
 public class SimpleGifCMD extends SimpleCommand {
 
     private final List<String> gifs;

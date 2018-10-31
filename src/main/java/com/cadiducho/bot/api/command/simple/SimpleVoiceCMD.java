@@ -16,6 +16,7 @@ import java.util.Random;
  * Comando que responde con una nota de voz
  * @author Cadiducho
  */
+@Deprecated
 public class SimpleVoiceCMD extends SimpleCommand {
 
     private final List<String> voices;

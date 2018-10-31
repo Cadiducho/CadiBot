@@ -9,6 +9,7 @@ import java.util.List;
  * Comandos simples para ser creados en una linea del constructor
  * @author Cadiducho
  */
+@Deprecated
 public abstract class SimpleCommand implements BotCommand {
 
     private final List<String> aliases;

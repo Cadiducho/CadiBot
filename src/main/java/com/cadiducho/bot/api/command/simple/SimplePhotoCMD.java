@@ -16,6 +16,7 @@ import java.util.Random;
  * Comando que responde con una foto
  * @author Cadiducho
  */
+@Deprecated
 public class SimplePhotoCMD extends SimpleCommand {
 
     private final List<String> photos;

@@ -17,6 +17,7 @@ import java.util.Random;
  * Comando que responde con un texto
  * @author Cadiducho
  */
+@Deprecated
 public class SimpleTextCMD extends SimpleCommand {
 
     private final List<String> replies;
