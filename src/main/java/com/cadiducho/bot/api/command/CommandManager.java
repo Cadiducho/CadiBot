@@ -1,19 +1,14 @@
 package com.cadiducho.bot.api.command;
 
 import com.cadiducho.bot.BotServer;
-import com.cadiducho.bot.api.command.simple.SimpleGifCMD;
-import com.cadiducho.bot.api.command.simple.SimplePhotoCMD;
-import com.cadiducho.bot.api.command.simple.SimpleTextCMD;
-import com.cadiducho.bot.api.command.simple.SimpleVoiceCMD;
 import com.cadiducho.telegrambotapi.*;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Instant;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
-
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
