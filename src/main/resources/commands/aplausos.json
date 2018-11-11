@@ -1,0 +1,11 @@
+{
+    "aliases": ["aplausos"],
+    "description": "",
+    "funcionalities": [
+        {
+            "type": "gif",
+            "gif_id": "CgADBAADTAMAAjEZZAfPEedEXgJYPwI",
+            "reply_to": "none"
+        }
+	]
+}

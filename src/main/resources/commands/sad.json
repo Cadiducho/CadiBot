@@ -1,0 +1,41 @@
+{
+    "aliases": [":("],
+    "description": "Tristeza.",
+    "funcionalities": [
+        {
+            "type": "text",
+            "text": "Sonríe, princesa",
+            "reply_to": "none"
+        },
+        {
+            "type": "text",
+            "text": "dont be sad bb",
+            "reply_to": "none"
+        },
+        {
+            "type": "text",
+            "text": ":)",
+            "reply_to": "none"
+        },
+		{
+            "type": "text",
+            "text": "no me calientes a ver si te voy a dar motivos para estar sad",
+            "reply_to": "none"
+        },
+		{
+            "type": "text",
+            "text": "Sonríe, no cambiará nada pero te verás menos feo",
+            "reply_to": "none"
+        },
+		{
+            "type": "text",
+            "text": "Yo también estaría triste si tuviese tu cara",
+            "reply_to": "none"
+        },
+		{
+            "type": "text",
+            "text": "tampoco me llores crack",
+            "reply_to": "none"
+        }
+    ]
+}

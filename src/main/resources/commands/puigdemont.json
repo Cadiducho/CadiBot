@@ -1,0 +1,11 @@
+{
+    "aliases": ["/viva", "puigdemont"],
+    "description": "",
+    "funcionalities": [
+        {
+            "type": "voice",
+            "voice_id": "AwADBAAD0AIAAnhgYFAc6it_QeBppwI",
+            "reply_to": "none"
+        }
+	]
+}

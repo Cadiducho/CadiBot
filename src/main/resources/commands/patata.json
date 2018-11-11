@@ -1,0 +1,21 @@
+{
+    "aliases": ["/patata"],
+    "description": "Te comes una patata",
+    "funcionalities": [
+        {
+            "type": "text",
+            "text": "Soy una patata y tú no. Bienvenido a tu cinta",
+            "reply_to": "none"
+        },
+        {
+            "type": "text",
+            "text": "Soy una patata y tú no. original",
+            "reply_to": "original"
+        },
+        {
+            "type": "text",
+            "text": "Soy una patata y tú no. answered",
+            "reply_to": "answered"
+        }
+    ]
+}
