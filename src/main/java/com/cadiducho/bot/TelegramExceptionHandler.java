@@ -22,7 +22,7 @@ public class TelegramExceptionHandler implements ExceptionHandler {
 
     @Override
     public void handle(TelegramException exception) {
-        if (exception.getCause() != null && exception.getCause().getMessage().equals("Read timed out")) {
+        if (exception.getCause() != null && ( exception.getCause().getMessage().equals("Read timed out") || exception.getCause().getMessage().equals("timeout"))) {
             //ignore
             return;
         }
