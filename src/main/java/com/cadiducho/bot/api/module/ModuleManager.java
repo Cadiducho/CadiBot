@@ -6,7 +6,6 @@ import com.cadiducho.bot.modules.core.CoreModule;
 import com.cadiducho.bot.modules.insultos.InsultosModule;
 import com.cadiducho.bot.modules.json.JsonModule;
 import com.cadiducho.bot.modules.pole.PoleModule;
-import com.cadiducho.bot.modules.saludos.SaludosModule;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
 
 @Log
 @RequiredArgsConstructor
@@ -38,7 +36,6 @@ public class ModuleManager {
         modules.add(new JsonModule());
         modules.add(new PoleModule());
         modules.add(new InsultosModule());
-        modules.add(new SaludosModule());
         modules.add(new AnimalesModule());
     }
     

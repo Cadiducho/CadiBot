@@ -1,0 +1,26 @@
+{
+  "aliases": ["/hola", "/buenosdias", "buenos dias", "buenos días"],
+  "description": "",
+  "funcionalities": [
+    {
+      "type": "text",
+      "text": "Hola bb",
+      "reply_to": "none"
+    },
+    {
+      "type": "text",
+      "text": "Ya era hora de levantarse",
+      "reply_to": "none"
+    },
+    {
+      "type": "text",
+      "text": "van siendo horas de ponerse a trabajar desgraciao",
+      "reply_to": "none"
+    },
+    {
+      "type": "video",
+      "video_id": "BAADAQADeQADxZfxRafipJskN5fBAg",
+      "reply_to": "none"
+    }
+  ]
+}
