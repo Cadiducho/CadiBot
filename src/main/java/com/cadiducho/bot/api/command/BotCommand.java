@@ -1,7 +1,6 @@
 package com.cadiducho.bot.api.command;
 
 import com.cadiducho.bot.BotServer;
-import com.cadiducho.bot.MySQL;
 import com.cadiducho.bot.api.command.args.Argument;
 import com.cadiducho.bot.api.command.args.CommandArguments;
 import com.cadiducho.bot.api.module.Module;
@@ -122,9 +121,5 @@ public interface BotCommand {
     
     default TelegramBot getBot() {
         return botServer.getCadibot();
-    }
-    
-    default MySQL getMySQL() {
-        return botServer.getMysql();
     }
 }

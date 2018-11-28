@@ -91,6 +91,8 @@ public class PoleCMD implements BotCommand {
     }
 
     private void saveToDatabase(PoleCacheManager manager, CachedGroup group, PoleCollection poles, int updated) {
-        CompletableFuture.runAsync(() -> manager.savePoleToDatabase(group, poles, updated));
+        CompletableFuture.runAsync(() -> {
+            manager.savePoleToDatabase(group, poles, updated);
+        });
     }
 }

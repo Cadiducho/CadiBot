@@ -44,7 +44,7 @@ public class PoleModule implements Module {
             Integer botId = botServer.getCadibot().getMe().getId();
             if (newChatMembers.stream().anyMatch(user -> user.getId().equals(botId))) {
                 log.info("Me han añadido al grupo " + chat.getTitle());
-                botServer.getMysql().updateGroup(chat.getId(), chat.getTitle(), true);
+                botServer.getDatabase().updateGroup(chat.getId(), chat.getTitle(), true);
                 poleCacheManager.setGroupLastAdded(Long.parseLong(chat.getId()));
             }
         } catch (TelegramException ignored) { }
