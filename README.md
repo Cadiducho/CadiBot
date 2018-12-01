@@ -5,3 +5,24 @@
 # Colaborar
 Cualquier aporte será bienvenido :D
 Puedes [aportar ideas](https://github.com/Cadiducho/CadiBot/issues/new?template=feature_request.md), [reportar errores](https://github.com/Cadiducho/CadiBot/issues/new?template=bug_report.md) o bien puedes hacer un fork y programar una nueva funcionalidad.
+
+Para programar una nueva funcionalidad, debes tener en cuenta lo siguiente:
+## Modularidad
+CadiBot desde la versión 2.0 contiene un núcleo principal y una serie de módulos que se añaden a su alrededor.
+Para crear un módulo nuevo, debes crear un nuevo package dentro de `com.cadiducho.bot.modules`, y una clase principal (por convenio, `MiFuncionalidadModule`)
+Esa clase debe implementar `Module` y la información acorde a este quedará registrada mediante la anotación `ModuleInfo`
+```
+@ModuleInfo(name = "MiFuncionalidad", description = "Breve descripción de qué hará mi módulo")
+public class MiFuncionalidadModule implements Module {
+    @Override
+    public void onLoad() {
+        //qué ejecutar cuando carga el módulo, por ejemplo: registrar comandos
+    }
+
+    @Override
+    public void onClose() {
+        //qué hacer cuando se descarga el módulo, por ejemplo: cerrar procesos secundarios, conexiones a bases de datos...
+    }
+}
+```
+Si quieres realizar un módulos externo, puedes compilar todas tus clases en un nuevo archivo .jar y moverlo a la subcarpeta `/modules` que se crea donde ejecuta el bot. Este módulo.jar cargará automáticamente.
