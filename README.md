@@ -26,3 +26,30 @@ public class MiFuncionalidadModule implements Module {
 }
 ```
 Si quieres realizar un módulos externo, puedes compilar todas tus clases en un nuevo archivo .jar y moverlo a la subcarpeta `/modules` que se crea donde ejecuta el bot. Este módulo.jar cargará automáticamente.
+
+
+## Comandos
+Los comandos que se creen deben estar asociados siempre a un módulo.
+
+Existen diferentes maneras de crear un comando.
+### Comandos simples 
+El sistema del bot soporta la creación de comandos simples mediante una sintaxis Json.
+
+Entenderemos por comandos simples que estos reciban un comando, ignorando los argumentos, y respondan con una o una serie de funcionalidades simples entre las que se incluyen Texto, Gifs, Foto etc.
+
+Este es un ejemplo de un comando simple que responderá a "hola" y "adios" con "ciao"
+```
+{
+    "aliases": ["hola", "adios"],
+    "description": "Saludar o despedirse",
+    "module": "Italian Module",
+    "funcionalities": [
+        {
+            "type": "text",
+            "text": "ciao",
+            "reply_to": "none"
+        }
+    ]
+}
+```
+[Aquí](https://github.com/Cadiducho/CadiBot/tree/development/src/main/resources/commands) puedes obtener más información sobre los comandos simples
