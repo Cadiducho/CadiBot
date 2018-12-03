@@ -42,6 +42,11 @@ public class BotServer {
      */
     @Getter private MySQLDatabase database;
 
+    /**
+     * The owner Telegram ID, if is set
+     */
+    @Getter private Long ownerId;
+
     @Getter private TelegramBot cadibot;
     @Getter private static BotServer instance;
 
@@ -99,6 +104,7 @@ public class BotServer {
         consoleManager.startConsole();
         consoleManager.startFile("logs/log-%D.txt");
         cadibot = new TelegramBot(cmd.getOptionValue("token"));
+        ownerId = Long.parseLong(cmd.getOptionValue("owner"));
 
         try {
             database = new MySQLDatabase(instance,
@@ -124,7 +130,7 @@ public class BotServer {
         UpdatesHandler events = new UpdatesHandler(cadibot, instance);
         cadibot.getUpdatesPoller().setHandler(events);
 
-        ExceptionHandler exceptionHandler = new TelegramExceptionHandler(cadibot, Long.parseLong(cmd.getOptionValue("owner")));
+        ExceptionHandler exceptionHandler = new TelegramExceptionHandler(cadibot, ownerId);
         cadibot.getUpdatesPoller().setExceptionHandler(exceptionHandler);
 
         cadibot.startUpdatesPoller();
