@@ -1,6 +1,8 @@
 package com.cadiducho.bot.modules.pole;
 
 import com.cadiducho.bot.BotServer;
+import com.cadiducho.telegrambotapi.TelegramBot;
+import com.cadiducho.telegrambotapi.exception.TelegramException;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 
@@ -8,6 +10,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -192,5 +195,59 @@ public class PoleCacheManager {
      */
     public void setGroupLastAdded(Long chatId) {
         getCachedGroup(chatId).ifPresent(cachedGroup -> cachedGroup.setLastAdded(LocalDate.now()));
+    }
+
+    public void checkSuspiciousBehaviour(CachedGroup group, PoleCollection poles, int updated) {
+        Integer userid = getUserIdFromUpdatedPoleCollection(poles, updated);
+        log.info("Analizando comportamiento de " + userid);
+        try {
+            Connection connection =  botServer.getDatabase().getConnection();
+            PreparedStatement statement = connection.prepareStatement(
+                    "SELECT `time` FROM cadibot_poles " +
+                            "WHERE userid=? " +
+                            "AND groupchat=? " +
+                            "AND `time` >= DATE_SUB(NOW(), INTERVAL 7 DAY)" +
+                            "GROUP BY `time` ORDER BY `time` DESC;");
+            statement.setLong(1, userid);
+            statement.setLong(2, group.getId());
+            ResultSet rs = statement.executeQuery();
+            ArrayList<LocalDateTime> timestamps = new ArrayList<>();
+            while (rs.next()) {
+                timestamps.add(rs.getTimestamp("time").toLocalDateTime());
+            }
+            botServer.getDatabase().closeConnection(connection);
+
+            // Si ha hecho pole los 7 días seguidos
+            if (timestamps.size() == 7) {
+                int avgMinutes = 0;
+                int avgSeconds = 0;
+                for (LocalDateTime ldt : timestamps) {
+                    if (ldt.getMinute() != 0) return; // Si no es el minuto 0, salir
+                    avgMinutes += ldt.getMinute();
+                    avgSeconds += ldt.getSecond();
+                }
+                avgMinutes /= 7;
+                avgSeconds /= 7;
+
+                // Si ha hecho la pole 7 días seguidos en el mismo minuto...
+                if (avgMinutes == 0 && avgSeconds <= 2) {
+                    //Comportamiento sospechoso
+                    log.info("Comportamiento sospechoso de " + userid + " en " + group.getTitle() + "#" + group.getId());
+                    try {
+                        TelegramBot bot = botServer.getCadibot();
+                        Long ownerId = botServer.getOwnerId();
+                        bot.sendMessage(ownerId, "Posible uso de mensajes automáticos por " + userid + " en " + group.getTitle() + "#" + group.getId());
+                        StringBuilder sb = new StringBuilder();
+                        timestamps.stream().map(t -> sb.append(t.format(DateTimeFormatter.ofPattern("d/M → HH:mm:ss.SSS"))).append('\n'));
+                        bot.sendMessage(ownerId, sb.toString());
+                    } catch (TelegramException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            log.severe("Error analizando comportamiento sospechoso: ");
+            log.severe(ex.getMessage());
+        }
     }
 }
