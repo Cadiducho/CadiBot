@@ -21,8 +21,9 @@ public class UpdatesHandler implements LongPollingHandler {
     public void handleUpdate(Update update) {
         if (update.getCallbackQuery() != null) {
             server.getCommandManager().onCallbackQuery(update.getCallbackQuery());
+            return; //Si la update es una callback query, no es un mensaje de texto, un comando u otra cosa.
         }
-        
+
         try {
             if (update.getMessage().getType().equals(Message.Type.NEW_CHAT_MEMBERS)) {
                 server.getModuleManager().getModules().forEach(m -> m.onNewChatMembers(update.getMessage().getChat(), update.getMessage().getNewChatMembers()));
