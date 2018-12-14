@@ -1,14 +1,17 @@
 package com.cadiducho.bot.modules.pole;
 
 import com.cadiducho.bot.BotServer;
+import com.cadiducho.telegrambotapi.TelegramBot;
+import com.cadiducho.telegrambotapi.exception.TelegramException;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Optional;
@@ -46,7 +49,8 @@ public class PoleCacheManager {
     private LinkedHashMap<Integer, Integer> getPolesOfGroupchat(Long groupId) {
         LinkedHashMap<Integer, Integer> poles = new LinkedHashMap<>();
         try {
-            PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
+            Connection connection =  botServer.getDatabase().getConnection();
+            PreparedStatement statement = connection.prepareStatement(
                     "SELECT `userid`, `poleType` FROM `" + PoleModule.TABLA_POLES + "` WHERE "
                             + "DATE(time)=DATE(CURDATE()) AND "
                             + "`groupchat`=?"
@@ -56,6 +60,7 @@ public class PoleCacheManager {
             while (rs.next()) {
                 poles.put(rs.getInt("poleType"), rs.getInt("userid"));
             }
+            botServer.getDatabase().closeConnection(connection);
         } catch (SQLException ex) {
             log.log(Level.WARNING, "No se ha podido cargar las poles en caché del grupo " + groupId, ex);
         }
@@ -69,7 +74,8 @@ public class PoleCacheManager {
     void loadCachedGroups() {
         log.info("Iniciando caché de grupos");
         try {
-            PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
+            Connection connection =  botServer.getDatabase().getConnection();
+            PreparedStatement statement = connection.prepareStatement(
                     "SELECT p.groupchat, g.name, g.lastAdded FROM cadibot_poles p " +
                             "JOIN cadibot_grupos g ON (p.groupchat = g.groupid) " +
                             "WHERE DATE(time)=DATE(CURDATE()) " +
@@ -80,6 +86,7 @@ public class PoleCacheManager {
                         rs.getString("name"),
                         rs.getTimestamp("lastAdded").toLocalDateTime().toLocalDate());
             }
+            botServer.getDatabase().closeConnection(connection);
         } catch (SQLException ex) {
             log.log(Level.SEVERE, "No se han podido cargar los grupos en caché", ex);
         }
@@ -116,6 +123,21 @@ public class PoleCacheManager {
         }
     }
 
+    public Integer getUserIdFromUpdatedPoleCollection(PoleCollection poles, int updated) {
+        Integer userid;
+        switch (updated) {
+            case 1:
+                userid = poles.getFirst().get();
+                break;
+            case 2:
+                userid = poles.getSecond().get();
+                break;
+            default:
+                userid = poles.getThird().get();
+                break;
+        }
+        return userid;
+    }
     /**
      * Insertar una pole en la base de datos. Se recomienda usar asíncronamente
      * @param group Grupo donde se realizó la pole
@@ -125,41 +147,40 @@ public class PoleCacheManager {
     @SuppressWarnings("ConstantConditions")
     public void savePoleToDatabase(CachedGroup group, PoleCollection poles, int updated) {
         try {
-            Integer userid;
-            switch (updated) {
-                case 1:
-                    userid = poles.getFirst().get();
-                    break;
-                case 2:
-                    userid = poles.getSecond().get();
-                    break;
-                default:
-                    userid = poles.getThird().get();
-                    break;
-            }
-            botServer.getMysql().updateUsername(userid, group.getId());
-            botServer.getMysql().updateGroup(group.getId(), group.getTitle(), false);
+            Integer userid = getUserIdFromUpdatedPoleCollection(poles, updated);
+            botServer.getDatabase().updateUsername(userid, group.getId());
+            botServer.getDatabase().updateGroup(group.getId(), group.getTitle(), false);
 
-            PreparedStatement insert = botServer.getMysql().openConnection().prepareStatement("INSERT INTO `" + PoleModule.TABLA_POLES + "` (`userid`, `groupchat`, `poleType`) VALUES (?, ?, ?)");
+            Connection connection =  botServer.getDatabase().getConnection();
+            PreparedStatement insert = connection.prepareStatement("INSERT INTO `" + PoleModule.TABLA_POLES + "` (`userid`, `groupchat`, `poleType`) VALUES (?, ?, ?)");
 
             insert.setInt(1, userid);
             insert.setLong(2, group.getId());
             insert.setInt(3, updated);
             insert.executeUpdate();
+            botServer.getDatabase().closeConnection(connection);
         } catch (SQLException ex) {
             log.severe("Error insertando una colección de poles en la base de datos: ");
             log.severe(ex.getMessage());
         }
     }
 
+    /**
+     * Obtener la fecha en la que el bot fue añadido por última bot a ese grupo
+     * @param groupId La id del grupo
+     * @return Fecha en la que el bot fue añadido
+     */
     public LocalDate getChatLastAdded(Long groupId) {
         try {
-            PreparedStatement statement = botServer.getMysql().openConnection().prepareStatement(
+            Connection connection =  botServer.getDatabase().getConnection();
+            PreparedStatement statement = connection.prepareStatement(
                     "SELECT lastAdded FROM cadibot_grupos WHERE groupid=?");
             statement.setLong(1, groupId);
             ResultSet rs = statement.executeQuery();
             if (rs.next()) {
-                return rs.getTimestamp("lastAdded").toLocalDateTime().toLocalDate();
+                LocalDate date = rs.getTimestamp("lastAdded").toLocalDateTime().toLocalDate();
+                botServer.getDatabase().closeConnection(connection);
+                return date;
             }
         } catch (SQLException ex) {
             log.severe("Error obteniendo la fecha de agreción del bot en el grupo " + groupId);
@@ -168,7 +189,65 @@ public class PoleCacheManager {
         return null;
     }
 
+    /**
+     * Establecer la fecha en la que el bot fue añadido por última vez a hoy
+     * @param chatId La id del grupo en la que fue añadido
+     */
     public void setGroupLastAdded(Long chatId) {
         getCachedGroup(chatId).ifPresent(cachedGroup -> cachedGroup.setLastAdded(LocalDate.now()));
+    }
+
+    public void checkSuspiciousBehaviour(CachedGroup group, PoleCollection poles, int updated) {
+        Integer userid = getUserIdFromUpdatedPoleCollection(poles, updated);
+        log.info("Analizando comportamiento de " + userid);
+        try {
+            Connection connection =  botServer.getDatabase().getConnection();
+            PreparedStatement statement = connection.prepareStatement(
+                    "SELECT `time` FROM cadibot_poles " +
+                            "WHERE userid=? " +
+                            "AND groupchat=? " +
+                            "AND `time` >= DATE_SUB(NOW(), INTERVAL 7 DAY)" +
+                            "GROUP BY `time` ORDER BY `time` DESC;");
+            statement.setLong(1, userid);
+            statement.setLong(2, group.getId());
+            ResultSet rs = statement.executeQuery();
+            ArrayList<LocalDateTime> timestamps = new ArrayList<>();
+            while (rs.next()) {
+                timestamps.add(rs.getTimestamp("time").toLocalDateTime());
+            }
+            botServer.getDatabase().closeConnection(connection);
+
+            // Si ha hecho pole los 7 días seguidos
+            if (timestamps.size() == 7) {
+                int avgMinutes = 0;
+                int avgSeconds = 0;
+                for (LocalDateTime ldt : timestamps) {
+                    if (ldt.getMinute() != 0) return; // Si no es el minuto 0, salir
+                    avgMinutes += ldt.getMinute();
+                    avgSeconds += ldt.getSecond();
+                }
+                avgMinutes /= 7;
+                avgSeconds /= 7;
+
+                // Si ha hecho la pole 7 días seguidos en el mismo minuto...
+                if (avgMinutes == 0 && avgSeconds <= 2) {
+                    //Comportamiento sospechoso
+                    log.info("Comportamiento sospechoso de " + userid + " en " + group.getTitle() + "#" + group.getId());
+                    try {
+                        TelegramBot bot = botServer.getCadibot();
+                        Long ownerId = botServer.getOwnerId();
+                        bot.sendMessage(ownerId, "Posible uso de mensajes automáticos por " + userid + " en " + group.getTitle() + "#" + group.getId());
+                        StringBuilder sb = new StringBuilder();
+                        timestamps.stream().map(t -> sb.append(t.format(DateTimeFormatter.ofPattern("d/M → HH:mm:ss.SSS"))).append('\n'));
+                        bot.sendMessage(ownerId, sb.toString());
+                    } catch (TelegramException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            log.severe("Error analizando comportamiento sospechoso: ");
+            log.severe(ex.getMessage());
+        }
     }
 }

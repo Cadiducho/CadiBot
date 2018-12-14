@@ -1,0 +1,11 @@
+{
+    "aliases": ["haber si me muero"],
+    "description": "morite pelotudo",
+    "funcionalities": [
+        {
+            "type": "text",
+            "text": "Ojalá",
+            "reply_to": "none"
+        }
+    ]
+}

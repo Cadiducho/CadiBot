@@ -1,0 +1,31 @@
+{
+    "aliases": [":)"],
+    "description": "Felichidad",
+    "funcionalities": [
+        {
+            "type": "text",
+            "text": ":)",
+            "reply_to": "none"
+        },
+        {
+            "type": "text",
+            "text": ":D",
+            "reply_to": "none"
+        },
+        {
+            "type": "text",
+            "text": ":smile:",
+            "reply_to": "none"
+        },
+		{
+            "type": "text",
+            "text": ":grinning:",
+            "reply_to": "none"
+        },
+		{
+            "type": "text",
+            "text": ":blush:",
+            "reply_to": "none"
+        }
+    ]
+}

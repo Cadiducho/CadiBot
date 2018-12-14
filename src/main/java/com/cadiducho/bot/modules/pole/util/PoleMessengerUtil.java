@@ -7,10 +7,7 @@ import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -137,7 +134,8 @@ public class PoleMessengerUtil {
      * @throws SQLException Si falla la conexión a la base de datos
      */
     public static LinkedHashMap<Integer, PoleUser> getPolesOfToday(LocalDateTime today, long chatId) throws SQLException {
-        PreparedStatement statement = BotServer.getInstance().getMysql().openConnection().prepareStatement(
+        Connection connection = BotServer.getInstance().getDatabase().getConnection();
+        PreparedStatement statement = connection.prepareStatement(
                 "SELECT * FROM cadibot_poles NATURAL JOIN cadibot_users WHERE "
                         + "DATE(time)=DATE(?) AND "
                         + "`groupchat`=?"
@@ -155,7 +153,7 @@ public class PoleMessengerUtil {
                     .build();
             poles.put(rs.getInt("poleType"), user);
         }
-
+        BotServer.getInstance().getDatabase().closeConnection(connection);
         return poles;
     }
 
@@ -171,7 +169,8 @@ public class PoleMessengerUtil {
      * @throws SQLException Si falla la base de datos
      */
     public static LinkedHashMap<PoleUser, Integer> getTopPoles(long chatId, int type, int limit) throws SQLException {
-        PreparedStatement statement = BotServer.getInstance().getMysql().openConnection().prepareStatement("" +
+        Connection connection = BotServer.getInstance().getDatabase().getConnection();
+        PreparedStatement statement = connection.prepareStatement("" +
                 "SELECT count(*) AS `totales`,`userid`,`name`,`username` FROM cadibot_poles NATURAL JOIN cadibot_users " +
                 "WHERE `groupchat`=? AND `poleType`=? GROUP BY `userid` ORDER BY `totales` DESC LIMIT ?");
         statement.setLong(1, chatId);
@@ -187,6 +186,7 @@ public class PoleMessengerUtil {
                     .build();
             poles.put(user, rs.getInt("totales"));
         }
+        BotServer.getInstance().getDatabase().closeConnection(connection);
         return poles;
     }
 
@@ -201,7 +201,8 @@ public class PoleMessengerUtil {
      * @throws SQLException Si falla la base de datos
      */
     public static LinkedHashMap<PoleUser, Integer> getTopPolesGlobal(int type, int limit) throws SQLException {
-        PreparedStatement statement = BotServer.getInstance().getMysql().openConnection().prepareStatement("" +
+        Connection connection = BotServer.getInstance().getDatabase().getConnection();
+        PreparedStatement statement = connection.prepareStatement("" +
                 "SELECT userid, COUNT(*) as totales, u.name, u.username " +
                 "FROM cadibot_poles p NATURAL JOIN cadibot_users u " +
                 "WHERE poleType=? " +
@@ -221,6 +222,7 @@ public class PoleMessengerUtil {
                     .build();
             poles.put(user, rs.getInt("totales"));
         }
+        BotServer.getInstance().getDatabase().closeConnection(connection);
         return poles;
     }
 
@@ -235,7 +237,8 @@ public class PoleMessengerUtil {
      * @throws SQLException Si falla la base de datos
      */
     public static LinkedHashMap<PoleUser, Integer> getTopPolesGrupal(int type, int limit) throws SQLException {
-        PreparedStatement statement = BotServer.getInstance().getMysql().openConnection().prepareStatement("" +
+        Connection connection = BotServer.getInstance().getDatabase().getConnection();
+        PreparedStatement statement = connection.prepareStatement("" +
                 "SELECT userid, COUNT(*) as totales, u.name, u.username, groupchat, g.name " +
                 "FROM cadibot_poles p NATURAL JOIN cadibot_users u JOIN cadibot_grupos g ON (p.groupchat = g.groupid) " +
                 "WHERE poleType=? " +
@@ -256,6 +259,7 @@ public class PoleMessengerUtil {
                     .build();
             poles.put(user, rs.getInt("totales"));
         }
+        BotServer.getInstance().getDatabase().closeConnection(connection);
         return poles;
     }
 

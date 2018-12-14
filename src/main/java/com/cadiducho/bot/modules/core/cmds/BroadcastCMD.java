@@ -30,12 +30,12 @@ public class BroadcastCMD implements BotCommand {
                 getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(), "html", null, false, messageId, null);
                 return;
             }
-            botServer.getMysql().getGroupsIds().forEach(id -> {
+            botServer.getDatabase().getGroupsIds().forEach(id -> {
                 try {
                     getBot().sendMessage(id, mensaje.get());
                 } catch (TelegramException ex) {
                     System.out.println("Disabling group " + id);
-                    botServer.getMysql().disableGroup(id);
+                    botServer.getDatabase().disableGroup(id);
                 }
             });
         } catch (CommandParseException ex) {

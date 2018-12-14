@@ -19,15 +19,6 @@ public class CatCMD implements BotCommand {
     @Override
     public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-
-        /*InlineKeyboardButton voteUp = new InlineKeyboardButton();
-        voteUp.setText(EmojiManager.getForAlias("thumbsup").getUnicode());
-        voteUp.setCallback_data("catVoteUp()");
-        InlineKeyboardButton voteDown = new InlineKeyboardButton();
-        voteDown.setText(EmojiManager.getForAlias("thumbsdown").getUnicode());
-        voteDown.setCallback_data("catVoteDown()");
-        inlineKeyboard.setInline_keyboard(Arrays.asList(Arrays.asList(voteUp, voteDown)));*/
-        
         String catFile = catApi + "?" + instant.getNano(); //añadir numero para tener variación
         getBot().sendPhoto(chat.getId(), catFile, null, false, null, inlineKeyboard);
     }

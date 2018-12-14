@@ -3,7 +3,9 @@ package com.cadiducho.bot;
 import com.cadiducho.bot.api.command.CommandManager;
 import com.cadiducho.bot.api.module.Module;
 import com.cadiducho.bot.api.module.ModuleManager;
+import com.cadiducho.bot.database.MySQLDatabase;
 import com.cadiducho.telegrambotapi.TelegramBot;
+import com.cadiducho.telegrambotapi.handlers.ExceptionHandler;
 import lombok.Getter;
 import lombok.extern.java.Log;
 import org.apache.commons.cli.*;
@@ -18,7 +20,7 @@ public class BotServer {
     /**
      * Server / bot version
      */
-    public static final String VERSION = "2.10";
+    public static final String VERSION = "2.12";
 
     /**
      * The Module manager
@@ -36,9 +38,14 @@ public class BotServer {
     private final ConsoleManager consoleManager;
 
     /**
-     * The database (MySQL) connector
+     * The database (MySQL)
      */
-    @Getter private MySQL mysql;
+    @Getter private MySQLDatabase database;
+
+    /**
+     * The owner Telegram ID, if is set
+     */
+    @Getter private Long ownerId;
 
     @Getter private TelegramBot cadibot;
     @Getter private static BotServer instance;
@@ -97,16 +104,16 @@ public class BotServer {
         consoleManager.startConsole();
         consoleManager.startFile("logs/log-%D.txt");
         cadibot = new TelegramBot(cmd.getOptionValue("token"));
+        ownerId = Long.parseLong(cmd.getOptionValue("owner"));
 
         try {
-            mysql = new MySQL(instance,
+            database = new MySQLDatabase(instance,
                     cmd.getOptionValue("database-host"),
                     cmd.getOptionValue("database-port"),
                     cmd.getOptionValue("database-name"),
                     cmd.getOptionValue("database-user"),
                     cmd.getOptionValue("database-pass"));
 
-            mysql.openConnection();
             log.info("SQL connection established");
         } catch (SQLException ex) {
             log.warning("Can't connect to database!");
@@ -122,7 +129,10 @@ public class BotServer {
 
         UpdatesHandler events = new UpdatesHandler(cadibot, instance);
         cadibot.getUpdatesPoller().setHandler(events);
-        //cadibot.getUpdatesPoller().setOwnerId(Long.parseLong(cmd.getOptionValue("owner")));
+
+        ExceptionHandler exceptionHandler = new TelegramExceptionHandler(cadibot, ownerId);
+        cadibot.getUpdatesPoller().setExceptionHandler(exceptionHandler);
+
         cadibot.startUpdatesPoller();
 
         log.info("Bot " + VERSION + " iniciado completamente");
@@ -131,10 +141,8 @@ public class BotServer {
     public void shutdown() {
         cadibot.stopUpdatesPoller();
         moduleManager.getModules().forEach(Module::onClose);
-        try {
-            mysql.closeConnection();
-        } catch (SQLException ignored) {
-        }
+
+        database.closeDatabase();
 
         log.info("Terminando...");
         consoleManager.stop();

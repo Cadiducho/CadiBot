@@ -1,6 +1,5 @@
 package com.cadiducho.bot.modules.core.cmds;
 
-import com.cadiducho.bot.MySQL;
 import com.cadiducho.bot.api.command.BotCommand;
 import com.cadiducho.bot.api.command.CommandContext;
 import com.cadiducho.bot.api.command.CommandInfo;
@@ -13,6 +12,7 @@ import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 import com.vdurmont.emoji.EmojiManager;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -54,12 +54,14 @@ public class ChangelogCMD implements BotCommand {
     private List<String> getChangelog(int limit) {
         List<String> versions = new LinkedList<>();
         try {
-            PreparedStatement statement = getMySQL().openConnection().prepareStatement("SELECT * FROM `" + MySQL.TABLE_CHANGELOG + "` ORDER BY `major` DESC, `minor` DESC LIMIT ?;");
+            Connection connection = botServer.getDatabase().getConnection();
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM `cadibot_changelog` ORDER BY `major` DESC, `minor` DESC LIMIT ?;");
             statement.setInt(1, limit);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 versions.add(rs.getInt("major") + "." + rs.getInt("minor") + ": " + rs.getString("changes"));
             }
+            botServer.getDatabase().closeConnection(connection);
         } catch (SQLException ignored) {
         }
         return versions;

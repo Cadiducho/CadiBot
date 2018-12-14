@@ -1,0 +1,46 @@
+{
+    "aliases": ["ok"],
+    "description": "vale crack",
+    "funcionalities": [
+        {
+            "type": "text",
+            "text": "OK",
+            "reply_to": "none"
+        },
+        {
+            "type": "text",
+            "text": "No te enfades bb",
+            "reply_to": "none"
+        },
+        {
+            "type": "text",
+            "text": "ok",
+            "reply_to": "none"
+        },
+		{
+            "type": "text",
+            "text": "ok de k hijo de puta",
+            "reply_to": "none"
+        },
+		{
+            "type": "text",
+            "text": "ko",
+            "reply_to": "none"
+        },
+		{
+            "type": "text",
+            "text": "Va",
+            "reply_to": "none"
+        },
+		{
+            "type": "text",
+            "text": "ya",
+            "reply_to": "none"
+        },
+		{
+            "type": "text",
+            "text": "vale crack",
+            "reply_to": "none"
+        }
+    ]
+}

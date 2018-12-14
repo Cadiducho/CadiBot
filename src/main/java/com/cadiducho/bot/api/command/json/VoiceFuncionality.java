@@ -14,12 +14,12 @@ import java.time.Instant;
 
 @Builder
 @EqualsAndHashCode
-public class ImageFuncionality implements CommandFuncionality {
+public class VoiceFuncionality implements CommandFuncionality {
 
     @Json(name = "reply_to") @Builder.Default private final ReplyPattern replyPattern = ReplyPattern.TO_NONE;
-    @Json(name = "image_id") private final String imageId;
+    @Json(name = "voice_id") private final String voiceId;
 
-    public void execute(TelegramBot bot, Chat chat, User from, CommandContext context, Integer messageId, Message replyingTo, Instant instant) throws TelegramException  {
-        bot.sendPhoto(chat.getId(), imageId, null, false, messageId, null);
+    public void execute(TelegramBot bot, Chat chat, User from, CommandContext context, Integer messageId, Message replyingTo, Instant instant) throws TelegramException {
+        bot.sendVoice(chat.getId(), voiceId, null, null, false, messageId, null);
     }
 }

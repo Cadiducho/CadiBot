@@ -20,9 +20,9 @@ public class UpdateUsernameCMD implements BotCommand {
     @Override
     public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         try {
-            getMySQL().updateUsername(from.getId(), Long.parseLong(chat.getId()));
+            botServer.getDatabase().updateUsername(from.getId(), Long.parseLong(chat.getId()));
             if (chat.isGroupChat()) {
-                getMySQL().updateGroup(chat.getId(), chat.getTitle(), false);
+                botServer.getDatabase().updateGroup(chat.getId(), chat.getTitle(), false);
             }
             getBot().sendMessage(chat.getId(), "Tu información ha sido actualizada/registrada", null, null, false, messageId, null);
         } catch (SQLException ex) {

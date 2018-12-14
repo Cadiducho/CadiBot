@@ -1,5 +1,6 @@
-package com.cadiducho.bot.api.command.simple;
+package com.cadiducho.bot.modules.insultos;
 
+import com.cadiducho.bot.api.command.BotCommand;
 import com.cadiducho.bot.api.command.CommandContext;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
@@ -8,29 +9,26 @@ import com.cadiducho.telegrambotapi.exception.TelegramException;
 import com.vdurmont.emoji.EmojiParser;
 
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Comando que responde con un texto
- * @author Cadiducho
- */
-public class SimpleTextCMD extends SimpleCommand {
+public class InsultosAbstractCMD implements BotCommand {
 
+    private final List<String> aliases;
     private final List<String> replies;
 
-    public SimpleTextCMD(List<String> aliases, String text) {
-        this(aliases, ReplyPattern.TO_ANSWERED, Collections.singletonList(text));
+    @Override
+    public String getName() {
+        return aliases.get(0);
     }
-    
-    public SimpleTextCMD(List<String> aliases, List<String> replies) {
-        this(aliases, ReplyPattern.TO_ANSWERED, replies);
+
+    @Override
+    public List<String> getAliases() {
+        return aliases;
     }
-    
-    public SimpleTextCMD(List<String> aliases, ReplyPattern replyPattern, List<String> replies) {
-        super(aliases, replyPattern);
+
+    public InsultosAbstractCMD(List<String> aliases, List<String> replies) {
+        this.aliases = aliases;
         this.replies = replies;
     }
 
@@ -39,6 +37,6 @@ public class SimpleTextCMD extends SimpleCommand {
         Random rand = new Random(instant.getNano());
         String reply = EmojiParser.parseToUnicode(replies.get(rand.nextInt(replies.size())));
 
-        getBot().sendMessage(chat.getId(), reply, null, null, false, replyTheCommandTo(messageId, replyingTo), null);
+        getBot().sendMessage(chat.getId(), reply, null, null, false, messageId, null);
     }
 }

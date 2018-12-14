@@ -1,4 +1,6 @@
-package com.cadiducho.bot.api.command.simple;
+package com.cadiducho.bot.api.command.json;
+
+import com.squareup.moshi.Json;
 
 /**
  * Enum para determinar a quien va a responder el comando.
@@ -7,7 +9,7 @@ package com.cadiducho.bot.api.command.simple;
  *  a nadie, al original 'B' o al que era respondido 'A'
  */
 public enum ReplyPattern {
-    TO_NONE,
-    TO_ORIGINAL,
-    TO_ANSWERED
+    @Json(name = "none") TO_NONE,
+    @Json(name = "original") TO_ORIGINAL,
+    @Json(name = "answered") TO_ANSWERED
 }

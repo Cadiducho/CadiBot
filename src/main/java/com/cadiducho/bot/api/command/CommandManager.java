@@ -1,21 +1,14 @@
 package com.cadiducho.bot.api.command;
 
 import com.cadiducho.bot.BotServer;
-import com.cadiducho.bot.api.command.simple.SimpleGifCMD;
-import com.cadiducho.bot.api.command.simple.SimplePhotoCMD;
-import com.cadiducho.bot.api.command.simple.SimpleTextCMD;
-import com.cadiducho.bot.api.command.simple.SimpleVoiceCMD;
 import com.cadiducho.telegrambotapi.*;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Instant;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
-
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,8 +26,6 @@ public class CommandManager {
     private final Map<String, BotCommand> commandMap = new HashMap<>();
     private final Map<String, CallbackListenerInstance> callbackListenersMap = new HashMap<>();
     private final BotServer server;
-
-    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withZone(ZoneId.systemDefault());
 
     /**
      * Registrar un comando y, si contiene, sus listener de CallbackQuery
@@ -76,8 +67,7 @@ public class CommandManager {
         Message message = update.getMessage();
         User from = update.getMessage().getFrom();
 
-        log.info(dateTimeFormatter.format(now) + " " +
-                        (from.getUsername() == null ? from.getFirstName() : ("@" + from.getUsername())) +
+        log.info((from.getUsername() == null ? from.getFirstName() : ("@" + from.getUsername())) +
                         "#" + message.getChat().getId() +
                         ": " + message.getText());
 
@@ -105,10 +95,9 @@ public class CommandManager {
     }
 
     public void onCallbackQuery(CallbackQuery callbackQuery) {
-        Instant now = Instant.now();
         User from = callbackQuery.getFrom();
 
-        log.info(dateTimeFormatter.format(now) + " InlineCallbackQuery: " +
+        log.info("InlineCallbackQuery: " +
                 (from.getUsername() == null ? from.getFirstName() : ("@" + from.getUsername())) +
                 "#" + (callbackQuery.getMessage() != null ? callbackQuery.getMessage().getChat().getId() : "") +
                 ": " + callbackQuery.getData());

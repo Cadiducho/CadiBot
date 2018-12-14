@@ -1,0 +1,11 @@
+{
+    "aliases": ["what"],
+    "description": "",
+    "funcionalities": [
+        {
+            "type": "gif",
+            "gif_id": "CgADBAADMwMAAjAZZAenCigGk2AkogI",
+            "reply_to": "none"
+        }
+	]
+}
