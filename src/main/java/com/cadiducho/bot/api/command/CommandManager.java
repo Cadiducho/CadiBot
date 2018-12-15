@@ -102,7 +102,8 @@ public class CommandManager {
                 "#" + (callbackQuery.getMessage() != null ? callbackQuery.getMessage().getChat().getId() : "") +
                 ": " + callbackQuery.getData());
 
-        Optional<CallbackListenerInstance> target = getCallbackListener(callbackQuery.getData());
+        String callbackQueryDataName = callbackQuery.getData().split("#")[0];
+        Optional<CallbackListenerInstance> target = getCallbackListener(callbackQueryDataName);
         if (target.isPresent()) {
             CallbackListenerInstance instance = target.get();
             try {
