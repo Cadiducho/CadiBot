@@ -25,7 +25,6 @@ public class CommandManager {
 
     private final Map<String, BotCommand> commandMap = new HashMap<>();
     private final Map<String, CallbackListenerInstance> callbackListenersMap = new HashMap<>();
-    private final BotServer server;
 
     /**
      * Registrar un comando y, si contiene, sus listener de CallbackQuery
