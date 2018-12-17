@@ -35,12 +35,20 @@ public class CommandManager {
 
         //Comprobar si tiene Listeners en su interior, y registrarlos
         if (cmd.getClass().isAnnotationPresent(CallbackListener.class)) {
-            for (Method method : cmd.getClass().getMethods()) {
-                if (method.isAnnotationPresent(ListenTo.class)) {
-                    ListenTo listenTo = method.getAnnotation(ListenTo.class);
-                    CallbackListenerInstance instance = new CallbackListenerInstance(cmd, method); //necesitamos guardar el método y su instancia de clase para ejecutarla mediante reflection
-                    callbackListenersMap.put(listenTo.value(), instance);
-                }
+            registerCallbackQueryListener((CallbackListener) cmd);
+        }
+    }
+
+    /**
+     * Registrar un nuevo listener de CallbackQuery
+     * @param listener El listener a registrar
+     */
+    public void registerCallbackQueryListener(CallbackListener listener) {
+        for (Method method : listener.getClass().getMethods()) {
+            if (method.isAnnotationPresent(ListenTo.class)) {
+                ListenTo listenTo = method.getAnnotation(ListenTo.class);
+                CallbackListenerInstance instance = new CallbackListenerInstance(listener, method); //necesitamos guardar el método y su instancia de clase para ejecutarla mediante reflection
+                callbackListenersMap.put(listenTo.value(), instance);
             }
         }
     }
@@ -122,7 +130,7 @@ public class CommandManager {
 
     @RequiredArgsConstructor
     private class CallbackListenerInstance {
-        private final BotCommand commandInstance;
+        private final CallbackListener commandInstance;
         private final Method method;
     }
 }
