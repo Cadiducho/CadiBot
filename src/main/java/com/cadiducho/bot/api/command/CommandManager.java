@@ -35,7 +35,7 @@ public class CommandManager {
 
         //Comprobar si tiene Listeners en su interior, y registrarlos
         if (cmd.getClass().isAnnotationPresent(CallbackListener.class)) {
-            registerCallbackQueryListener((CallbackListener) cmd);
+            registerCallbackQueryListener(cmd);
         }
     }
 
@@ -43,7 +43,7 @@ public class CommandManager {
      * Registrar un nuevo listener de CallbackQuery
      * @param listener El listener a registrar
      */
-    public void registerCallbackQueryListener(CallbackListener listener) {
+    public void registerCallbackQueryListener(BotCommand listener) { //ToDo: CallbackListener interface en lugar de BotCommand?
         for (Method method : listener.getClass().getMethods()) {
             if (method.isAnnotationPresent(ListenTo.class)) {
                 ListenTo listenTo = method.getAnnotation(ListenTo.class);
@@ -130,7 +130,7 @@ public class CommandManager {
 
     @RequiredArgsConstructor
     private class CallbackListenerInstance {
-        private final CallbackListener commandInstance;
+        private final BotCommand commandInstance;
         private final Method method;
     }
 }
