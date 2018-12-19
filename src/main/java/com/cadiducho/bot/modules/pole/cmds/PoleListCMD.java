@@ -41,7 +41,6 @@ public class PoleListCMD implements BotCommand {
 
     @ListenTo("mostrarTopGrupo")
     public void mostrarTopGrupo(CallbackQuery callbackQuery) throws TelegramException {
-        log.info("mostrando top grupo");
         editPoleListMessage(callbackQuery,
                 () -> {
                     try {

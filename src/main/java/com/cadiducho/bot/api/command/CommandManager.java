@@ -25,7 +25,6 @@ public class CommandManager {
 
     private final Map<String, BotCommand> commandMap = new HashMap<>();
     private final Map<String, CallbackListenerInstance> callbackListenersMap = new HashMap<>();
-    private final BotServer server;
 
     /**
      * Registrar un comando y, si contiene, sus listener de CallbackQuery
@@ -36,12 +35,20 @@ public class CommandManager {
 
         //Comprobar si tiene Listeners en su interior, y registrarlos
         if (cmd.getClass().isAnnotationPresent(CallbackListener.class)) {
-            for (Method method : cmd.getClass().getMethods()) {
-                if (method.isAnnotationPresent(ListenTo.class)) {
-                    ListenTo listenTo = method.getAnnotation(ListenTo.class);
-                    CallbackListenerInstance instance = new CallbackListenerInstance(cmd, method); //necesitamos guardar el método y su instancia de clase para ejecutarla mediante reflection
-                    callbackListenersMap.put(listenTo.value(), instance);
-                }
+            registerCallbackQueryListener(cmd);
+        }
+    }
+
+    /**
+     * Registrar un nuevo listener de CallbackQuery
+     * @param listener El listener a registrar
+     */
+    public void registerCallbackQueryListener(BotCommand listener) { //ToDo: CallbackListener interface en lugar de BotCommand?
+        for (Method method : listener.getClass().getMethods()) {
+            if (method.isAnnotationPresent(ListenTo.class)) {
+                ListenTo listenTo = method.getAnnotation(ListenTo.class);
+                CallbackListenerInstance instance = new CallbackListenerInstance(listener, method); //necesitamos guardar el método y su instancia de clase para ejecutarla mediante reflection
+                callbackListenersMap.put(listenTo.value(), instance);
             }
         }
     }
@@ -102,7 +109,8 @@ public class CommandManager {
                 "#" + (callbackQuery.getMessage() != null ? callbackQuery.getMessage().getChat().getId() : "") +
                 ": " + callbackQuery.getData());
 
-        Optional<CallbackListenerInstance> target = getCallbackListener(callbackQuery.getData());
+        String callbackQueryDataName = callbackQuery.getData().split("#")[0];
+        Optional<CallbackListenerInstance> target = getCallbackListener(callbackQueryDataName);
         if (target.isPresent()) {
             CallbackListenerInstance instance = target.get();
             try {

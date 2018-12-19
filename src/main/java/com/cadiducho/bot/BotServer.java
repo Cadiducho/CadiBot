@@ -20,7 +20,7 @@ public class BotServer {
     /**
      * Server / bot version
      */
-    public static final String VERSION = "2.12";
+    public static final String VERSION = "2.13";
 
     /**
      * The Module manager
@@ -95,7 +95,7 @@ public class BotServer {
         instance = this;
         consoleManager = new ConsoleManager(instance);
         moduleManager = new ModuleManager(instance, new File("modules"));
-        commandManager = new CommandManager(instance);
+        commandManager = new CommandManager();
     }
     
     private void startServer(CommandLine cmd) {
