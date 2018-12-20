@@ -7,6 +7,7 @@ import com.cadiducho.bot.api.module.ModuleInfo;
 import com.cadiducho.bot.modules.pole.cmds.PoleCMD;
 import com.cadiducho.bot.modules.pole.cmds.PoleListCMD;
 import com.cadiducho.bot.modules.pole.cmds.UpdateUsernameCMD;
+import com.cadiducho.bot.modules.pole.cmds.admin.MigrateGroupCMD;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import com.cadiducho.telegrambotapi.User;
@@ -35,6 +36,7 @@ public class PoleModule implements Module {
         commandManager.register(new PoleCMD());
         commandManager.register(new PoleListCMD());
         commandManager.register(new UpdateUsernameCMD());
+        commandManager.register(new MigrateGroupCMD());
         log.info("Módulo de poles cargado");
     }
 
