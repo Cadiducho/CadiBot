@@ -73,7 +73,7 @@ public class CommandContextTest {
         assertEquals(context.get("fechaHora").get(), LocalDateTime.of(2002, 2, 2, 20, 30));
 
         LocalDateArgumentType argumentType = new LocalDateArgumentType();
-        assertEquals(argumentType.parse("20/2/2010"), argumentType.parse("20/02/2010"));
+        assertEquals(argumentType.parse("20/2/10"), argumentType.parse("20/02/2010"));
 
         assertThrows(CommandParseException.class, () -> argumentType.parse("malFormato"));
     }
