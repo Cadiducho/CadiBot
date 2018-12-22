@@ -26,8 +26,7 @@ import java.util.Optional;
         @Argument(name = "viejoGrupo", type = Long.class, description = "ID del viejo grupo"),
         @Argument(name = "nuevoGrupo", type = Long.class, description = "ID del nuevo grupo")
 })
-@CallbackListener
-public class MigrateGroupCMD implements BotCommand {
+public class MigrateGroupCMD implements BotCommand, CallbackListener {
 
     @Override
     public void execute(Chat chat, User from, CommandContext context, Integer messageId, Message replyingTo, Instant instant) throws TelegramException {

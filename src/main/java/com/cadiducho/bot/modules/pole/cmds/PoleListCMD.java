@@ -17,9 +17,9 @@ import java.time.Instant;
 import java.util.function.Supplier;
 
 @Log
-@CallbackListener
 @CommandInfo(module = PoleModule.class, aliases = {"/poles", "/polelist"})
 public class PoleListCMD implements BotCommand {
+public class PoleListCMD implements BotCommand, CallbackListener {
 
     private final PoleModule module = (PoleModule) getModule();
 

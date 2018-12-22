@@ -24,7 +24,7 @@ import java.util.Optional;
 public class CommandManager {
 
     private final Map<String, BotCommand> commandMap = new HashMap<>();
-    private final Map<String, CallbackListenerInstance> callbackListenersMap = new HashMap<>();
+    private final Map<String, CallbackListenerMethodInstance> callbackListenersMap = new HashMap<>();
 
     /**
      * Registrar un comando y, si contiene, sus listener de CallbackQuery
@@ -34,8 +34,8 @@ public class CommandManager {
         cmd.getAliases().forEach(alias -> commandMap.put(alias, cmd));
 
         //Comprobar si tiene Listeners en su interior, y registrarlos
-        if (cmd.getClass().isAnnotationPresent(CallbackListener.class)) {
-            registerCallbackQueryListener(cmd);
+        if (cmd instanceof CallbackListener) {
+            registerCallbackQueryListener((CallbackListener) cmd);
         }
     }
 
@@ -43,11 +43,11 @@ public class CommandManager {
      * Registrar un nuevo listener de CallbackQuery
      * @param listener El listener a registrar
      */
-    public void registerCallbackQueryListener(BotCommand listener) { //ToDo: CallbackListener interface en lugar de BotCommand?
+    public void registerCallbackQueryListener(CallbackListener listener) {
         for (Method method : listener.getClass().getMethods()) {
             if (method.isAnnotationPresent(ListenTo.class)) {
                 ListenTo listenTo = method.getAnnotation(ListenTo.class);
-                CallbackListenerInstance instance = new CallbackListenerInstance(listener, method); //necesitamos guardar el método y su instancia de clase para ejecutarla mediante reflection
+                CallbackListenerMethodInstance instance = new CallbackListenerMethodInstance(listener, method); //necesitamos guardar el método y su instancia de clase para ejecutarla mediante reflection
                 callbackListenersMap.put(listenTo.value(), instance);
             }
         }
@@ -57,7 +57,7 @@ public class CommandManager {
         return Optional.ofNullable(commandMap.get(alias));
     }
 
-    public Optional<CallbackListenerInstance> getCallbackListener(String query) {
+    public Optional<CallbackListenerMethodInstance> getCallbackListener(String query) {
         return Optional.ofNullable(callbackListenersMap.get(query));
     }
 
@@ -110,12 +110,12 @@ public class CommandManager {
                 ": " + callbackQuery.getData());
 
         String callbackQueryDataName = callbackQuery.getData().split("#")[0];
-        Optional<CallbackListenerInstance> target = getCallbackListener(callbackQueryDataName);
+        Optional<CallbackListenerMethodInstance> target = getCallbackListener(callbackQueryDataName);
         if (target.isPresent()) {
-            CallbackListenerInstance instance = target.get();
+            CallbackListenerMethodInstance instance = target.get();
             try {
                 log.info(" # Ejecutando callback listener para '" + callbackQuery.getData() + "'");
-                instance.method.invoke(instance.commandInstance, callbackQuery);
+                instance.method.invoke(instance.listenerInstance, callbackQuery);
             } catch (InvocationTargetException invocationException) {
                 if (invocationException.getCause() instanceof TelegramException) { // los métodos de listener pueden lanzar TelegramException
                     log.severe("Error respondiendo a un CallbackQuery en la API de Telegram: ");
@@ -129,8 +129,8 @@ public class CommandManager {
     }
 
     @RequiredArgsConstructor
-    private class CallbackListenerInstance {
-        private final BotCommand commandInstance;
+    private class CallbackListenerMethodInstance {
+        private final CallbackListener listenerInstance;
         private final Method method;
     }
 }
