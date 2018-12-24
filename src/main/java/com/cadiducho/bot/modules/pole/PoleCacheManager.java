@@ -199,7 +199,6 @@ public class PoleCacheManager {
 
     public void checkSuspiciousBehaviour(CachedGroup group, PoleCollection poles, int updated) {
         Integer userid = getUserIdFromUpdatedPoleCollection(poles, updated);
-        log.info("Analizando comportamiento de " + userid);
         try {
             Connection connection =  botServer.getDatabase().getConnection();
             PreparedStatement statement = connection.prepareStatement(
@@ -238,7 +237,7 @@ public class PoleCacheManager {
                         Long ownerId = botServer.getOwnerId();
                         bot.sendMessage(ownerId, "Posible uso de mensajes automáticos por " + userid + " en " + group.getTitle() + "#" + group.getId());
                         StringBuilder sb = new StringBuilder();
-                        timestamps.stream().map(t -> sb.append(t.format(DateTimeFormatter.ofPattern("d/M → HH:mm:ss.SSS"))).append('\n'));
+                        timestamps.forEach(t -> sb.append(t.format(DateTimeFormatter.ofPattern("d/M → HH:mm:ss.SSS"))).append('\n'));
                         bot.sendMessage(ownerId, sb.toString());
                     } catch (TelegramException e) {
                         e.printStackTrace();
