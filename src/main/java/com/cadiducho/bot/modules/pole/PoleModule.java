@@ -8,6 +8,7 @@ import com.cadiducho.bot.modules.pole.cmds.PoleCMD;
 import com.cadiducho.bot.modules.pole.cmds.PoleListCMD;
 import com.cadiducho.bot.modules.pole.cmds.UpdateUsernameCMD;
 import com.cadiducho.bot.modules.pole.cmds.admin.MigrateGroupCMD;
+import com.cadiducho.bot.modules.pole.util.PoleAntiCheat;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import com.cadiducho.telegrambotapi.User;
@@ -25,12 +26,14 @@ public class PoleModule implements Module {
     public static final String TABLA_POLES = "cadibot_poles";
 
     @Getter private PoleCacheManager poleCacheManager;
+    @Getter private PoleAntiCheat poleAntiCheat;
 
     @Override
     public void onLoad() {
         log.info("Cargando módulo de poles");
         poleCacheManager = new PoleCacheManager(this);
         poleCacheManager.loadCachedGroups();
+        poleAntiCheat = new PoleAntiCheat(this);
 
         CommandManager commandManager = BotServer.getInstance().getCommandManager();
         commandManager.register(new PoleCMD());

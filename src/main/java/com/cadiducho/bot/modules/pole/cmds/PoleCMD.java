@@ -7,6 +7,7 @@ import com.cadiducho.bot.modules.pole.CachedGroup;
 import com.cadiducho.bot.modules.pole.PoleCacheManager;
 import com.cadiducho.bot.modules.pole.PoleCollection;
 import com.cadiducho.bot.modules.pole.PoleModule;
+import com.cadiducho.bot.modules.pole.util.PoleAntiCheat;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.User;
@@ -37,6 +38,12 @@ public class PoleCMD implements BotCommand {
     public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         if (!module.isChatSafe(getBot(), chat, from)) return;
 
+        PoleAntiCheat antiCheat = module.getPoleAntiCheat();
+        if (antiCheat.isFlooding(from.getId())) {
+            getBot().sendMessage(chat.getId(), "Sistema antiflood activado, te quedas sin poles por listo crack");
+            return;
+        }
+        
         LocalDateTime today = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
         PoleCacheManager manager = module.getPoleCacheManager();
         Long groupId = Long.parseLong(chat.getId());
@@ -63,26 +70,26 @@ public class PoleCMD implements BotCommand {
             PoleCollection polesHoy = PoleCollection.builder().first(from.getId()).build();
             cachedGroup.getPolesMap().put(today.toLocalDate(), polesHoy);
             save(manager, cachedGroup, today.toLocalDate(), polesHoy);
-            saveToDatabase(manager, cachedGroup, polesHoy, 1);
+            saveToDatabase(manager, antiCheat, cachedGroup, polesHoy, 1);
             getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b> navideña" + emojiGift + "!!!", "html", null, false, messageId, null);
             log.info("Pole otorgado a " + from.getId() + " en " + chat.getId());
         } else if (!poles.get().contains(from.getId())) {
             if (!poles.get().getFirst().isPresent() && !poles.get().getSecond().isPresent() && !poles.get().getThird().isPresent()) { //fixbug a si el objeto PolleCollection existe en memoria pero realmente no se han realizado poles
                 poles.get().setFirst(from.getId());
                 save(manager, cachedGroup, today.toLocalDate(), poles.get());
-                saveToDatabase(manager, cachedGroup, poles.get(), 1);
+                saveToDatabase(manager, antiCheat, cachedGroup, poles.get(), 1);
                 getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b><i>*</i>!!!", "html", null, false, messageId, null);
                 log.info("Pole (fixbug) otorgado a " + from.getId() + " en " + chat.getId());
             } else if (!poles.get().getSecond().isPresent()) { // si hay lista y el segundo no está presente, es plata
                 poles.get().setSecond(from.getId());
                 save(manager, cachedGroup, today.toLocalDate(), poles.get());
-                saveToDatabase(manager, cachedGroup, poles.get(), 2);
+                saveToDatabase(manager, antiCheat, cachedGroup, poles.get(), 2);
                 getBot().sendMessage(chat.getId(), base + " ha hecho la <b>subpole</b> navideña" + emojiTree + ", meh", "html", null, false, messageId, null);
                 log.info("Plata otorgado a " + from.getId() + " en " + chat.getId());
             } else if (!poles.get().getThird().isPresent()) { // si hay lista y el tercero no está presente, es plata
                 poles.get().setThird(from.getId());
                 save(manager, cachedGroup, today.toLocalDate(), poles.get());
-                saveToDatabase(manager, cachedGroup, poles.get(), 3);
+                saveToDatabase(manager, antiCheat, cachedGroup, poles.get(), 3);
                 getBot().sendMessage(chat.getId(), base + " ha hecho la <b>bronce</b> navideña" + emojiSnow + " (cual perdedor)", "html", null, false, messageId, null);
                 log.info("Bronce otorgado a " + from.getId() + " en " + chat.getId());
             }
@@ -95,10 +102,10 @@ public class PoleCMD implements BotCommand {
         manager.clearOldCache(group, today);
     }
 
-    private void saveToDatabase(PoleCacheManager manager, CachedGroup group, PoleCollection poles, int updated) {
+    private void saveToDatabase(PoleCacheManager manager, PoleAntiCheat antiCheat, CachedGroup group, PoleCollection poles, int updated) {
         CompletableFuture.runAsync(() -> {
             manager.savePoleToDatabase(group, poles, updated);
-            manager.checkSuspiciousBehaviour(group, poles, updated);
+            antiCheat.checkSuspiciousBehaviour(group, poles, updated);
         });
     }
 }

@@ -3,6 +3,7 @@ package com.cadiducho.bot;
 import com.cadiducho.bot.modules.pole.CachedGroup;
 import com.cadiducho.bot.modules.pole.PoleCacheManager;
 import com.cadiducho.bot.modules.pole.PoleCollection;
+import com.cadiducho.bot.modules.pole.util.PoleAntiCheat;
 import org.junit.jupiter.api.*;
 
 import java.time.Instant;
@@ -18,10 +19,12 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PoleTest {
 
     private PoleCacheManager manager;
+    private PoleAntiCheat antiCheat;
 
     @BeforeEach
     public void setup() {
         manager = new PoleCacheManager(null);
+        antiCheat = new PoleAntiCheat(null);
     }
 
     @Test
@@ -117,5 +120,17 @@ public class PoleTest {
 
         CachedGroup cachedGroup = manager.getCachedGroup(groupId).get();
         assertNotEquals(LocalDate.now(), cachedGroup.getLastAdded());
+    }
+
+    @Test
+    @DisplayName("Antiflood")
+    public void antiFloodTest() {
+        Integer userid = 1;
+        assertFalse(antiCheat.isFlooding(userid)); //la primera vez debe dar falso
+        antiCheat.isFlooding(userid);
+        antiCheat.isFlooding(userid);
+        antiCheat.isFlooding(userid);
+        antiCheat.isFlooding(userid);
+        assertTrue(antiCheat.isFlooding(userid)); // tras 4 intentos seguidos, falta el antiflood
     }
 }
