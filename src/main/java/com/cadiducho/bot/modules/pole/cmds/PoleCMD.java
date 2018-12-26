@@ -39,11 +39,11 @@ public class PoleCMD implements BotCommand {
         if (!module.isChatSafe(getBot(), chat, from)) return;
 
         PoleAntiCheat antiCheat = module.getPoleAntiCheat();
-        if (antiCheat.isFlooding(from.getId())) {
+        if (antiCheat.isFlooding(from.getId(), Long.parseLong(chat.getId()))) {
             getBot().sendMessage(chat.getId(), "Sistema antiflood activado, te quedas sin poles por listo crack");
             return;
         }
-        
+
         LocalDateTime today = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
         PoleCacheManager manager = module.getPoleCacheManager();
         Long groupId = Long.parseLong(chat.getId());

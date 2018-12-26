@@ -126,11 +126,15 @@ public class PoleTest {
     @DisplayName("Antiflood")
     public void antiFloodTest() {
         Integer userid = 1;
-        assertFalse(antiCheat.isFlooding(userid)); //la primera vez debe dar falso
-        antiCheat.isFlooding(userid);
-        antiCheat.isFlooding(userid);
-        antiCheat.isFlooding(userid);
-        antiCheat.isFlooding(userid);
-        assertTrue(antiCheat.isFlooding(userid)); // tras 4 intentos seguidos, falta el antiflood
+        Long groupOne = 1L;
+        Long groupTwo = 2L;
+        assertFalse(antiCheat.isFlooding(userid, groupOne)); //la primera vez debe dar falso
+        antiCheat.isFlooding(userid, groupOne);
+        antiCheat.isFlooding(userid, groupOne);
+        antiCheat.isFlooding(userid, groupOne);
+        antiCheat.isFlooding(userid, groupOne);
+        assertTrue(antiCheat.isFlooding(userid, groupOne)); // tras 4 intentos seguidos, falta el antiflood
+
+        assertFalse(antiCheat.isFlooding(userid, groupTwo)); // en otro grupo no cuenta como flood
     }
 }

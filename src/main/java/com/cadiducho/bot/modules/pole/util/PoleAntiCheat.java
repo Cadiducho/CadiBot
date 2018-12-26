@@ -6,6 +6,8 @@ import com.cadiducho.bot.modules.pole.PoleCollection;
 import com.cadiducho.bot.modules.pole.PoleModule;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
@@ -27,7 +29,7 @@ public class PoleAntiCheat {
 
     private final PoleModule module;
     private static final BotServer botServer = BotServer.getInstance();
-    private final HashMap<Integer, AntiFloodData> antiFloodDataMap = new HashMap<>();
+    private final HashMap<UserInGroup, AntiFloodData> antiFloodDataMap = new HashMap<>();
 
     /**
      * Analizar ultimos comportamientos de un usuario para determinar si son sospechosos o no
@@ -90,17 +92,27 @@ public class PoleAntiCheat {
 
     /**
      * Sistema antiflood de las poles. Intenta frenar los intentos de hacer pole mediante ponerlo 3432 veces seguidas
+     * @param userid El usuario que se está analizando
+     * @param groupId El grupo donde el usuario está siendo analizado
      * @return true si está realizando flood, falso si ha pasado el filtro
      */
-    public boolean isFlooding(Integer userid) {
-        if (!antiFloodDataMap.containsKey(userid)) {
-            antiFloodDataMap.put(userid, new AntiFloodData());
+    public boolean isFlooding(Integer userid, Long groupId) {
+        UserInGroup key = new UserInGroup(userid, groupId);
+        if (!antiFloodDataMap.containsKey(key)) {
+            antiFloodDataMap.put(key, new AntiFloodData());
         }
-        AntiFloodData data = antiFloodDataMap.get(userid);
+        AntiFloodData data = antiFloodDataMap.get(key);
         return data.isFlooding();
     }
 
-    class AntiFloodData {
+    @EqualsAndHashCode
+    @AllArgsConstructor
+    private class UserInGroup {
+        Integer user;
+        Long group;
+    }
+
+    private class AntiFloodData {
         long lastMessages[] = {0L, 0L, 0L};
         long lastSpam = 0L;
 
