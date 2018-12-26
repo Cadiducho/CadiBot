@@ -40,7 +40,7 @@ public class PoleCMD implements BotCommand {
 
         PoleAntiCheat antiCheat = module.getPoleAntiCheat();
         if (antiCheat.isFlooding(from.getId(), Long.parseLong(chat.getId()))) {
-            getBot().sendMessage(chat.getId(), "Sistema antiflood activado, te quedas sin poles por listo crack");
+            getBot().sendMessage(chat.getId(), "Antiflood aplicado a " + from.getFirstName() + ", te quedas sin poles por listo");
             return;
         }
 
