@@ -153,7 +153,7 @@ public class PoleMessengerUtil {
         PreparedStatement statement = connection.prepareStatement(
                 "SELECT * FROM cadibot_poles NATURAL JOIN cadibot_users WHERE "
                         + "DATE(time)=DATE(?) AND "
-                        + "`groupchat`=?"
+                        + "groupid=?"
                         + " ORDER BY `poleType`");
         statement.setTimestamp(1, Timestamp.valueOf(day.atStartOfDay()));
         statement.setLong(2, chatId);
@@ -188,7 +188,7 @@ public class PoleMessengerUtil {
         Connection connection = BotServer.getInstance().getDatabase().getConnection();
         PreparedStatement statement = connection.prepareStatement("" +
                 "SELECT count(*) AS `totales`,`userid`,`name`,`username` FROM cadibot_poles NATURAL JOIN cadibot_users " +
-                "WHERE `groupchat`=? AND `poleType`=? AND DATE(time)<=DATE(?) GROUP BY `userid` ORDER BY `totales` DESC LIMIT ?");
+                "WHERE groupid=? AND `poleType`=? AND DATE(time)<=DATE(?) GROUP BY `userid` ORDER BY `totales` DESC LIMIT ?");
         statement.setLong(1, chatId);
         statement.setInt(2, type);
         statement.setTimestamp(3, Timestamp.valueOf(atDay.atStartOfDay()));
@@ -259,10 +259,10 @@ public class PoleMessengerUtil {
     public static LinkedHashMap<PoleUser, Integer> getTopPolesGrupal(LocalDate atDay, int type, int limit) throws SQLException {
         Connection connection = BotServer.getInstance().getDatabase().getConnection();
         PreparedStatement statement = connection.prepareStatement("" +
-                "SELECT userid, COUNT(*) as totales, u.name, u.username, groupchat, g.name " +
-                "FROM cadibot_poles p NATURAL JOIN cadibot_users u JOIN cadibot_grupos g ON (p.groupchat = g.groupid) " +
+                "SELECT userid, COUNT(*) as totales, u.name, u.username, g.groupid, g.name " +
+                "FROM cadibot_poles p NATURAL JOIN cadibot_users u JOIN cadibot_grupos g ON (p.groupid = g.groupid) " +
                 "WHERE poleType=? AND DATE(p.time)<=DATE(?) " +
-                "GROUP BY userid, groupchat " +
+                "GROUP BY userid, groupid " +
                 "HAVING COUNT(*) > 1 " +
                 "ORDER BY totales DESC LIMIT ?");
         statement.setInt(1, type);

@@ -44,7 +44,7 @@ public class PoleAntiCheat {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT `time` FROM cadibot_poles " +
                             "WHERE userid=? " +
-                            "AND groupchat=? " +
+                            "AND groupid=? " +
                             "AND `time` >= DATE_SUB(NOW(), INTERVAL 7 DAY)" +
                             "GROUP BY `time` ORDER BY `time` DESC;");
             statement.setLong(1, userid);

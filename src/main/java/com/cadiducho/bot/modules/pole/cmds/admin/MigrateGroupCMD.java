@@ -135,7 +135,7 @@ public class MigrateGroupCMD implements BotCommand, CallbackListener {
         try {
             Connection connection = BotServer.getInstance().getDatabase().getConnection();
             PreparedStatement statement = connection.prepareStatement(
-                    "UPDATE cadibot_poles SET groupchat=? WHERE groupchat=?");
+                    "UPDATE cadibot_poles SET groupid=? WHERE groupid=?");
             statement.setLong(1, newId);
             statement.setLong(2, oldId);
             updated = statement.executeUpdate();

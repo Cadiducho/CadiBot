@@ -51,7 +51,7 @@ public class PoleCacheManager {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT `userid`, `poleType` FROM `" + PoleModule.TABLA_POLES + "` WHERE "
                             + "DATE(time)=DATE(CURDATE()) AND "
-                            + "`groupchat`=?"
+                            + "groupid=?"
                             + " ORDER BY `poleType`");
             statement.setLong(1, groupId);
             ResultSet rs = statement.executeQuery();
@@ -74,13 +74,13 @@ public class PoleCacheManager {
         try {
             Connection connection =  botServer.getDatabase().getConnection();
             PreparedStatement statement = connection.prepareStatement(
-                    "SELECT p.groupchat, g.name, g.lastAdded FROM cadibot_poles p " +
-                            "JOIN cadibot_grupos g ON (p.groupchat = g.groupid) " +
+                    "SELECT p.groupid, g.name, g.lastAdded FROM cadibot_poles p " +
+                            "JOIN cadibot_grupos g ON (p.groupid = g.groupid) " +
                             "WHERE DATE(time)=DATE(CURDATE()) " +
-                            "GROUP BY groupchat");
+                            "GROUP BY groupid");
             ResultSet rs = statement.executeQuery(); //lista de grupos que han hecho HOY una pole para poner en cache
             while (rs.next()) {
-                initializeGroupCache(rs.getLong("groupchat"),
+                initializeGroupCache(rs.getLong("groupid"),
                         rs.getString("name"),
                         rs.getTimestamp("lastAdded").toLocalDateTime().toLocalDate());
             }
@@ -151,7 +151,7 @@ public class PoleCacheManager {
             botServer.getDatabase().updateGroup(group.getId(), group.getTitle(), false);
 
             Connection connection =  botServer.getDatabase().getConnection();
-            PreparedStatement insert = connection.prepareStatement("INSERT INTO `" + PoleModule.TABLA_POLES + "` (`userid`, `groupchat`, `poleType`) VALUES (?, ?, ?)");
+            PreparedStatement insert = connection.prepareStatement("INSERT INTO `" + PoleModule.TABLA_POLES + "` (`userid`, groupid, `poleType`) VALUES (?, ?, ?)");
 
             insert.setInt(1, userid);
             insert.setLong(2, group.getId());
