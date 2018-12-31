@@ -47,12 +47,21 @@ public class PoleAntiCheat {
                             "AND groupid=? " +
                             "AND `time` >= DATE_SUB(NOW(), INTERVAL 7 DAY)" +
                             "GROUP BY `time` ORDER BY `time` DESC;");
-            statement.setLong(1, userid);
+            statement.setInt(1, userid);
             statement.setLong(2, group.getId());
             ResultSet rs = statement.executeQuery();
             ArrayList<LocalDateTime> timestamps = new ArrayList<>();
             while (rs.next()) {
                 timestamps.add(rs.getTimestamp("time").toLocalDateTime());
+            }
+            PreparedStatement statement2 = connection.prepareStatement("SELECT username,name FROM cadibot_users WHERE userid=?");
+            statement2.setInt(1, userid);
+            ResultSet rs2 = statement2.executeQuery();
+
+            String username = "", name = "";
+            if (rs2.next()) {
+                username = rs2.getString("username");
+                name = rs2.getString("name");
             }
             botServer.getDatabase().closeConnection(connection);
 
@@ -71,7 +80,7 @@ public class PoleAntiCheat {
                 // Si ha hecho la pole 7 días seguidos en el mismo minuto...
                 if (avgMinutes == 0 && avgSeconds <= 2) {
                     //Comportamiento sospechoso
-                    log.info("Comportamiento sospechoso de " + userid + " en " + group.getTitle() + "#" + group.getId());
+                    log.info("Comportamiento sospechoso de " + name + "@" + username + "#" + userid + " en " + group.getTitle() + "#" + group.getId());
                     try {
                         TelegramBot bot = botServer.getCadibot();
                         Long ownerId = botServer.getOwnerId();
@@ -113,7 +122,7 @@ public class PoleAntiCheat {
     }
 
     private class AntiFloodData {
-        long lastMessages[] = {0L, 0L, 0L};
+        long[] lastMessages = {0L, 0L, 0L};
         long lastSpam = 0L;
 
         public boolean isFlooding() {
