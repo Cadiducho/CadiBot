@@ -12,7 +12,6 @@ import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
-import com.vdurmont.emoji.EmojiManager;
 import lombok.extern.java.Log;
 
 import java.time.Instant;
@@ -69,7 +68,6 @@ public class PoleCMD implements BotCommand {
             saveToDatabase(manager, antiCheat, cachedGroup, polesHoy, 1);
             getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b>!!!", "html", null, false, messageId, null);
             log.info("Pole otorgado a " + from.getId() + " en " + chat.getId());
-            checkNewYear(manager, from.getId(), from.getFirstName(), cachedGroup.getId(), cachedGroup.getTitle());
         } else if (!poles.get().contains(from.getId())) {
             if (!poles.get().getFirst().isPresent() && !poles.get().getSecond().isPresent() && !poles.get().getThird().isPresent()) { //fixbug a si el objeto PolleCollection existe en memoria pero realmente no se han realizado poles
                 poles.get().setFirst(from.getId());
@@ -103,30 +101,6 @@ public class PoleCMD implements BotCommand {
         CompletableFuture.runAsync(() -> {
             manager.savePoleToDatabase(group, poles, updated);
             antiCheat.checkSuspiciousBehaviour(group, poles, updated);
-        });
-    }
-
-    private void checkNewYear(PoleCacheManager manager, Integer userid, String userName, Long group, String title) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                Thread.sleep(911);
-            } catch (InterruptedException ignored) {}
-
-            int status = manager.checkIfIsNewYear(group, userid);
-            try {
-                switch (status) {
-                    case 1:
-                        log.info(userName + " ha hecho la primera pole en su grupo " + group + "#" + title);
-                        getBot().sendMessage(group, userName + " ha sido la primera pole del año en este grupo " + EmojiManager.getForAlias("tada").getUnicode());
-                        break;
-                    case 2:
-                        log.info(userName + " ha hecho la primera pole del año!!!!!! En " + group + "#" + title);
-                        Long ownerId = botServer.getOwnerId();
-                        getBot().sendMessage(group, userName + " ha hecho la primera pole del 2019 (en todos los grupos) " + EmojiManager.getForAlias("military_medal").getUnicode());
-                        getBot().sendMessage(ownerId, userName + " se a llevado la primera pole del año, en " + group + "#" + title);
-                        break;
-                }
-            } catch (TelegramException ignore) {}
         });
     }
 }
