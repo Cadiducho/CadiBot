@@ -4,10 +4,11 @@ import com.cadiducho.bot.BotServer;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 
-import java.sql.*;
-import java.time.Instant;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -194,49 +195,5 @@ public class PoleCacheManager {
      */
     public void setGroupLastAdded(Long chatId) {
         getCachedGroup(chatId).ifPresent(cachedGroup -> cachedGroup.setLastAdded(LocalDate.now()));
-    }
-
-    /**
-     * @return 0 si no es el primero del año. 1 si lo es de su grupo, 2 si lo es del total
-     */
-    public int checkIfIsNewYear(Long group, Integer userid) {
-        LocalDate now = LocalDate.now();
-        if (now.getDayOfMonth() != 1 || now.getMonth().equals(Month.JANUARY)) {
-            return 0;
-        }
-        try {
-            Connection connection =  botServer.getDatabase().getConnection();
-            PreparedStatement statementAño = connection.prepareStatement(
-                    "SELECT userid, YEAR(DATE(time)) FROM cadibot_poles WHERE poleType=1 " +
-                            "AND YEAR(DATE(time))=YEAR(DATE(?)) ORDER BY time ASC LIMIT 1");
-            statementAño.setTimestamp(1, Timestamp.valueOf(now.atStartOfDay()));
-            ResultSet rsAño = statementAño.executeQuery();
-
-            if (rsAño.next()) {
-                Integer primero = rsAño.getInt("userid");
-                if (primero.equals(userid)) {
-                    return 2;
-                }
-            }
-
-            PreparedStatement statementMes = connection.prepareStatement(
-                    "SELECT userid, YEAR(DATE(time)) FROM cadibot_poles WHERE groupid=? AND poleType=1 " +
-                            "AND YEAR(DATE(time))=YEAR(DATE(?)) ORDER BY time ASC LIMIT 1");
-            statementMes.setLong(1, group);
-            statementMes.setTimestamp(1, Timestamp.valueOf(now.atStartOfDay()));
-            ResultSet rsMes = statementMes.executeQuery();
-
-            if (rsMes.next()) {
-                Integer primero = rsMes.getInt("userid");
-                if (primero.equals(userid)) {
-                    return 1;
-                }
-            }
-            botServer.getDatabase().closeConnection(connection);
-        } catch (SQLException ex) {
-            log.severe("Error comprobando si es la primera pole del año en " + group);
-            log.severe(ex.getMessage());
-        }
-        return 0;
     }
 }
