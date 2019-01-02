@@ -18,7 +18,7 @@ public class VersionCMD implements BotCommand {
     @Override
     public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         String aboutme = "Hola! Soy Cadibot \n" +
-                "Se está ejecutando la versión _" + BotServer.VERSION + "_ - Navideño edition " + EmojiManager.getForAlias("christmas_tree").getUnicode() + " \n" +
+                "Se está ejecutando la versión _" + BotServer.VERSION + "_ \n" +
                 "Información y novedades: @Cadibotnews";
 
         getBot().sendMessage(chat.getId(), aboutme, "markdown", null, false, messageId, null);
