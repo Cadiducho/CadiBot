@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Conjunto de funciones y estructuras de datos para asegurar el "fair-play" de las poles
@@ -40,12 +41,12 @@ public class PoleAntiCheat {
     public void checkSuspiciousBehaviour(CachedGroup group, PoleCollection poles, int updated) {
         Integer userid = module.getPoleCacheManager().getUserIdFromUpdatedPoleCollection(poles, updated);
         try {
-            Connection connection =  botServer.getDatabase().getConnection();
+            Connection connection = botServer.getDatabase().getConnection();
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT `time` FROM cadibot_poles " +
                             "WHERE userid=? " +
                             "AND groupid=? " +
-                            "AND `time` >= DATE_SUB(NOW(), INTERVAL 7 DAY)" +
+                            "AND `time` >= DATE_SUB(NOW(), INTERVAL 7 DAY) " +
                             "GROUP BY `time` ORDER BY `time` DESC;");
             statement.setInt(1, userid);
             statement.setLong(2, group.getId());
@@ -54,7 +55,7 @@ public class PoleAntiCheat {
             while (rs.next()) {
                 timestamps.add(rs.getTimestamp("time").toLocalDateTime());
             }
-            PreparedStatement statement2 = connection.prepareStatement("SELECT username,name FROM cadibot_users WHERE userid=?");
+            PreparedStatement statement2 = connection.prepareStatement("SELECT username, name FROM cadibot_users WHERE userid=?");
             statement2.setInt(1, userid);
             ResultSet rs2 = statement2.executeQuery();
 
@@ -65,38 +66,53 @@ public class PoleAntiCheat {
             }
             botServer.getDatabase().closeConnection(connection);
 
-            // Si ha hecho pole los 7 días seguidos
-            if (timestamps.size() == 7) {
-                int avgMinutes = 0;
-                int avgSeconds = 0;
-                for (LocalDateTime ldt : timestamps) {
-                    if (ldt.getMinute() != 0) return; // Si no es el minuto 0, salir
-                    avgMinutes += ldt.getMinute();
-                    avgSeconds += ldt.getSecond();
-                }
-                avgMinutes /= 7;
-                avgSeconds /= 7;
-
-                // Si ha hecho la pole 7 días seguidos en el mismo minuto...
-                if (avgMinutes == 0 && avgSeconds <= 2) {
-                    //Comportamiento sospechoso
-                    log.info("Comportamiento sospechoso de " + name + "@" + username + "#" + userid + " en " + group.getTitle() + "#" + group.getId());
-                    try {
-                        TelegramBot bot = botServer.getCadibot();
-                        Long ownerId = botServer.getOwnerId();
-                        bot.sendMessage(ownerId, "Posible uso de mensajes automáticos por " + userid + " en " + group.getTitle() + "#" + group.getId());
-                        StringBuilder sb = new StringBuilder();
-                        timestamps.forEach(t -> sb.append(t.format(DateTimeFormatter.ofPattern("d/M → HH:mm:ss.SSS"))).append('\n'));
-                        bot.sendMessage(ownerId, sb.toString());
-                    } catch (TelegramException e) {
-                        e.printStackTrace();
-                    }
+            final String fName = name;
+            final String fUsername = username;
+            if (checkSuspiciousBehaviour(timestamps)) {
+                try {
+                    log.info("Comportamiento sospechoso de " + fName + "@" + fUsername + "#" + userid + " en " + group.getTitle() + "#" + group.getId());
+                    TelegramBot bot = botServer.getCadibot();
+                    Long ownerId = botServer.getOwnerId();
+                    bot.sendMessage(ownerId, "Posible uso de mensajes automáticos por " + fName + "@" + fUsername + "#" + userid + " en " + group.getTitle() + "#" + group.getId());
+                    StringBuilder sb = new StringBuilder();
+                    timestamps.forEach(t -> sb.append(t.format(DateTimeFormatter.ofPattern("d/M → HH:mm:ss.SSS"))).append('\n'));
+                    bot.sendMessage(ownerId, sb.toString());
+                } catch (TelegramException e) {
+                    e.printStackTrace();
                 }
             }
         } catch (SQLException ex) {
             log.severe("Error analizando comportamiento sospechoso: ");
             log.severe(ex.getMessage());
         }
+    }
+
+    /**
+     * Analizar una lista de fechas para determinar si son sospechosos o no
+     * @param timestamps Lista de timestamps a analizar
+     * @return Verdadero si el comportamiento es sopechoso
+     */
+    public boolean checkSuspiciousBehaviour(List<LocalDateTime> timestamps) {
+        // Si ha hecho pole los 5 días seguidos
+        if (timestamps.size() == 5) {
+            float avgMinutes = 0;
+            float avgSeconds = 0;
+            for (LocalDateTime ldt : timestamps) {
+                if (ldt.getMinute() != 0) return false; // Si no es el minuto 0, salir
+
+                avgMinutes += ldt.getMinute();
+                avgSeconds += ldt.getSecond();
+            }
+            avgMinutes /= 5;
+            avgSeconds /= 5;
+
+            // Si ha hecho la pole 5 días seguidos en el mismo minuto...
+            if (avgMinutes == 0 && avgSeconds <= 2) {
+                //Comportamiento sospechoso
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -114,6 +130,9 @@ public class PoleAntiCheat {
         return data.isFlooding();
     }
 
+    /**
+     * Pequeño 'struct' para agrupar el par userid->groupid y poder compararlos con EqualsAndHashCode
+     */
     @EqualsAndHashCode
     @AllArgsConstructor
     private class UserInGroup {
@@ -121,6 +140,9 @@ public class PoleAntiCheat {
         Long group;
     }
 
+    /**
+     * Pequeña subclase para controlar los datos del antiflood
+     */
     private class AntiFloodData {
         long[] lastMessages = {0L, 0L, 0L};
         long lastSpam = 0L;
