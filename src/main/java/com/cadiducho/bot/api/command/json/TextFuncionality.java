@@ -23,6 +23,6 @@ public class TextFuncionality implements CommandFuncionality {
     public void execute(TelegramBot bot, Chat chat, User from, CommandContext context, Integer messageId, Message replyingTo, Instant instant) throws TelegramException {
         String reply = EmojiParser.parseToUnicode(text);
 
-        bot.sendMessage(chat.getId(), reply, null, null, false, messageId, null);
+        bot.sendMessage(chat.getId(), reply, null, null, false, replyTheCommandTo(replyPattern, messageId, replyingTo), null);
     }
 }
