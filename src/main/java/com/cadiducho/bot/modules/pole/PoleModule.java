@@ -34,6 +34,7 @@ public class PoleModule implements Module {
         poleCacheManager = new PoleCacheManager(this);
         poleCacheManager.loadCachedGroups();
         poleAntiCheat = new PoleAntiCheat(this);
+        poleAntiCheat.loadBannedUsers();
 
         CommandManager commandManager = BotServer.getInstance().getCommandManager();
         commandManager.register(new PoleCMD());
@@ -59,18 +60,17 @@ public class PoleModule implements Module {
      * Comprobar si un chat está autorizado a hacer poles
      * @param bot Instancia del bot para mandar los mensajes de error
      * @param chat Chat para realizar comprobaciones
-     * @param user Usuario para realizar comprobaciones
      * @return True si se pueden realizar poles
      */
-    public boolean isChatSafe(TelegramBot bot, Chat chat, User user) throws TelegramException {
+    public boolean isChatUnsafe(TelegramBot bot, Chat chat) throws TelegramException {
         if (chat.isUser()) {
             bot.sendMessage(chat.getId(), "No se vale hacer poles por privado loko");
-            return false;
+            return true;
         }
         if (bot.getChatMembersCount(chat.getId()) < 3) {
             bot.sendMessage(chat.getId(), "Este grupo no tiene el mínimo de usuarios para hacer poles " + EmojiManager.getForAlias("sweat_smile").getUnicode());
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 }

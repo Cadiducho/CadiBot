@@ -31,9 +31,13 @@ public class PoleCMD implements BotCommand {
     @SuppressWarnings({"OptionalGetWithoutIsPresent"})
     @Override
     public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
-        if (!module.isChatSafe(getBot(), chat, from)) return;
+        if (module.isChatUnsafe(getBot(), chat)) return;
 
         PoleAntiCheat antiCheat = module.getPoleAntiCheat();
+        if (antiCheat.isUserBanned(from.getId())) {
+            getBot().sendMessage(chat.getId(), "Has sido baneado y no tienes permitido realizar poles", null, null, true, messageId, null);
+            return;
+        }
         if (antiCheat.isFlooding(from.getId(), Long.parseLong(chat.getId()))) {
             getBot().sendMessage(chat.getId(), "Antiflood aplicado a " + from.getFirstName() + ", te quedas sin poles por listo");
             return;

@@ -30,7 +30,7 @@ public class PoleListCMD implements BotCommand, CallbackListener {
 
     @Override
     public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
-        if (!module.isChatSafe(getBot(), chat, from)) return;
+        if (module.isChatUnsafe(getBot(), chat)) return;
 
         LocalDate atDate = LocalDate.now();
         try {
