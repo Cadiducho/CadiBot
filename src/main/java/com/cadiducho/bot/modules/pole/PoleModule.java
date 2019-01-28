@@ -7,7 +7,9 @@ import com.cadiducho.bot.api.module.ModuleInfo;
 import com.cadiducho.bot.modules.pole.cmds.PoleCMD;
 import com.cadiducho.bot.modules.pole.cmds.PoleListCMD;
 import com.cadiducho.bot.modules.pole.cmds.UpdateUsernameCMD;
+import com.cadiducho.bot.modules.pole.cmds.admin.AnalyzeUserCMD;
 import com.cadiducho.bot.modules.pole.cmds.admin.MigrateGroupCMD;
+import com.cadiducho.bot.modules.pole.util.BanUserListener;
 import com.cadiducho.bot.modules.pole.util.PoleAntiCheat;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.TelegramBot;
@@ -17,7 +19,12 @@ import com.vdurmont.emoji.EmojiManager;
 import lombok.Getter;
 import lombok.extern.java.Log;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Log
 @ModuleInfo(name = "Poles", description = "Módulo para hacer poles cada día")
@@ -41,6 +48,9 @@ public class PoleModule implements Module {
         commandManager.register(new PoleListCMD());
         commandManager.register(new UpdateUsernameCMD());
         commandManager.register(new MigrateGroupCMD());
+        commandManager.register(new AnalyzeUserCMD());
+        commandManager.registerCallbackQueryListener(new BanUserListener(this));
+
         log.info("Módulo de poles cargado");
     }
 
@@ -72,5 +82,56 @@ public class PoleModule implements Module {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Obten el nombre de un grupo de la base de datos a partir de su ID
+     * @param groupId La id del grupo
+     * @return el nombre del grupo
+     */
+    public Optional<String> getGroupName(Long groupId) {
+        Optional<String> name = Optional.empty();
+        try {
+            Connection connection = BotServer.getInstance().getDatabase().getConnection();
+            PreparedStatement statement = connection.prepareStatement(
+                    "SELECT name FROM cadibot_grupos WHERE groupid=?");
+            statement.setLong(1, groupId);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                name = Optional.of(rs.getString("name"));
+            }
+            BotServer.getInstance().getDatabase().closeConnection(connection);
+        } catch (SQLException exception) {
+            log.severe("Error obteniendo un grupo para su migración");
+            log.severe(exception.toString());
+        }
+        return name;
+    }
+
+    /**
+     * Obten el nombre de un usuario desde la base de datos
+     * La posición 0 representará el nombre y la 1 el @username
+     * @param userid La id del usuario
+     * @return El nombre usuario
+     */
+    public String[] getUsername(Integer userid) {
+        String name = "";
+        String username = "";
+        try {
+            Connection connection = BotServer.getInstance().getDatabase().getConnection();
+            PreparedStatement statement = connection.prepareStatement(
+                    "SELECT name, username FROM cadibot_users WHERE userid=?");
+            statement.setInt(1, userid);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                name = rs.getString("name");
+                username = rs.getString("username");
+            }
+            BotServer.getInstance().getDatabase().closeConnection(connection);
+        } catch (SQLException exception) {
+            log.severe("Error obteniendo un grupo para su migración");
+            log.severe(exception.toString());
+        }
+        return new String[] {name, username};
     }
 }

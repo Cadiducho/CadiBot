@@ -1,11 +1,11 @@
 package com.cadiducho.bot.modules.pole.util;
 
 import com.cadiducho.bot.BotServer;
-import com.cadiducho.bot.modules.pole.CachedGroup;
-import com.cadiducho.bot.modules.pole.PoleCollection;
 import com.cadiducho.bot.modules.pole.PoleModule;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
+import com.cadiducho.telegrambotapi.inline.InlineKeyboardButton;
+import com.cadiducho.telegrambotapi.inline.InlineKeyboardMarkup;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,51 +33,60 @@ public class PoleAntiCheat {
     private static final BotServer botServer = BotServer.getInstance();
     private final HashMap<UserInGroup, AntiFloodData> antiFloodDataMap = new HashMap<>();
 
+    private final List<Integer> bannedUsers = new ArrayList<>();
+
     /**
      * Analizar ultimos comportamientos de un usuario para determinar si son sospechosos o no
-     * @param group Grupo donde se está analizando
-     * @param poles Colección de poles del día en el que se analiza
-     * @param updated La pole que se ha actualizado (es decir, la posición del usuario el día que se analiza)
+     * @param groupId Id del grupo donde se está analizando
+     * @param userId Id del usuario a analizar
+     * @param days Número de días a analizar
+     * @return Verdadero si es sospechoso
      */
-    public void checkSuspiciousBehaviour(CachedGroup group, PoleCollection poles, int updated) {
-        Integer userid = module.getPoleCacheManager().getUserIdFromUpdatedPoleCollection(poles, updated);
+    public boolean checkSuspiciousBehaviour(Long groupId, Integer userId, int days) {
         try {
             Connection connection = botServer.getDatabase().getConnection();
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT `time` FROM cadibot_poles " +
                             "WHERE userid=? " +
                             "AND groupid=? " +
-                            "AND `time` >= DATE_SUB(NOW(), INTERVAL 7 DAY) " +
+                            "AND `time` >= DATE_SUB(NOW(), INTERVAL " + days + " DAY) " +
                             "GROUP BY `time` ORDER BY `time` DESC;");
-            statement.setInt(1, userid);
-            statement.setLong(2, group.getId());
+            statement.setInt(1, userId);
+            statement.setLong(2, groupId);
             ResultSet rs = statement.executeQuery();
             ArrayList<LocalDateTime> timestamps = new ArrayList<>();
             while (rs.next()) {
                 timestamps.add(rs.getTimestamp("time").toLocalDateTime());
             }
-            PreparedStatement statement2 = connection.prepareStatement("SELECT username, name FROM cadibot_users WHERE userid=?");
-            statement2.setInt(1, userid);
-            ResultSet rs2 = statement2.executeQuery();
-
-            String username = "", name = "";
-            if (rs2.next()) {
-                username = rs2.getString("username");
-                name = rs2.getString("name");
-            }
             botServer.getDatabase().closeConnection(connection);
 
-            final String fName = name;
-            final String fUsername = username;
-            if (checkSuspiciousBehaviour(timestamps)) {
+            if (checkSuspiciousBehaviour(timestamps, days)) {
                 try {
-                    log.info("Comportamiento sospechoso de " + fName + "@" + fUsername + "#" + userid + " en " + group.getTitle() + "#" + group.getId());
+                    @SuppressWarnings("OptionalGetWithoutIsPresent") String groupName = module.getGroupName(groupId).get();
+                    String[] names = module.getUsername(userId);
+                    String name = names[0];
+                    String username = names[1];
+
+                    log.info("Comportamiento sospechoso de " + name + "@" + username + "#" + userId + " en " + groupName + "#" + groupId);
                     TelegramBot bot = botServer.getCadibot();
                     Long ownerId = botServer.getOwnerId();
-                    bot.sendMessage(ownerId, "Posible uso de mensajes automáticos por " + fName + "@" + fUsername + "#" + userid + " en " + group.getTitle() + "#" + group.getId());
                     StringBuilder sb = new StringBuilder();
+
+                    sb.append("Posible uso de mensajes automáticos por ")
+                            .append(name).append("@").append(username).append("#").append(userId)
+                            .append(" en ")
+                            .append(groupName).append("#").append(groupId)
+                            .append("\n\n");
                     timestamps.forEach(t -> sb.append(t.format(DateTimeFormatter.ofPattern("d/M → HH:mm:ss.SSS"))).append('\n'));
-                    bot.sendMessage(ownerId, sb.toString());
+
+                    final InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
+                    final InlineKeyboardButton banear = new InlineKeyboardButton();
+                    banear.setText("Banear usuario");
+                    banear.setCallbackData("askBanUser#" + userId + "#" + groupId);
+                    inlineKeyboard.setInlineKeyboard(Collections.singletonList(Collections.singletonList(banear)));
+
+                    bot.sendMessage(ownerId, sb.toString(), "html", null, null, null, inlineKeyboard);
+                    return true;
                 } catch (TelegramException e) {
                     e.printStackTrace();
                 }
@@ -85,16 +95,18 @@ public class PoleAntiCheat {
             log.severe("Error analizando comportamiento sospechoso: ");
             log.severe(ex.getMessage());
         }
+        return false;
     }
 
     /**
      * Analizar una lista de fechas para determinar si son sospechosos o no
      * @param timestamps Lista de timestamps a analizar
+     * @param days Número de días a analizar
      * @return Verdadero si el comportamiento es sopechoso
      */
-    public boolean checkSuspiciousBehaviour(List<LocalDateTime> timestamps) {
-        // Si ha hecho pole los 5 días seguidos
-        if (timestamps.size() == 5) {
+    public boolean checkSuspiciousBehaviour(List<LocalDateTime> timestamps, int days) {
+        // Si ha hecho pole los <days> días seguidos
+        if (timestamps.size() >= days) {
             float avgMinutes = 0;
             float avgSeconds = 0;
             for (LocalDateTime ldt : timestamps) {
@@ -103,14 +115,11 @@ public class PoleAntiCheat {
                 avgMinutes += ldt.getMinute();
                 avgSeconds += ldt.getSecond();
             }
-            avgMinutes /= 5;
-            avgSeconds /= 5;
+            avgMinutes /= timestamps.size();
+            avgSeconds /= timestamps.size();
 
-            // Si ha hecho la pole 5 días seguidos en el mismo minuto...
-            if (avgMinutes == 0 && avgSeconds <= 2) {
-                //Comportamiento sospechoso
-                return true;
-            }
+            // Si ha hecho la pole <days> días seguidos en el mismo minuto...
+            return avgMinutes == 0 && avgSeconds <= 2;
         }
         return false;
     }
@@ -130,6 +139,46 @@ public class PoleAntiCheat {
         return data.isFlooding();
     }
 
+    public void loadBannedUsers() {
+        bannedUsers.clear();
+        try {
+            Connection connection = botServer.getDatabase().getConnection();
+            PreparedStatement statement = connection.prepareStatement("SELECT userid FROM cadibot_users WHERE isBanned=1");
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                bannedUsers.add(rs.getInt("userid"));
+            }
+            log.info("Cargados " + bannedUsers.size() + " usuarios baneados");
+            botServer.getDatabase().closeConnection(connection);
+        } catch (SQLException ex) {
+            log.severe("Error cargando la lista de usuarios baneados: ");
+            log.severe(ex.getMessage());
+        }
+    }
+
+    /**
+     * Banear un usuario
+     * @param userid ID del usuario. Debe ser válida y corresponder a un usuario existente
+     */
+    public void banUser(Integer userid) {
+        try {
+            Connection connection = botServer.getDatabase().getConnection();
+            PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE cadibot_users SET isBanned=1, banTime=NOW() WHERE userid=?;");
+            statement.setInt(1, userid);
+            statement.executeUpdate();
+
+            botServer.getDatabase().closeConnection(connection);
+        } catch (SQLException ex) {
+            log.severe("Error cargando la lista de usuarios baneados: ");
+            log.severe(ex.getMessage());
+        }
+    }
+
+    public boolean isUserBanned(Integer userid) {
+        return bannedUsers.contains(userid);
+    }
+
     /**
      * Pequeño 'struct' para agrupar el par userid->groupid y poder compararlos con EqualsAndHashCode
      */
@@ -144,7 +193,7 @@ public class PoleAntiCheat {
      * Pequeña subclase para controlar los datos del antiflood
      */
     private class AntiFloodData {
-        long[] lastMessages = {0L, 0L, 0L};
+        final long[] lastMessages = {0L, 0L, 0L};
         long lastSpam = 0L;
 
         public boolean isFlooding() {

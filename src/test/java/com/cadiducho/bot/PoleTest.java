@@ -145,6 +145,7 @@ public class PoleTest {
     @Test
     @DisplayName("Anticheat - Antibot")
     public void testAntibot() {
+        final int days = 5;
         List<LocalDateTime> timestamps = Arrays.asList(
                 Timestamp.valueOf("2019-01-25 00:00:00.021").toLocalDateTime(),
                 Timestamp.valueOf("2019-01-24 00:00:00.011").toLocalDateTime(),
@@ -152,7 +153,7 @@ public class PoleTest {
                 Timestamp.valueOf("2019-01-21 00:00:00.481").toLocalDateTime()
         );
         // Falso -> Tiempos relativamente sospechosos, pero no ha sido todos los días seguidos
-        assertFalse(antiCheat.checkSuspiciousBehaviour(timestamps));
+        assertFalse(antiCheat.checkSuspiciousBehaviour(timestamps, days));
 
         timestamps = Arrays.asList(
                 Timestamp.valueOf("2019-01-25 00:00:01.021").toLocalDateTime(),
@@ -162,7 +163,7 @@ public class PoleTest {
                 Timestamp.valueOf("2019-01-21 00:00:05.481").toLocalDateTime()
         );
         // Falso -> Tiempos "normales" con segundos variados que superan la media de 2 segundos
-        assertFalse(antiCheat.checkSuspiciousBehaviour(timestamps));
+        assertFalse(antiCheat.checkSuspiciousBehaviour(timestamps, days));
 
         timestamps = Arrays.asList(
                 Timestamp.valueOf("2019-01-25 00:00:00.2892").toLocalDateTime(),
@@ -172,6 +173,6 @@ public class PoleTest {
                 Timestamp.valueOf("2019-01-21 00:00:00.3934").toLocalDateTime()
         );
         // Verdadero -> Días seguidos, en el mismo segundo y con milesimas de diferencias
-        assertTrue(antiCheat.checkSuspiciousBehaviour(timestamps));
+        assertTrue(antiCheat.checkSuspiciousBehaviour(timestamps, days));
     }
 }

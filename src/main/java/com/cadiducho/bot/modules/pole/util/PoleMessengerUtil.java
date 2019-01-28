@@ -18,10 +18,10 @@ import java.util.Map;
  */
 public class PoleMessengerUtil {
 
-    private static Emoji chart = EmojiManager.getForAlias("chart_with_upwards_trend");
-    private static Emoji gold = EmojiManager.getForAlias("first_place_medal");
-    private static Emoji silver = EmojiManager.getForAlias("second_place_medal");
-    private static Emoji bronze =  EmojiManager.getForAlias("third_place_medal");
+    private static final Emoji chart = EmojiManager.getForAlias("chart_with_upwards_trend");
+    private static final Emoji gold = EmojiManager.getForAlias("first_place_medal");
+    private static final Emoji silver = EmojiManager.getForAlias("second_place_medal");
+    private static final Emoji bronze =  EmojiManager.getForAlias("third_place_medal");
 
     private static final DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("d/M/yyyy");
 

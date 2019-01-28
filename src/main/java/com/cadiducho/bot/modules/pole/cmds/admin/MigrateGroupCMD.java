@@ -18,6 +18,7 @@ import lombok.extern.java.Log;
 import java.sql.*;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 
 @Log
@@ -27,6 +28,8 @@ import java.util.Optional;
         @Argument(name = "nuevoGrupo", type = Long.class, description = "ID del nuevo grupo")
 })
 public class MigrateGroupCMD implements BotCommand, CallbackListener {
+
+    private final PoleModule module = (PoleModule) getModule();
 
     @Override
     public void execute(Chat chat, User from, CommandContext context, Integer messageId, Message replyingTo, Instant instant) throws TelegramException {
@@ -42,8 +45,8 @@ public class MigrateGroupCMD implements BotCommand, CallbackListener {
                 return;
             }
 
-            Optional<String> nombreViejoGrupo = getGroupName(viejoGrupo.get());
-            Optional<String> nombreNuevoGrupo = getGroupName(nuevoGrupo.get());
+            Optional<String> nombreViejoGrupo = module.getGroupName(viejoGrupo.get());
+            Optional<String> nombreNuevoGrupo = module.getGroupName(nuevoGrupo.get());
             if (!nombreViejoGrupo.isPresent() || !nombreNuevoGrupo.isPresent()) {
                 getBot().sendMessage(chat.getId(), "Grupos no reconocidos.");
                 return;
@@ -57,7 +60,7 @@ public class MigrateGroupCMD implements BotCommand, CallbackListener {
             cancelar.setText("Cancelar");
             cancelar.setCallbackData("cancelarMigracionGrupo#" + viejoGrupo.get() + "#" + nuevoGrupo.get());
 
-            inlineKeyboard.setInlineKeyboard(Arrays.asList(Arrays.asList(confirmacion, cancelar)));
+            inlineKeyboard.setInlineKeyboard(Collections.singletonList(Arrays.asList(confirmacion, cancelar)));
 
             String body = "¿Estás seguro de que quieres migrar todas las poles de \n"
                     + "<b>" + nombreViejoGrupo.get() + "</b>[<i>" + viejoGrupo.get() + "</i>] "
@@ -76,8 +79,8 @@ public class MigrateGroupCMD implements BotCommand, CallbackListener {
         String[] callbackData = callbackQuery.getData().split("#");
         Long oldId = Long.parseLong(callbackData[1]);
         Long newId = Long.parseLong(callbackData[2]);
-        Optional<String> nombreViejoGrupo = getGroupName(oldId);
-        Optional<String> nombreNuevoGrupo = getGroupName(newId);
+        Optional<String> nombreViejoGrupo = module.getGroupName(oldId);
+        Optional<String> nombreNuevoGrupo = module.getGroupName(newId);
         int updated = migratePoles(oldId, newId);
 
         // Informar por mensaje a los grupos afectados en el cambio
@@ -105,29 +108,10 @@ public class MigrateGroupCMD implements BotCommand, CallbackListener {
     public void cancelarMigracionGrupo(CallbackQuery callbackQuery) throws TelegramException {
         if (!callbackQuery.getFrom().getUsername().equalsIgnoreCase("cadiducho")) return;
         String[] callbackData = callbackQuery.getData().split("#");
-        String body = "Has cancelado la migración del grupo <b>" + getGroupName(Long.parseLong(callbackData[1])).get() + "</b>[<i>" + callbackData[1] + "</i>]"
-                + " a <b>" + getGroupName(Long.parseLong(callbackData[2])).get() + "</b>[<i>" + callbackData[2] + "</i>]";
+        String body = "Has cancelado la migración del grupo <b>" + module.getGroupName(Long.parseLong(callbackData[1])).get() + "</b>[<i>" + callbackData[1] + "</i>]"
+                + " a <b>" + module.getGroupName(Long.parseLong(callbackData[2])).get() + "</b>[<i>" + callbackData[2] + "</i>]";
         botServer.getCadibot().editMessageText(callbackQuery.getMessage().getChat().getId(), callbackQuery.getMessage().getMessageId(), callbackQuery.getInlineMessageId(),
                 body, "html", false, null);
-    }
-
-    private Optional<String> getGroupName(Long groupId) {
-        Optional<String> name = Optional.empty();
-        try {
-            Connection connection = BotServer.getInstance().getDatabase().getConnection();
-            PreparedStatement statement = connection.prepareStatement(
-                    "SELECT name FROM cadibot_grupos WHERE groupid=?");
-            statement.setLong(1, groupId);
-            ResultSet rs = statement.executeQuery();
-            if (rs.next()) {
-                name = Optional.of(rs.getString("name"));
-            }
-            BotServer.getInstance().getDatabase().closeConnection(connection);
-        } catch (SQLException exception) {
-            log.severe("Error obteniendo un grupo para su migración");
-            log.severe(exception.toString());
-        }
-        return name;
     }
 
     private int migratePoles(Long oldId, Long newId) {
