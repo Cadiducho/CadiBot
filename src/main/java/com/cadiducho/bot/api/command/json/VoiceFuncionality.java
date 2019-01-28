@@ -20,6 +20,6 @@ public class VoiceFuncionality implements CommandFuncionality {
     @Json(name = "voice_id") private final String voiceId;
 
     public void execute(TelegramBot bot, Chat chat, User from, CommandContext context, Integer messageId, Message replyingTo, Instant instant) throws TelegramException {
-        bot.sendVoice(chat.getId(), voiceId, null, null, false, messageId, null);
+        bot.sendVoice(chat.getId(), voiceId, null, null, false, replyTheCommandTo(replyPattern, messageId, replyingTo), null);
     }
 }

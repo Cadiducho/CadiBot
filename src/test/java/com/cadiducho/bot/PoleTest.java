@@ -4,14 +4,18 @@ import com.cadiducho.bot.modules.pole.CachedGroup;
 import com.cadiducho.bot.modules.pole.PoleCacheManager;
 import com.cadiducho.bot.modules.pole.PoleCollection;
 import com.cadiducho.bot.modules.pole.util.PoleAntiCheat;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -136,5 +140,39 @@ public class PoleTest {
         assertTrue(antiCheat.isFlooding(userid, groupOne)); // tras 4 intentos seguidos, falta el antiflood
 
         assertFalse(antiCheat.isFlooding(userid, groupTwo)); // en otro grupo no cuenta como flood
+    }
+
+    @Test
+    @DisplayName("Anticheat - Antibot")
+    public void testAntibot() {
+        final int days = 5;
+        List<LocalDateTime> timestamps = Arrays.asList(
+                Timestamp.valueOf("2019-01-25 00:00:00.021").toLocalDateTime(),
+                Timestamp.valueOf("2019-01-24 00:00:00.011").toLocalDateTime(),
+                Timestamp.valueOf("2019-01-22 00:00:00.281").toLocalDateTime(),
+                Timestamp.valueOf("2019-01-21 00:00:00.481").toLocalDateTime()
+        );
+        // Falso -> Tiempos relativamente sospechosos, pero no ha sido todos los días seguidos
+        assertFalse(antiCheat.checkSuspiciousBehaviour(timestamps, days));
+
+        timestamps = Arrays.asList(
+                Timestamp.valueOf("2019-01-25 00:00:01.021").toLocalDateTime(),
+                Timestamp.valueOf("2019-01-24 00:00:01.011").toLocalDateTime(),
+                Timestamp.valueOf("2019-01-23 00:00:00.521").toLocalDateTime(),
+                Timestamp.valueOf("2019-01-22 00:00:04.281").toLocalDateTime(),
+                Timestamp.valueOf("2019-01-21 00:00:05.481").toLocalDateTime()
+        );
+        // Falso -> Tiempos "normales" con segundos variados que superan la media de 2 segundos
+        assertFalse(antiCheat.checkSuspiciousBehaviour(timestamps, days));
+
+        timestamps = Arrays.asList(
+                Timestamp.valueOf("2019-01-25 00:00:00.2892").toLocalDateTime(),
+                Timestamp.valueOf("2019-01-24 00:00:00.3512").toLocalDateTime(),
+                Timestamp.valueOf("2019-01-23 00:00:00.3894").toLocalDateTime(),
+                Timestamp.valueOf("2019-01-22 00:00:00.3832").toLocalDateTime(),
+                Timestamp.valueOf("2019-01-21 00:00:00.3934").toLocalDateTime()
+        );
+        // Verdadero -> Días seguidos, en el mismo segundo y con milesimas de diferencias
+        assertTrue(antiCheat.checkSuspiciousBehaviour(timestamps, days));
     }
 }

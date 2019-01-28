@@ -18,10 +18,10 @@ import java.util.Map;
  */
 public class PoleMessengerUtil {
 
-    private static Emoji chart = EmojiManager.getForAlias("chart_with_upwards_trend");
-    private static Emoji gold = EmojiManager.getForAlias("first_place_medal");
-    private static Emoji silver = EmojiManager.getForAlias("second_place_medal");
-    private static Emoji bronze =  EmojiManager.getForAlias("third_place_medal");
+    private static final Emoji chart = EmojiManager.getForAlias("chart_with_upwards_trend");
+    private static final Emoji gold = EmojiManager.getForAlias("first_place_medal");
+    private static final Emoji silver = EmojiManager.getForAlias("second_place_medal");
+    private static final Emoji bronze =  EmojiManager.getForAlias("third_place_medal");
 
     private static final DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("d/M/yyyy");
 
@@ -187,7 +187,7 @@ public class PoleMessengerUtil {
     public static LinkedHashMap<PoleUser, Integer> getTopPoles(long chatId, LocalDate atDay, int type, int limit) throws SQLException {
         Connection connection = BotServer.getInstance().getDatabase().getConnection();
         PreparedStatement statement = connection.prepareStatement("" +
-                "SELECT count(*) AS `totales`,`userid`,`name`,`username` FROM cadibot_poles NATURAL JOIN cadibot_users " +
+                "SELECT count(*) AS `totales`,`userid`,`name`,`username`,`isBanned` FROM cadibot_poles NATURAL JOIN cadibot_users " +
                 "WHERE groupid=? AND `poleType`=? AND DATE(time)<=DATE(?) GROUP BY `userid` ORDER BY `totales` DESC LIMIT ?");
         statement.setLong(1, chatId);
         statement.setInt(2, type);
@@ -200,6 +200,7 @@ public class PoleMessengerUtil {
                     .id(rs.getInt("userid"))
                     .name(rs.getString("name"))
                     .username(rs.getString("username"))
+                    .isBanned(rs.getBoolean("isBanned"))
                     .build();
             poles.put(user, rs.getInt("totales"));
         }
@@ -294,13 +295,32 @@ public class PoleMessengerUtil {
         if (!top.isEmpty()) {
             body.append("\n").append(title).append("\n");
             for (Map.Entry<PoleUser, Integer> entry : top.entrySet()) {
-                String pole_user_name = EmojiParser.parseToUnicode(entry.getKey().getName());
-                body.append(pole_user_name).append(" → ").append(entry.getValue());
-                if (entry.getKey().groupname().isPresent()) {
-                    body.append("<i> en ").append(entry.getKey().groupname().get()).append("</i>");
+                PoleUser user = entry.getKey();
+                Integer polesCount = entry.getValue();
+                String pole_user_name = EmojiParser.parseToUnicode(user.getName());
+                String banTag = "";
+                if (user.isBanned()) {
+                    pole_user_name = strikeThrough(pole_user_name);
+                    banTag = "  <i>[ban]</i>";
+                }
+                body.append(pole_user_name).append(" → ").append(polesCount).append(banTag);
+                if (user.groupname().isPresent()) {
+                    body.append("<i> en ").append(user.groupname().get()).append("</i>");
                 }
                 body.append("\n");
             }
         }
+    }
+
+    /**
+     * Tachar un nombre
+     */
+    public static String strikeThrough(String name) {
+        StringBuilder sb = new StringBuilder();
+        char[] charArray = name.toCharArray();
+        for (char c : charArray) {
+            sb.append(c).append('\u0336');
+        }
+        return sb.toString();
     }
 }

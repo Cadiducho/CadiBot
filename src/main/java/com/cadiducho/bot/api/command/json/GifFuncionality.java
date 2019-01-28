@@ -20,6 +20,6 @@ public class GifFuncionality implements CommandFuncionality {
     @Json(name = "gif_id") private final String gifId;
 
     public void execute(TelegramBot bot, Chat chat, User from, CommandContext context, Integer messageId, Message replyingTo, Instant instant) throws TelegramException {
-        bot.sendDocument(chat.getId(), gifId, false, messageId, null);
+        bot.sendDocument(chat.getId(), gifId, false, replyTheCommandTo(replyPattern, messageId, replyingTo), null);
     }
 }
