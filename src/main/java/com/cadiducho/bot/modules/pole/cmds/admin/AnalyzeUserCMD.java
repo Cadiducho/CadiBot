@@ -4,9 +4,7 @@ import com.cadiducho.bot.api.command.BotCommand;
 import com.cadiducho.bot.api.command.CommandContext;
 import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.bot.api.command.args.Argument;
-import com.cadiducho.bot.api.command.args.CommandArguments;
 import com.cadiducho.bot.api.command.args.CommandParseException;
-import com.cadiducho.bot.modules.pole.CachedGroup;
 import com.cadiducho.bot.modules.pole.PoleModule;
 import com.cadiducho.bot.modules.pole.util.PoleAntiCheat;
 import com.cadiducho.telegrambotapi.Chat;
@@ -17,10 +15,11 @@ import com.cadiducho.telegrambotapi.exception.TelegramException;
 import java.time.Instant;
 import java.util.Optional;
 
-@CommandInfo(module = PoleModule.class, aliases = "/analyzeuser")
-@CommandArguments({
-        @Argument(name = "usuario", type = Integer.class, description = "ID del usuario"),
-        @Argument(name = "grupo", type = Long.class, description = "ID del grupo donde analizar")
+@CommandInfo(module = PoleModule.class,
+        aliases = "/analyzeuser",
+        arguments = {
+            @Argument(name = "usuario", type = Integer.class, description = "ID del usuario"),
+            @Argument(name = "grupo", type = Long.class, description = "ID del grupo donde analizar")
 })
 public class AnalyzeUserCMD implements BotCommand {
 

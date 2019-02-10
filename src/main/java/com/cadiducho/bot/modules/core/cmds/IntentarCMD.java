@@ -4,7 +4,6 @@ import com.cadiducho.bot.api.command.BotCommand;
 import com.cadiducho.bot.api.command.CommandContext;
 import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.bot.api.command.args.Argument;
-import com.cadiducho.bot.api.command.args.CommandArguments;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.User;
@@ -14,8 +13,7 @@ import com.vdurmont.emoji.EmojiManager;
 import java.time.Instant;
 import java.util.Optional;
 
-@CommandInfo(aliases = "/intentar")
-@CommandArguments(@Argument(name = "accion", type = String.class, description = "Acción a intentar"))
+@CommandInfo(aliases = "/intentar", arguments = @Argument(name = "accion", type = String.class, description = "Acción a intentar"))
 public class IntentarCMD implements BotCommand {
 
     @Override

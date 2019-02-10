@@ -3,7 +3,6 @@ package com.cadiducho.bot.modules.pole.cmds.admin;
 import com.cadiducho.bot.BotServer;
 import com.cadiducho.bot.api.command.*;
 import com.cadiducho.bot.api.command.args.Argument;
-import com.cadiducho.bot.api.command.args.CommandArguments;
 import com.cadiducho.bot.api.command.args.CommandParseException;
 import com.cadiducho.bot.modules.pole.PoleModule;
 import com.cadiducho.telegrambotapi.CallbackQuery;
@@ -22,11 +21,13 @@ import java.util.Collections;
 import java.util.Optional;
 
 @Log
-@CommandInfo(module = PoleModule.class, aliases = "/migrategroup")
-@CommandArguments({
-        @Argument(name = "viejoGrupo", type = Long.class, description = "ID del viejo grupo"),
-        @Argument(name = "nuevoGrupo", type = Long.class, description = "ID del nuevo grupo")
-})
+@CommandInfo(module = PoleModule.class,
+        aliases = "/migrategroup",
+        arguments = {
+                @Argument(name = "viejoGrupo", type = Long.class, description = "ID del viejo grupo"),
+                @Argument(name = "nuevoGrupo", type = Long.class, description = "ID del nuevo grupo")
+        }
+)
 public class MigrateGroupCMD implements BotCommand, CallbackListener {
 
     private final PoleModule module = (PoleModule) getModule();

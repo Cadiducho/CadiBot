@@ -1,5 +1,6 @@
 package com.cadiducho.bot.api.command;
 
+import com.cadiducho.bot.api.command.args.Argument;
 import com.cadiducho.bot.api.module.Module;
 
 import java.lang.annotation.*;
@@ -16,6 +17,12 @@ public @interface CommandInfo {
      * @return Módulo al que pertenece el comando
      */
     Class<? extends Module> module() default Module.class;
+
+    /**
+     * Lista de argumentos del comando. Ver {@link Argument}
+     * @return lista de argumentos
+     */
+    Argument[] arguments() default {};
 
     /**
      * Lista de alias por las que ese comando se puede ejecutar

@@ -2,7 +2,6 @@ package com.cadiducho.bot.api.command;
 
 import com.cadiducho.bot.BotServer;
 import com.cadiducho.bot.api.command.args.Argument;
-import com.cadiducho.bot.api.command.args.CommandArguments;
 import com.cadiducho.bot.api.module.Module;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
@@ -61,10 +60,10 @@ public interface BotCommand {
     }
 
     default List<Argument> getArguments() {
-        if (!this.getClass().isAnnotationPresent(CommandArguments.class)) {
+        if (!this.getClass().isAnnotationPresent(CommandInfo.class)) {
             return new ArrayList<>();
         }
-        Argument[] arguments = this.getClass().getAnnotationsByType(Argument.class);
+        Argument[] arguments = this.getClass().getAnnotation(CommandInfo.class).arguments();
         return Arrays.asList(arguments);
     }
 
