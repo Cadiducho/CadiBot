@@ -31,7 +31,7 @@ public class CommandManager {
      * @param cmd El comando a registrar
      */
     public void register(BotCommand cmd) {
-        cmd.getAliases().forEach(alias -> commandMap.put(alias, cmd));
+        cmd.getAliases().forEach(alias -> commandMap.put(alias.toLowerCase(), cmd));
 
         //Comprobar si tiene Listeners en su interior, y registrarlos
         if (cmd instanceof CallbackListener) {

@@ -20,7 +20,7 @@ public class BotServer {
     /**
      * Server / bot version
      */
-    public static final String VERSION = "2.15";
+    public static final String VERSION = "2.16-beta";
 
     /**
      * The Module manager
