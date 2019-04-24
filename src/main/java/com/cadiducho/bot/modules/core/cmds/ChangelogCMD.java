@@ -4,7 +4,6 @@ import com.cadiducho.bot.api.command.BotCommand;
 import com.cadiducho.bot.api.command.CommandContext;
 import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.bot.api.command.args.Argument;
-import com.cadiducho.bot.api.command.args.CommandArguments;
 import com.cadiducho.bot.api.command.args.CommandParseException;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
@@ -21,8 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-@CommandInfo(aliases = "/changelog")
-@CommandArguments(@Argument(name = "cantidad", type = Integer.class, description = "Número de versiones a visualizar"))
+@CommandInfo(aliases = "/changelog", arguments = @Argument(name = "cantidad", type = Integer.class, description = "Número de versiones a visualizar"))
 public class ChangelogCMD implements BotCommand {
     
     @Override

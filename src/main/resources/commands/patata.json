@@ -9,12 +9,7 @@
         },
         {
             "type": "text",
-            "text": "Soy una patata y tú no. original",
-            "reply_to": "original"
-        },
-        {
-            "type": "text",
-            "text": "Soy una patata y tú no. answered",
+            "text": "Soy una patata y tú no.",
             "reply_to": "answered"
         }
     ]

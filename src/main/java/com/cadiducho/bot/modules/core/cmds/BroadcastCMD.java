@@ -4,7 +4,6 @@ import com.cadiducho.bot.api.command.BotCommand;
 import com.cadiducho.bot.api.command.CommandContext;
 import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.bot.api.command.args.Argument;
-import com.cadiducho.bot.api.command.args.CommandArguments;
 import com.cadiducho.bot.api.command.args.CommandParseException;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
@@ -14,8 +13,7 @@ import com.cadiducho.telegrambotapi.exception.TelegramException;
 import java.time.Instant;
 import java.util.Optional;
 
-@CommandInfo(aliases = "/broadcastcadibot")
-@CommandArguments(@Argument(name = "mensaje", type = String.class, description = "Mensaje a retransmitir"))
+@CommandInfo(aliases = "/broadcastcadibot", arguments = @Argument(name = "mensaje", type = String.class, description = "Mensaje a retransmitir"))
 public class BroadcastCMD implements BotCommand {
 
     @Override

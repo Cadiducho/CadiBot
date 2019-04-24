@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.cadiducho</groupId>
     <artifactId>Cadibot</artifactId>
-    <version>2.15</version>
+    <version>2.16</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>com.cadiducho</groupId>
             <artifactId>TelegramBotAPI</artifactId>
-            <version>4.1.1</version>
+            <version>4.2</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.0</version>
+            <version>1.18.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -4,7 +4,6 @@ import com.cadiducho.bot.api.command.BotCommand;
 import com.cadiducho.bot.api.command.CommandContext;
 import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.bot.api.command.args.Argument;
-import com.cadiducho.bot.api.command.args.CommandArguments;
 import com.cadiducho.bot.api.command.args.CommandParseException;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
@@ -54,11 +53,12 @@ public class CommandTest {
         }
     }
 
-    @CommandInfo(aliases = "/commandWithArgs", description = "resumen del comando con argumentos")
-    @CommandArguments({
-            @Argument(name = "nombre", type = String.class, required = true, description = "Nombre del usuario"),
-            @Argument(name = "cantidad", type = Integer.class, required = false, description = "Cantidad a asignar")
-    })
+    @CommandInfo(aliases = "/commandWithArgs", description = "resumen del comando con argumentos",
+            arguments = {
+                    @Argument(name = "nombre", type = String.class, required = true, description = "Nombre del usuario"),
+                    @Argument(name = "cantidad", type = Integer.class, required = false, description = "Cantidad a asignar")
+            }
+    )
     private class TestCommandWithArguments implements BotCommand {
         @Override
         public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {

@@ -2,7 +2,6 @@ package com.cadiducho.bot.modules.pole.cmds;
 
 import com.cadiducho.bot.api.command.*;
 import com.cadiducho.bot.api.command.args.Argument;
-import com.cadiducho.bot.api.command.args.CommandArguments;
 import com.cadiducho.bot.api.command.args.CommandParseException;
 import com.cadiducho.bot.modules.pole.PoleModule;
 import com.cadiducho.bot.modules.pole.util.InlineKeyboardUtil;
@@ -22,8 +21,10 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @Log
-@CommandInfo(module = PoleModule.class, aliases = {"/poles", "/polelist"})
-@CommandArguments(@Argument(name = "dia", type = LocalDate.class, required = false, description = "Día en el que observar las poles"))
+@CommandInfo(module = PoleModule.class,
+        aliases = {"/poles", "/polelist"},
+        arguments = @Argument(name = "dia", type = LocalDate.class, required = false, description = "Día en el que observar las poles")
+)
 public class PoleListCMD implements BotCommand, CallbackListener {
 
     private final PoleModule module = (PoleModule) getModule();
