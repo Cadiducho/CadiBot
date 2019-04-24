@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.ConcurrentModificationException;
 
 @Log
 @RequiredArgsConstructor
@@ -41,6 +43,11 @@ public class UpdatesHandler implements LongPollingHandler {
         } catch (TelegramException ex) {
             log.severe("Fallo procesando una Update de la API de Telegram: " + ex.getMessage());
             if (ex.getCause() != null) log.severe("Causa: " + ex.getCause().getMessage());
+            log.severe(Arrays.toString(ex.getStackTrace()));
+        } catch (ConcurrentModificationException ex) {
+            log.severe("Fallo de concurrencia procesando una Update de la API de Telegram: " + ex.getMessage());
+            if (ex.getCause() != null) log.severe("Causa: " + ex.getCause().getMessage());
+            log.severe(Arrays.toString(ex.getStackTrace()));
         }
     }
 }
