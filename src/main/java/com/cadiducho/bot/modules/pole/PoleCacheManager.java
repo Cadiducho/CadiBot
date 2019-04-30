@@ -109,11 +109,11 @@ public class PoleCacheManager {
     }
 
     /**
-     * Eliminar caché pasado 3 días para no hacer enormes los archivos y a la vez no sobrecargar la ram
+     * Eliminar caché pasado 3 días para no sobrecargar la ram
      * @param group Grupo a limpiar
      * @param today Día para contar 3 días hacia atrás
      */
-    public void clearOldCache(CachedGroup group, LocalDate today) {
+    public synchronized void clearOldCache(CachedGroup group, LocalDate today) {
         for (LocalDate poleDate : group.getPolesMap().keySet()) {
             if (poleDate.plusDays(3).isBefore(today)) { //si han pasado 3 días se borra ese cache
                 group.getPolesMap().remove(poleDate);
