@@ -186,7 +186,7 @@ public class PoleCacheManager {
             log.severe("Error obteniendo la fecha de agreción del bot en el grupo " + groupId);
             log.severe(ex.getMessage());
         }
-        return null;
+        return LocalDate.now();
     }
 
     /**
