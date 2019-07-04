@@ -1,0 +1,11 @@
+{
+    "aliases": ["/f1"],
+    "description": "",
+    "funcionalities": [
+        {
+            "type": "voice",
+            "voice_id": "AwADBAAD0xIAAoJ_8VB8wiPab57BYgI",
+            "reply_to": "answered"
+        }
+    ]
+}
