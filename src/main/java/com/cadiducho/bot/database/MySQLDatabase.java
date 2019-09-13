@@ -64,7 +64,8 @@ public class MySQLDatabase {
                 grupos.add(rs.getString("groupid"));
             }
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+            log.warning("Error obteniendo las ids de los grupos");
+            ex.printStackTrace();
         }
         return grupos;
     }
@@ -90,9 +91,10 @@ public class MySQLDatabase {
             update_user_name.setString(6, user.get().getUsername());
             update_user_name.setString(7, user.get().getLanguageCode());
             update_user_name.executeUpdate();
-
-            manager.closeConnection(connection);
-        }
+            } catch (SQLException ex) {
+                log.warning("Error actualizando el username de " + userid + " en " + groupchat);
+                ex.printStackTrace();
+            }
     }
 
     public void updateGroup(Object groupId, String groupName, boolean addedNow) {
@@ -106,19 +108,24 @@ public class MySQLDatabase {
             if (addedNow) registerGroup.setTimestamp(4, Timestamp.from(Instant.now()));
             registerGroup.executeUpdate();
 
-            manager.closeConnection(connection);
-        } catch (SQLException ignored) { }
+            closeConnection(connection);
+        } catch (SQLException ex) {
+            log.warning("Error actualizando el grupo " + groupId + "#" + groupName + " con addedNow="+addedNow);
+            ex.printStackTrace();
+        }
     }
 
     public void disableGroup(Object groupId) {
         try {
-            Connection connection = manager.getConnection();
+            Connection connection = getConnection();
             PreparedStatement disableGroup = connection.prepareStatement("UPDATE `" + TABLE_GRUPOS + "` SET `valid`='0' WHERE  `groupid`=?");
             disableGroup.setObject(1, groupId);
             disableGroup.executeUpdate();
 
-            manager.closeConnection(connection);
-        } catch (SQLException ignored) {
+            closeConnection(connection);
+        } catch (SQLException ex) {
+            log.warning("Error desactivando el grupo " + groupId);
+            ex.printStackTrace();
         }
     }
 }
