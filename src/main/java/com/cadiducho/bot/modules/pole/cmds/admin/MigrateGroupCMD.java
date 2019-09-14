@@ -117,14 +117,12 @@ public class MigrateGroupCMD implements BotCommand, CallbackListener {
 
     private int migratePoles(Long oldId, Long newId) {
         int updated = -1;
-        try {
-            Connection connection = BotServer.getInstance().getDatabase().getConnection();
+        try (Connection connection = BotServer.getInstance().getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "UPDATE cadibot_poles SET groupid=? WHERE groupid=?");
             statement.setLong(1, newId);
             statement.setLong(2, oldId);
             updated = statement.executeUpdate();
-            BotServer.getInstance().getDatabase().closeConnection(connection);
             return updated;
         } catch (SQLException exception) {
             log.severe("Error migrando un grupo");

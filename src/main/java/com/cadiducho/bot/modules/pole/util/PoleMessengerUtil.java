@@ -149,26 +149,26 @@ public class PoleMessengerUtil {
      * @throws SQLException Si falla la conexión a la base de datos
      */
     public static LinkedHashMap<Integer, PoleUser> getPolesOfDay(LocalDate day, long chatId) throws SQLException {
-        Connection connection = BotServer.getInstance().getDatabase().getConnection();
-        PreparedStatement statement = connection.prepareStatement(
-                "SELECT * FROM cadibot_poles NATURAL JOIN cadibot_users WHERE "
-                        + "DATE(time)=DATE(?) AND "
-                        + "groupid=?"
-                        + " ORDER BY `poleType`");
-        statement.setTimestamp(1, Timestamp.valueOf(day.atStartOfDay()));
-        statement.setLong(2, chatId);
-        ResultSet rs = statement.executeQuery();
+        final LinkedHashMap<Integer, PoleUser> poles = new LinkedHashMap<>();
+        try (Connection connection = BotServer.getInstance().getDatabase().getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(
+                    "SELECT * FROM cadibot_poles NATURAL JOIN cadibot_users WHERE "
+                            + "DATE(time)=DATE(?) AND "
+                            + "groupid=?"
+                            + " ORDER BY `poleType`");
+            statement.setTimestamp(1, Timestamp.valueOf(day.atStartOfDay()));
+            statement.setLong(2, chatId);
+            ResultSet rs = statement.executeQuery();
 
-        LinkedHashMap<Integer, PoleUser> poles = new LinkedHashMap<>();
-        while (rs.next()) {
-            PoleUser user = PoleUser.builder()
-                    .id(rs.getInt("userid"))
-                    .name(rs.getString("name"))
-                    .username(rs.getString("username"))
-                    .build();
-            poles.put(rs.getInt("poleType"), user);
+            while (rs.next()) {
+                PoleUser user = PoleUser.builder()
+                        .id(rs.getInt("userid"))
+                        .name(rs.getString("name"))
+                        .username(rs.getString("username"))
+                        .build();
+                poles.put(rs.getInt("poleType"), user);
+            }
         }
-        BotServer.getInstance().getDatabase().closeConnection(connection);
         return poles;
     }
 
@@ -185,26 +185,26 @@ public class PoleMessengerUtil {
      * @throws SQLException Si falla la base de datos
      */
     public static LinkedHashMap<PoleUser, Integer> getTopPoles(long chatId, LocalDate atDay, int type, int limit) throws SQLException {
-        Connection connection = BotServer.getInstance().getDatabase().getConnection();
-        PreparedStatement statement = connection.prepareStatement("" +
-                "SELECT count(*) AS `totales`,`userid`,`name`,`username`,`isBanned` FROM cadibot_poles NATURAL JOIN cadibot_users " +
-                "WHERE groupid=? AND `poleType`=? AND DATE(time)<=DATE(?) GROUP BY `userid` ORDER BY `totales` DESC LIMIT ?");
-        statement.setLong(1, chatId);
-        statement.setInt(2, type);
-        statement.setTimestamp(3, Timestamp.valueOf(atDay.atStartOfDay()));
-        statement.setInt(4, limit);
-        ResultSet rs = statement.executeQuery();
-        LinkedHashMap<PoleUser, Integer> poles = new LinkedHashMap<>();
-        while (rs.next()) {
-            PoleUser user = PoleUser.builder()
-                    .id(rs.getInt("userid"))
-                    .name(rs.getString("name"))
-                    .username(rs.getString("username"))
-                    .isBanned(rs.getBoolean("isBanned"))
-                    .build();
-            poles.put(user, rs.getInt("totales"));
+        final LinkedHashMap<PoleUser, Integer> poles = new LinkedHashMap<>();
+        try (Connection connection = BotServer.getInstance().getDatabase().getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("" +
+                    "SELECT count(*) AS `totales`,`userid`,`name`,`username`,`isBanned` FROM cadibot_poles NATURAL JOIN cadibot_users " +
+                    "WHERE groupid=? AND `poleType`=? AND DATE(time)<=DATE(?) GROUP BY `userid` ORDER BY `totales` DESC LIMIT ?");
+            statement.setLong(1, chatId);
+            statement.setInt(2, type);
+            statement.setTimestamp(3, Timestamp.valueOf(atDay.atStartOfDay()));
+            statement.setInt(4, limit);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                PoleUser user = PoleUser.builder()
+                        .id(rs.getInt("userid"))
+                        .name(rs.getString("name"))
+                        .username(rs.getString("username"))
+                        .isBanned(rs.getBoolean("isBanned"))
+                        .build();
+                poles.put(user, rs.getInt("totales"));
+            }
         }
-        BotServer.getInstance().getDatabase().closeConnection(connection);
         return poles;
     }
 
@@ -220,29 +220,29 @@ public class PoleMessengerUtil {
      * @throws SQLException Si falla la base de datos
      */
     public static LinkedHashMap<PoleUser, Integer> getTopPolesGlobal(LocalDate atDay, int type, int limit) throws SQLException {
-        Connection connection = BotServer.getInstance().getDatabase().getConnection();
-        PreparedStatement statement = connection.prepareStatement("" +
-                "SELECT userid, COUNT(*) as totales, u.name, u.username " +
-                "FROM cadibot_poles p NATURAL JOIN cadibot_users u " +
-                "WHERE poleType=? AND DATE(p.time)<=DATE(?) " +
-                "GROUP BY userid " +
-                "HAVING COUNT(*) > 1 " +
-                "ORDER BY totales DESC LIMIT ?");
-        statement.setInt(1, type);
-        statement.setTimestamp(2, Timestamp.valueOf(atDay.atStartOfDay()));
-        statement.setInt(3, limit);
+        final LinkedHashMap<PoleUser, Integer> poles = new LinkedHashMap<>();
+        try (Connection connection = BotServer.getInstance().getDatabase().getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("" +
+                    "SELECT userid, COUNT(*) as totales, u.name, u.username " +
+                    "FROM cadibot_poles p NATURAL JOIN cadibot_users u " +
+                    "WHERE poleType=? AND DATE(p.time)<=DATE(?) " +
+                    "GROUP BY userid " +
+                    "HAVING COUNT(*) > 1 " +
+                    "ORDER BY totales DESC LIMIT ?");
+            statement.setInt(1, type);
+            statement.setTimestamp(2, Timestamp.valueOf(atDay.atStartOfDay()));
+            statement.setInt(3, limit);
 
-        ResultSet rs = statement.executeQuery();
-        LinkedHashMap<PoleUser, Integer> poles = new LinkedHashMap<>();
-        while (rs.next()) {
-            PoleUser user = PoleUser.builder()
-                    .id(rs.getInt("userid"))
-                    .name(rs.getString("u.name"))
-                    .username(rs.getString("username"))
-                    .build();
-            poles.put(user, rs.getInt("totales"));
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                PoleUser user = PoleUser.builder()
+                        .id(rs.getInt("userid"))
+                        .name(rs.getString("u.name"))
+                        .username(rs.getString("username"))
+                        .build();
+                poles.put(user, rs.getInt("totales"));
+            }
         }
-        BotServer.getInstance().getDatabase().closeConnection(connection);
         return poles;
     }
 
@@ -258,30 +258,30 @@ public class PoleMessengerUtil {
      * @throws SQLException Si falla la base de datos
      */
     public static LinkedHashMap<PoleUser, Integer> getTopPolesGrupal(LocalDate atDay, int type, int limit) throws SQLException {
-        Connection connection = BotServer.getInstance().getDatabase().getConnection();
-        PreparedStatement statement = connection.prepareStatement("" +
-                "SELECT userid, COUNT(*) as totales, u.name, u.username, g.groupid, g.name " +
-                "FROM cadibot_poles p NATURAL JOIN cadibot_users u JOIN cadibot_grupos g ON (p.groupid = g.groupid) " +
-                "WHERE poleType=? AND DATE(p.time)<=DATE(?) " +
-                "GROUP BY userid, groupid " +
-                "HAVING COUNT(*) > 1 " +
-                "ORDER BY totales DESC LIMIT ?");
-        statement.setInt(1, type);
-        statement.setTimestamp(2, Timestamp.valueOf(atDay.atStartOfDay()));
-        statement.setInt(3, limit);
+        final LinkedHashMap<PoleUser, Integer> poles = new LinkedHashMap<>();
+        try (Connection connection = BotServer.getInstance().getDatabase().getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("" +
+                    "SELECT userid, COUNT(*) as totales, u.name, u.username, g.groupid, g.name " +
+                    "FROM cadibot_poles p NATURAL JOIN cadibot_users u JOIN cadibot_grupos g ON (p.groupid = g.groupid) " +
+                    "WHERE poleType=? AND DATE(p.time)<=DATE(?) " +
+                    "GROUP BY userid, groupid " +
+                    "HAVING COUNT(*) > 1 " +
+                    "ORDER BY totales DESC LIMIT ?");
+            statement.setInt(1, type);
+            statement.setTimestamp(2, Timestamp.valueOf(atDay.atStartOfDay()));
+            statement.setInt(3, limit);
 
-        ResultSet rs = statement.executeQuery();
-        LinkedHashMap<PoleUser, Integer> poles = new LinkedHashMap<>();
-        while (rs.next()) {
-            PoleUser user = PoleUser.builder()
-                    .id(rs.getInt("userid"))
-                    .name(rs.getString("u.name"))
-                    .username(rs.getString("username"))
-                    .groupname(rs.getString("g.name"))
-                    .build();
-            poles.put(user, rs.getInt("totales"));
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                PoleUser user = PoleUser.builder()
+                        .id(rs.getInt("userid"))
+                        .name(rs.getString("u.name"))
+                        .username(rs.getString("username"))
+                        .groupname(rs.getString("g.name"))
+                        .build();
+                poles.put(user, rs.getInt("totales"));
+            }
         }
-        BotServer.getInstance().getDatabase().closeConnection(connection);
         return poles;
     }
 

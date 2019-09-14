@@ -1,11 +1,11 @@
 {
-    "aliases": ["/titanic"],
+    "aliases": ["/f1"],
     "description": "",
     "funcionalities": [
         {
             "type": "voice",
-            "voice_id": "AwADBAADujYAAv4dZAcEaOHAa3eQ8wI",
+            "voice_id": "AwADBAAD0xIAAoJ_8VB8wiPab57BYgI",
             "reply_to": "answered"
         }
-	]
+    ]
 }

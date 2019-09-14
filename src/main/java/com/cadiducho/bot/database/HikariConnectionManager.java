@@ -51,7 +51,7 @@ public class HikariConnectionManager {
      * Obtener una conexión segura de Hikari
      * @return Connection
      */
-    public Connection getConnection() {
+    Connection getConnection() {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
