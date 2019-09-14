@@ -91,8 +91,7 @@ public class PoleModule implements Module {
      */
     public Optional<String> getGroupName(Long groupId) {
         Optional<String> name = Optional.empty();
-        try {
-            Connection connection = BotServer.getInstance().getDatabase().getConnection();
+        try (Connection connection = botServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT name FROM cadibot_grupos WHERE groupid=?");
             statement.setLong(1, groupId);
@@ -100,7 +99,6 @@ public class PoleModule implements Module {
             if (rs.next()) {
                 name = Optional.of(rs.getString("name"));
             }
-            BotServer.getInstance().getDatabase().closeConnection(connection);
         } catch (SQLException exception) {
             log.severe("Error obteniendo un grupo para su migración");
             log.severe(exception.toString());
@@ -117,8 +115,7 @@ public class PoleModule implements Module {
     public String[] getUsername(Integer userid) {
         String name = "";
         String username = "";
-        try {
-            Connection connection = BotServer.getInstance().getDatabase().getConnection();
+        try (Connection connection = botServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT name, username FROM cadibot_users WHERE userid=?");
             statement.setInt(1, userid);
@@ -127,7 +124,6 @@ public class PoleModule implements Module {
                 name = rs.getString("name");
                 username = rs.getString("username");
             }
-            BotServer.getInstance().getDatabase().closeConnection(connection);
         } catch (SQLException exception) {
             log.severe("Error obteniendo un grupo para su migración");
             log.severe(exception.toString());

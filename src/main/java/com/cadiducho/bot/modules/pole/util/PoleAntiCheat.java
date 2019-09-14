@@ -43,8 +43,7 @@ public class PoleAntiCheat {
      * @return Verdadero si es sospechoso
      */
     public boolean checkSuspiciousBehaviour(Long groupId, Integer userId, int days) {
-        try {
-            Connection connection = botServer.getDatabase().getConnection();
+        try (Connection connection = botServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT `time` FROM cadibot_poles " +
                             "WHERE userid=? " +
@@ -58,7 +57,6 @@ public class PoleAntiCheat {
             while (rs.next()) {
                 timestamps.add(rs.getTimestamp("time").toLocalDateTime());
             }
-            botServer.getDatabase().closeConnection(connection);
 
             if (checkSuspiciousBehaviour(timestamps, days)) {
                 try {
@@ -141,15 +139,13 @@ public class PoleAntiCheat {
 
     public void loadBannedUsers() {
         bannedUsers.clear();
-        try {
-            Connection connection = botServer.getDatabase().getConnection();
+        try (Connection connection = botServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement("SELECT userid FROM cadibot_users WHERE isBanned=1");
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 bannedUsers.add(rs.getInt("userid"));
             }
             log.info("Cargados " + bannedUsers.size() + " usuarios baneados");
-            botServer.getDatabase().closeConnection(connection);
         } catch (SQLException ex) {
             log.severe("Error cargando la lista de usuarios baneados: ");
             log.severe(ex.getMessage());
@@ -161,14 +157,12 @@ public class PoleAntiCheat {
      * @param userid ID del usuario. Debe ser válida y corresponder a un usuario existente
      */
     public void banUser(Integer userid) {
-        try {
-            Connection connection = botServer.getDatabase().getConnection();
+        try (Connection connection = botServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "UPDATE cadibot_users SET isBanned=1, banTime=NOW() WHERE userid=?;");
             statement.setInt(1, userid);
             statement.executeUpdate();
 
-            botServer.getDatabase().closeConnection(connection);
         } catch (SQLException ex) {
             log.severe("Error cargando la lista de usuarios baneados: ");
             log.severe(ex.getMessage());

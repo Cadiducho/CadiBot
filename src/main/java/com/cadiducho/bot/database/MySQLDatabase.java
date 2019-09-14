@@ -26,12 +26,11 @@ public class MySQLDatabase {
 
         manager.setupPool();
 
-        Connection connection = manager.getConnection();
-        if (connection == null) {
-            throw new SQLException("Connection is null");
+        try (Connection connection = getConnection()) {
+            if (connection == null) {
+                throw new SQLException("Connection is null");
+            }
         }
-
-        manager.closeConnection(connection);
     }
 
     /**
@@ -41,12 +40,12 @@ public class MySQLDatabase {
         manager.shutdownConnPool();
     }
 
+    /**
+     * Obtener una conexión segura de Hikari
+     * @return Connection
+     */
     public Connection getConnection() {
         return manager.getConnection();
-    }
-
-    public void closeConnection(Connection connection) {
-        manager.closeConnection(connection);
     }
 
     /*
@@ -56,8 +55,8 @@ public class MySQLDatabase {
 
     public ArrayList<String> getGroupsIds() {
         ArrayList<String> grupos = new ArrayList<>();
-        try {
-            PreparedStatement statement = getConnection().prepareStatement("SELECT `groupid` FROM `" + TABLE_GRUPOS + "`");
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("SELECT `groupid` FROM `" + TABLE_GRUPOS + "`");
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
@@ -70,8 +69,15 @@ public class MySQLDatabase {
         return grupos;
     }
 
-    public void updateUsername(int userid, Long groupchat) throws SQLException {
+    /**
+     * Actualizar un username. Devuelve true si se ha actualizado correctamente
+     * @param userid La id del usuario
+     * @param groupchat La id del chat
+     * @return true si se ha actualizado correctamente
+     */
+    public boolean updateUsername(int userid, Long groupchat) {
         Optional<User> user = Optional.empty();
+        boolean actualizado = false;
         try {
             user = Optional.ofNullable(server.getCadibot().getChatMember(groupchat, userid).getUser());
         } catch (TelegramException ignored) {
@@ -80,26 +86,28 @@ public class MySQLDatabase {
             String currentname = user.get().getFirstName();
             String safe = EmojiParser.parseToAliases(currentname);
 
-            Connection connection = manager.getConnection();
-            PreparedStatement update_user_name = connection.prepareStatement("INSERT INTO `" + TABLE_USERS + "` (`userid`, `name`, `username`, `lang`) VALUES(?, ?, ?, ?) " +
-                    "ON DUPLICATE KEY UPDATE `name`=?, `username`=?, `lang`=?");
-            update_user_name.setInt(1, user.get().getId());
-            update_user_name.setString(2, safe);
-            update_user_name.setString(3, user.get().getUsername());
-            update_user_name.setString(4, user.get().getLanguageCode());
-            update_user_name.setString(5, safe);
-            update_user_name.setString(6, user.get().getUsername());
-            update_user_name.setString(7, user.get().getLanguageCode());
-            update_user_name.executeUpdate();
+            try (Connection connection = getConnection()) {
+                PreparedStatement update_user_name = connection.prepareStatement("INSERT INTO `" + TABLE_USERS + "` (`userid`, `name`, `username`, `lang`) VALUES(?, ?, ?, ?) " +
+                        "ON DUPLICATE KEY UPDATE `name`=?, `username`=?, `lang`=?");
+                update_user_name.setInt(1, user.get().getId());
+                update_user_name.setString(2, safe);
+                update_user_name.setString(3, user.get().getUsername());
+                update_user_name.setString(4, user.get().getLanguageCode());
+                update_user_name.setString(5, safe);
+                update_user_name.setString(6, user.get().getUsername());
+                update_user_name.setString(7, user.get().getLanguageCode());
+                update_user_name.executeUpdate();
+                actualizado = true;
             } catch (SQLException ex) {
                 log.warning("Error actualizando el username de " + userid + " en " + groupchat);
                 ex.printStackTrace();
             }
+        }
+        return actualizado;
     }
 
     public void updateGroup(Object groupId, String groupName, boolean addedNow) {
-        try {
-            Connection connection = manager.getConnection();
+        try (Connection connection = getConnection()) {
             PreparedStatement registerGroup = connection.prepareStatement("INSERT INTO `" + TABLE_GRUPOS + "` (`groupid`, `name`) VALUES (?, ?) "
                     + "ON DUPLICATE KEY UPDATE `name`=? " + (addedNow ? ", `lastAdded`=?" : ""));
             registerGroup.setObject(1, groupId);
@@ -107,8 +115,6 @@ public class MySQLDatabase {
             registerGroup.setString(3, groupName);
             if (addedNow) registerGroup.setTimestamp(4, Timestamp.from(Instant.now()));
             registerGroup.executeUpdate();
-
-            closeConnection(connection);
         } catch (SQLException ex) {
             log.warning("Error actualizando el grupo " + groupId + "#" + groupName + " con addedNow="+addedNow);
             ex.printStackTrace();
@@ -116,13 +122,10 @@ public class MySQLDatabase {
     }
 
     public void disableGroup(Object groupId) {
-        try {
-            Connection connection = getConnection();
+        try (Connection connection = getConnection()) {
             PreparedStatement disableGroup = connection.prepareStatement("UPDATE `" + TABLE_GRUPOS + "` SET `valid`='0' WHERE  `groupid`=?");
             disableGroup.setObject(1, groupId);
             disableGroup.executeUpdate();
-
-            closeConnection(connection);
         } catch (SQLException ex) {
             log.warning("Error desactivando el grupo " + groupId);
             ex.printStackTrace();

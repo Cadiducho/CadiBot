@@ -46,8 +46,7 @@ public class PoleCacheManager {
 
     private LinkedHashMap<Integer, Integer> getPolesOfGroupchat(Long groupId) {
         LinkedHashMap<Integer, Integer> poles = new LinkedHashMap<>();
-        try {
-            Connection connection =  botServer.getDatabase().getConnection();
+        try (Connection connection = botServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT `userid`, `poleType` FROM `" + PoleModule.TABLA_POLES + "` WHERE "
                             + "DATE(time)=DATE(CURDATE()) AND "
@@ -58,7 +57,6 @@ public class PoleCacheManager {
             while (rs.next()) {
                 poles.put(rs.getInt("poleType"), rs.getInt("userid"));
             }
-            botServer.getDatabase().closeConnection(connection);
         } catch (SQLException ex) {
             log.log(Level.WARNING, "No se ha podido cargar las poles en caché del grupo " + groupId, ex);
         }
@@ -71,8 +69,7 @@ public class PoleCacheManager {
      */
     void loadCachedGroups() {
         log.info("Iniciando caché de grupos");
-        try {
-            Connection connection =  botServer.getDatabase().getConnection();
+        try (Connection connection = botServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT p.groupid, g.name, g.lastAdded FROM cadibot_poles p " +
                             "JOIN cadibot_grupos g ON (p.groupid = g.groupid) " +
@@ -84,7 +81,6 @@ public class PoleCacheManager {
                         rs.getString("name"),
                         rs.getTimestamp("lastAdded").toLocalDateTime().toLocalDate());
             }
-            botServer.getDatabase().closeConnection(connection);
         } catch (SQLException ex) {
             log.log(Level.SEVERE, "No se han podido cargar los grupos en caché", ex);
         }
@@ -145,19 +141,17 @@ public class PoleCacheManager {
      * @param updated La posición que se ha actualizado
      */
     public void savePoleToDatabase(CachedGroup group, PoleCollection poles, int updated) {
-        try {
+        try (Connection connection = botServer.getDatabase().getConnection()) {
             Integer userid = getUserIdFromUpdatedPoleCollection(poles, updated);
             botServer.getDatabase().updateUsername(userid, group.getId());
             botServer.getDatabase().updateGroup(group.getId(), group.getTitle(), false);
 
-            Connection connection =  botServer.getDatabase().getConnection();
             PreparedStatement insert = connection.prepareStatement("INSERT INTO `" + PoleModule.TABLA_POLES + "` (`userid`, groupid, `poleType`) VALUES (?, ?, ?)");
 
             insert.setInt(1, userid);
             insert.setLong(2, group.getId());
             insert.setInt(3, updated);
             insert.executeUpdate();
-            botServer.getDatabase().closeConnection(connection);
         } catch (SQLException ex) {
             log.severe("Error insertando una colección de poles en la base de datos: ");
             log.severe(ex.getMessage());
@@ -170,18 +164,14 @@ public class PoleCacheManager {
      * @return Fecha en la que el bot fue añadido
      */
     public LocalDate getChatLastAdded(Long groupId) {
-        try {
-            Connection connection =  botServer.getDatabase().getConnection();
+        try (Connection connection = botServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT lastAdded FROM cadibot_grupos WHERE groupid=?");
             statement.setLong(1, groupId);
             ResultSet rs = statement.executeQuery();
             if (rs.next()) {
-                LocalDate date = rs.getTimestamp("lastAdded").toLocalDateTime().toLocalDate();
-                botServer.getDatabase().closeConnection(connection);
-                return date;
+                return rs.getTimestamp("lastAdded").toLocalDateTime().toLocalDate();
             }
-            botServer.getDatabase().closeConnection(connection);
         } catch (SQLException ex) {
             log.severe("Error obteniendo la fecha de agreción del bot en el grupo " + groupId);
             log.severe(ex.getMessage());

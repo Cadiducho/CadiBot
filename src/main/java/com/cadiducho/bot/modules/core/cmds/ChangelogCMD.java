@@ -51,15 +51,13 @@ public class ChangelogCMD implements BotCommand {
     
     private List<String> getChangelog(int limit) {
         List<String> versions = new LinkedList<>();
-        try {
-            Connection connection = botServer.getDatabase().getConnection();
+        try (Connection connection = botServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM `cadibot_changelog` ORDER BY `major` DESC, `minor` DESC LIMIT ?;");
             statement.setInt(1, limit);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 versions.add(rs.getInt("major") + "." + rs.getInt("minor") + ": " + rs.getString("changes"));
             }
-            botServer.getDatabase().closeConnection(connection);
         } catch (SQLException ignored) {
         }
         return versions;
