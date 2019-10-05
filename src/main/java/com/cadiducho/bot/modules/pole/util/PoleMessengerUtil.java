@@ -297,7 +297,7 @@ public class PoleMessengerUtil {
             for (Map.Entry<PoleUser, Integer> entry : top.entrySet()) {
                 PoleUser user = entry.getKey();
                 Integer polesCount = entry.getValue();
-                String pole_user_name = EmojiParser.parseToUnicode(user.getName());
+                String pole_user_name = EmojiParser.parseToUnicode(user.getName()); //FixMe no parsear en... 2020? Ya serán todos los nombres unicode
                 String banTag = "";
                 if (user.isBanned()) {
                     pole_user_name = strikeThrough(pole_user_name);

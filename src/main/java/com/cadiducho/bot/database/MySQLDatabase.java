@@ -3,7 +3,6 @@ package com.cadiducho.bot.database;
 import com.cadiducho.bot.BotServer;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
-import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.java.Log;
 
 import java.sql.*;
@@ -84,16 +83,15 @@ public class MySQLDatabase {
         }
         if (user.isPresent()) {
             String currentname = user.get().getFirstName();
-            String safe = EmojiParser.parseToAliases(currentname);
 
             try (Connection connection = getConnection()) {
                 PreparedStatement update_user_name = connection.prepareStatement("INSERT INTO `" + TABLE_USERS + "` (`userid`, `name`, `username`, `lang`) VALUES(?, ?, ?, ?) " +
                         "ON DUPLICATE KEY UPDATE `name`=?, `username`=?, `lang`=?");
                 update_user_name.setInt(1, user.get().getId());
-                update_user_name.setString(2, safe);
+                update_user_name.setString(2, currentname);
                 update_user_name.setString(3, user.get().getUsername());
                 update_user_name.setString(4, user.get().getLanguageCode());
-                update_user_name.setString(5, safe);
+                update_user_name.setString(5, currentname);
                 update_user_name.setString(6, user.get().getUsername());
                 update_user_name.setString(7, user.get().getLanguageCode());
                 update_user_name.executeUpdate();
