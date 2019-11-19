@@ -26,10 +26,10 @@ public interface BotCommand {
      * @param context El {@link CommandContext} en el que ha sido ejecutado el comando
      * @param messageId ID del mensaje del comando
      * @param replyingTo Mensaje al que el comando respondía
-     * @param instant Instante en el que el comando fue ejecutado
+     * @param received Instante en el que el comando fue ejecutado
      * @throws TelegramException Excepción ocurrida
      */
-    void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException;
+    void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant received) throws TelegramException;
     
     default Module getModule() {
         if (!this.getClass().isAnnotationPresent(CommandInfo.class)) {
