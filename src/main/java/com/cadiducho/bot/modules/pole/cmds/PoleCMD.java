@@ -31,6 +31,7 @@ public class PoleCMD implements BotCommand {
     @SuppressWarnings({"OptionalGetWithoutIsPresent"})
     @Override
     public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
+        final LocalDate today = LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDate();
         if (module.isChatUnsafe(getBot(), chat)) return;
 
         PoleAntiCheat antiCheat = module.getPoleAntiCheat();
@@ -43,7 +44,6 @@ public class PoleCMD implements BotCommand {
             return;
         }
 
-        LocalDateTime today = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
         PoleCacheManager manager = module.getPoleCacheManager();
         Long groupId = Long.parseLong(chat.getId());
         String currentname = from.getFirstName();
@@ -56,7 +56,7 @@ public class PoleCMD implements BotCommand {
         CachedGroup cachedGroup = manager.getCachedGroup(groupId).get();
 
         // Si el bot ha sido añadido hoy, no se podrán hacer poles hasta el siguiente 00:00:00
-        if (today.toLocalDate().isEqual(cachedGroup.getLastAdded())) {
+        if (today.isEqual(cachedGroup.getLastAdded())) {
             getBot().sendMessage(chat.getId(), "Lo siento, pero he sido añadido al grupo hoy.\nNo se podrán realizar poles hasta la siguiente medianoche");
             return;
         }
@@ -64,11 +64,11 @@ public class PoleCMD implements BotCommand {
         cachedGroup.setTitle(chat.getTitle()); // actualizar titulo del grupo
 
         // Obtener lista de poles hechas hoy y gestionar la posición de el intento actual
-        Optional<PoleCollection> poles = cachedGroup.getPolesOfADay(today.toLocalDate());
+        Optional<PoleCollection> poles = cachedGroup.getPolesOfADay(today);
         if (!poles.isPresent()) { // si no hay lista, es el primer puesto
             PoleCollection polesHoy = PoleCollection.builder().first(from.getId()).build();
-            cachedGroup.getPolesMap().put(today.toLocalDate(), polesHoy);
-            save(manager, cachedGroup, today.toLocalDate(), polesHoy);
+            cachedGroup.getPolesMap().put(today, polesHoy);
+            save(manager, cachedGroup, today, polesHoy);
             saveToDatabase(manager, cachedGroup, polesHoy, 1);
             checkSuspiciousBehaviour(antiCheat, groupId, from.getId());
             getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b>!!!", "html", null, false, messageId, null);
@@ -76,19 +76,19 @@ public class PoleCMD implements BotCommand {
         } else if (!poles.get().contains(from.getId())) {
             if (!poles.get().getFirst().isPresent() && !poles.get().getSecond().isPresent() && !poles.get().getThird().isPresent()) { //fixbug a si el objeto PolleCollection existe en memoria pero realmente no se han realizado poles
                 poles.get().setFirst(from.getId());
-                save(manager, cachedGroup, today.toLocalDate(), poles.get());
+                save(manager, cachedGroup, today, poles.get());
                 saveToDatabase(manager, cachedGroup, poles.get(), 1);
                 getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b><i>*</i>!!!", "html", null, false, messageId, null);
                 log.info("Pole (fixbug) otorgado a " + from.getId() + " en " + chat.getId());
             } else if (!poles.get().getSecond().isPresent()) { // si hay lista y el segundo no está presente, es plata
                 poles.get().setSecond(from.getId());
-                save(manager, cachedGroup, today.toLocalDate(), poles.get());
+                save(manager, cachedGroup, today, poles.get());
                 saveToDatabase(manager, cachedGroup, poles.get(), 2);
                 getBot().sendMessage(chat.getId(), base + " ha hecho la <b>subpole</b>, meh", "html", null, false, messageId, null);
                 log.info("Plata otorgado a " + from.getId() + " en " + chat.getId());
             } else if (!poles.get().getThird().isPresent()) { // si hay lista y el tercero no está presente, es plata
                 poles.get().setThird(from.getId());
-                save(manager, cachedGroup, today.toLocalDate(), poles.get());
+                save(manager, cachedGroup, today, poles.get());
                 saveToDatabase(manager, cachedGroup, poles.get(), 3);
                 getBot().sendMessage(chat.getId(), base + " ha hecho la <b>bronce</b> (cual perdedor)", "html", null, false, messageId, null);
                 log.info("Bronce otorgado a " + from.getId() + " en " + chat.getId());

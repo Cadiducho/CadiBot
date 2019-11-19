@@ -69,8 +69,7 @@ public class CommandManager {
      * @return Verdadero si se ha ejecutado, falso si no
      * @throws com.cadiducho.telegrambotapi.exception.TelegramException Excepcion
      */
-    public boolean onCmd(TelegramBot bot, Update update) throws TelegramException {
-        Instant now = Instant.now();
+    public boolean onCmd(TelegramBot bot, Update update, Instant received) throws TelegramException {
         Message message = update.getMessage();
         User from = update.getMessage().getFrom();
 
@@ -96,7 +95,7 @@ public class CommandManager {
         CommandContext context = new CommandContext(target.get().getArguments(), Arrays.copyOfRange(rawcmd, 1, rawcmd.length));
 
         log.info(" # Ejecutando '" + target.get().getName() + "'");
-        target.get().execute(message.getChat(), from, context, message.getMessageId(), message.getReplyToMessage(), now);
+        target.get().execute(message.getChat(), from, context, message.getMessageId(), message.getReplyToMessage(), received);
 
         return true;
     }
