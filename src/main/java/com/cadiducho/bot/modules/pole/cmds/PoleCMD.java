@@ -12,6 +12,7 @@ import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
+import com.vdurmont.emoji.EmojiManager;
 import lombok.extern.java.Log;
 
 import java.time.Instant;
@@ -19,7 +20,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
 @Log
@@ -27,6 +31,12 @@ import java.util.concurrent.CompletableFuture;
 public class PoleCMD implements BotCommand {
 
     private final PoleModule module = (PoleModule) getModule();
+
+    private final List<String> xmasEmojis = Arrays.asList(
+            EmojiManager.getForAlias("gift").getUnicode(),
+            EmojiManager.getForAlias("christmas_tree").getUnicode(),
+            EmojiManager.getForAlias("snowflake").getUnicode(),
+            EmojiManager.getForAlias("santa").getUnicode());
 
     @SuppressWarnings({"OptionalGetWithoutIsPresent"})
     @Override
@@ -71,7 +81,7 @@ public class PoleCMD implements BotCommand {
             save(manager, cachedGroup, today, polesHoy);
             saveToDatabase(manager, cachedGroup, polesHoy, 1);
             checkSuspiciousBehaviour(antiCheat, groupId, from.getId());
-            getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b>!!!", "html", null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b> " + getRandomXmasEmoji() + "!!!", "html", null, false, messageId, null);
             log.info("Pole otorgado a " + from.getId() + " en " + chat.getId());
         } else if (!poles.get().contains(from.getId())) {
             if (!poles.get().getFirst().isPresent() && !poles.get().getSecond().isPresent() && !poles.get().getThird().isPresent()) { //fixbug a si el objeto PolleCollection existe en memoria pero realmente no se han realizado poles
@@ -84,17 +94,16 @@ public class PoleCMD implements BotCommand {
                 poles.get().setSecond(from.getId());
                 save(manager, cachedGroup, today, poles.get());
                 saveToDatabase(manager, cachedGroup, poles.get(), 2);
-                getBot().sendMessage(chat.getId(), base + " ha hecho la <b>subpole</b>, meh", "html", null, false, messageId, null);
+                getBot().sendMessage(chat.getId(), base + " ha hecho la <b>subpole</b> " + getRandomXmasEmoji() + ", meh", "html", null, false, messageId, null);
                 log.info("Plata otorgado a " + from.getId() + " en " + chat.getId());
             } else if (!poles.get().getThird().isPresent()) { // si hay lista y el tercero no está presente, es plata
                 poles.get().setThird(from.getId());
                 save(manager, cachedGroup, today, poles.get());
                 saveToDatabase(manager, cachedGroup, poles.get(), 3);
-                getBot().sendMessage(chat.getId(), base + " ha hecho la <b>bronce</b> (cual perdedor)", "html", null, false, messageId, null);
+                getBot().sendMessage(chat.getId(), base + " ha hecho la <b>bronce</b> " + getRandomXmasEmoji() + " (cual perdedor)", "html", null, false, messageId, null);
                 log.info("Bronce otorgado a " + from.getId() + " en " + chat.getId());
             }
         }
-
     }
 
     private void save(PoleCacheManager manager, CachedGroup group, LocalDate today, PoleCollection poles) {
@@ -108,5 +117,14 @@ public class PoleCMD implements BotCommand {
 
     private void checkSuspiciousBehaviour(PoleAntiCheat antiCheat, Long groupid, Integer userid) {
         CompletableFuture.runAsync(() -> antiCheat.checkSuspiciousBehaviour(groupid, userid, 5));
+    }
+
+    private String getRandomXmasEmoji() {
+        Random rand = new Random();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < rand.nextInt(4); ++i) {
+            sb.append(xmasEmojis.get(rand.nextInt(xmasEmojis.size())));
+        }
+        return sb.toString();
     }
 }
