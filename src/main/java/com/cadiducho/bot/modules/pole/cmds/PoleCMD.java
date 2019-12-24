@@ -122,9 +122,11 @@ public class PoleCMD implements BotCommand {
     private String getRandomXmasEmoji() {
         Random rand = new Random();
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < rand.nextInt(4); ++i) {
+        int size = rand.nextInt(5) + 1;
+        for (int i = 0; i < size; ++i) {
             sb.append(xmasEmojis.get(rand.nextInt(xmasEmojis.size())));
         }
+        sb.append(" navideña");
         return sb.toString();
     }
 }
