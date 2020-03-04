@@ -8,6 +8,7 @@ import com.cadiducho.bot.modules.pole.cmds.PoleCMD;
 import com.cadiducho.bot.modules.pole.cmds.PoleListCMD;
 import com.cadiducho.bot.modules.pole.cmds.UpdateUsernameCMD;
 import com.cadiducho.bot.modules.pole.cmds.admin.AnalyzeUserCMD;
+import com.cadiducho.bot.modules.pole.cmds.admin.BanUserCMD;
 import com.cadiducho.bot.modules.pole.cmds.admin.MigrateGroupCMD;
 import com.cadiducho.bot.modules.pole.util.BanUserListener;
 import com.cadiducho.bot.modules.pole.util.PoleAntiCheat;
@@ -49,6 +50,7 @@ public class PoleModule implements Module {
         commandManager.register(new UpdateUsernameCMD());
         commandManager.register(new MigrateGroupCMD());
         commandManager.register(new AnalyzeUserCMD());
+        commandManager.register(new BanUserCMD());
         commandManager.registerCallbackQueryListener(new BanUserListener(this));
 
         log.info("Módulo de poles cargado");
