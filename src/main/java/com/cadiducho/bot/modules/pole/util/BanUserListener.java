@@ -54,8 +54,7 @@ public class BanUserListener implements CallbackListener {
         Optional<String> nombreGrupo = module.getGroupName(groupid);
         String body = "El usuario " + nombreUsuario[0] + "@" + nombreUsuario[1] + "#" + userid + " ha sido baneado del sistema de poles por el uso de cheats en ";
 
-        module.getPoleAntiCheat().banUser(userid);
-        botServer.getCadibot().sendMessage(groupid,  body + "este grupo");
+        module.getPoleAntiCheat().banUser(userid, groupid, body + "este grupo");
         botServer.getCadibot().editMessageText(callbackQuery.getMessage().getChat().getId(), callbackQuery.getMessage().getMessageId(), callbackQuery.getInlineMessageId(),
                 body + nombreGrupo.get(), "html", false, null);
     }

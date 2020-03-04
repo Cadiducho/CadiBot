@@ -152,11 +152,26 @@ public class PoleAntiCheat {
         }
     }
 
+
     /**
      * Banear un usuario
+     */
+    public void banUser(Integer userid, Long groupid, String message) {
+        log.info("Baneando al usuario " + userid + ":" + message);
+        banUserInDatabase(userid);
+        if (groupid != null && message != null) {
+            try {
+                botServer.getCadibot().sendMessage(groupid, message);
+            } catch (TelegramException ignored) {}
+        }
+        loadBannedUsers();
+    }
+
+    /**
+     * Banear un usuario en la base de datos
      * @param userid ID del usuario. Debe ser válida y corresponder a un usuario existente
      */
-    public void banUser(Integer userid) {
+    public void banUserInDatabase(Integer userid) {
         try (Connection connection = botServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "UPDATE cadibot_users SET isBanned=1, banTime=NOW() WHERE userid=?;");

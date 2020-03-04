@@ -94,7 +94,6 @@ public class PoleCMD implements BotCommand {
                 log.info("Bronce otorgado a " + from.getId() + " en " + chat.getId());
             }
         }
-
     }
 
     private void save(PoleCacheManager manager, CachedGroup group, LocalDate today, PoleCollection poles) {
