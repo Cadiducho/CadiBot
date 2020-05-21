@@ -1,20 +1,20 @@
 package com.cadiducho.bot.modules.pole.cmds.admin;
 
-import com.cadiducho.bot.BotServer;
-import com.cadiducho.bot.api.command.*;
-import com.cadiducho.bot.api.command.args.Argument;
-import com.cadiducho.bot.api.command.args.CommandParseException;
+import com.cadiducho.bot.CadiBotServer;
 import com.cadiducho.bot.modules.pole.PoleModule;
-import com.cadiducho.telegrambotapi.CallbackQuery;
-import com.cadiducho.telegrambotapi.Chat;
-import com.cadiducho.telegrambotapi.Message;
-import com.cadiducho.telegrambotapi.User;
+import com.cadiducho.telegrambotapi.*;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 import com.cadiducho.telegrambotapi.inline.InlineKeyboardButton;
 import com.cadiducho.telegrambotapi.inline.InlineKeyboardMarkup;
+import com.cadiducho.zincite.api.command.BotCommand;
+import com.cadiducho.zincite.api.command.*;
+import com.cadiducho.zincite.api.command.args.Argument;
+import com.cadiducho.zincite.api.command.args.CommandParseException;
 import lombok.extern.java.Log;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +31,7 @@ import java.util.Optional;
 public class MigrateGroupCMD implements BotCommand, CallbackListener {
 
     private final PoleModule module = (PoleModule) getModule();
+    private final CadiBotServer cadiBotServer = CadiBotServer.getInstance();
 
     @Override
     public void execute(Chat chat, User from, CommandContext context, Integer messageId, Message replyingTo, Instant instant) throws TelegramException {
@@ -41,14 +42,14 @@ public class MigrateGroupCMD implements BotCommand, CallbackListener {
         try {
             Optional<Long> viejoGrupo = context.get("viejoGrupo");
             Optional<Long> nuevoGrupo = context.get("nuevoGrupo");
-            if (!viejoGrupo.isPresent() || !nuevoGrupo.isPresent()) {
-                getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(), "html", null, false, messageId, null);
+            if (viejoGrupo.isEmpty() || nuevoGrupo.isEmpty()) {
+                getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, messageId, null);
                 return;
             }
 
             Optional<String> nombreViejoGrupo = module.getGroupName(viejoGrupo.get());
             Optional<String> nombreNuevoGrupo = module.getGroupName(nuevoGrupo.get());
-            if (!nombreViejoGrupo.isPresent() || !nombreNuevoGrupo.isPresent()) {
+            if (nombreViejoGrupo.isEmpty() || nombreNuevoGrupo.isEmpty()) {
                 getBot().sendMessage(chat.getId(), "Grupos no reconocidos.");
                 return;
             }
@@ -67,9 +68,9 @@ public class MigrateGroupCMD implements BotCommand, CallbackListener {
                     + "<b>" + nombreViejoGrupo.get() + "</b>[<i>" + viejoGrupo.get() + "</i>] "
                     + "al nuevo <b>" + nombreNuevoGrupo.get() + "</b>[<i>" + nuevoGrupo.get() + "</i>]?\n"
                     + "Esto alterará todas las poles de esos dos grupos.";
-            getBot().sendMessage(chat.getId(), body, "html", null, null, null, inlineKeyboard);
+            getBot().sendMessage(chat.getId(), body,  ParseMode.HTML, null, null, null, inlineKeyboard);
         } catch (CommandParseException ex) {
-            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(), "html", null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, messageId, null);
         }
     }
 
@@ -87,20 +88,20 @@ public class MigrateGroupCMD implements BotCommand, CallbackListener {
         // Informar por mensaje a los grupos afectados en el cambio
         String body = "Se han migrado las " + updated + " poles de <b>" + nombreViejoGrupo.get() + "</b>[<i>" + oldId + "</i>]"
                 + " a <b>" + nombreNuevoGrupo.get() + "</b>[<i>" + newId + "</i>]";
-        botServer.getCadibot().editMessageText(callbackQuery.getMessage().getChat().getId(), callbackQuery.getMessage().getMessageId(), callbackQuery.getInlineMessageId(),
-                body, "html", false, null);
+        cadiBotServer.getCadibot().getTelegramBot().editMessageText(callbackQuery.getMessage().getChat().getId(), callbackQuery.getMessage().getMessageId(), callbackQuery.getInlineMessageId(),
+                body,  ParseMode.HTML, false, null);
 
         body = "Se han migrado " + updated + " registros de poles desde el grupo <b>" + nombreViejoGrupo.get() + "</b>[<i>" + newId + "</i>] a este";
-        botServer.getCadibot().sendMessage(oldId, body,
-                "HTML", false, false, null, null);
+        cadiBotServer.getCadibot().getTelegramBot().sendMessage(oldId, body,
+                 ParseMode.HTML, false, false, null, null);
 
         try {
             body = "Las poles que habían en este grupo han sido migradas a  <b>" + nombreNuevoGrupo.get() + "</b>[<i>" + oldId + "</i>]";
-            botServer.getCadibot().sendMessage(newId, body,
-                "HTML", false, false, null, null);
+            cadiBotServer.getCadibot().getTelegramBot().sendMessage(newId, body,
+                 ParseMode.HTML, false, false, null, null);
         } catch (TelegramException ex) {
             log.info("Disabling group " + oldId);
-            botServer.getDatabase().disableGroup(oldId);
+            cadiBotServer.getDatabase().disableGroup(oldId);
         }
     }
 
@@ -111,13 +112,13 @@ public class MigrateGroupCMD implements BotCommand, CallbackListener {
         String[] callbackData = callbackQuery.getData().split("#");
         String body = "Has cancelado la migración del grupo <b>" + module.getGroupName(Long.parseLong(callbackData[1])).get() + "</b>[<i>" + callbackData[1] + "</i>]"
                 + " a <b>" + module.getGroupName(Long.parseLong(callbackData[2])).get() + "</b>[<i>" + callbackData[2] + "</i>]";
-        botServer.getCadibot().editMessageText(callbackQuery.getMessage().getChat().getId(), callbackQuery.getMessage().getMessageId(), callbackQuery.getInlineMessageId(),
-                body, "html", false, null);
+        cadiBotServer.getCadibot().getTelegramBot().editMessageText(callbackQuery.getMessage().getChat().getId(), callbackQuery.getMessage().getMessageId(), callbackQuery.getInlineMessageId(),
+                body,  ParseMode.HTML, false, null);
     }
 
     private int migratePoles(Long oldId, Long newId) {
         int updated = -1;
-        try (Connection connection = BotServer.getInstance().getDatabase().getConnection()) {
+        try (Connection connection = CadiBotServer.getInstance().getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "UPDATE cadibot_poles SET groupid=? WHERE groupid=?");
             statement.setLong(1, newId);

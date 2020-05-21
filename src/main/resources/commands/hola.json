@@ -1,7 +1,7 @@
 {
   "aliases": ["/hola", "/buenosdias", "buenos dias", "buenos días"],
-  "description": "",
-  "funcionalities": [
+  "description": "buenos días",
+  "functionalities": [
     {
       "type": "text",
       "text": "Hola bb",

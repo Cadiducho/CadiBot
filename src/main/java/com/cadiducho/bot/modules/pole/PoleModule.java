@@ -1,9 +1,6 @@
 package com.cadiducho.bot.modules.pole;
 
-import com.cadiducho.bot.BotServer;
-import com.cadiducho.bot.api.command.CommandManager;
-import com.cadiducho.bot.api.module.Module;
-import com.cadiducho.bot.api.module.ModuleInfo;
+import com.cadiducho.bot.CadiBotServer;
 import com.cadiducho.bot.modules.pole.cmds.PoleCMD;
 import com.cadiducho.bot.modules.pole.cmds.PoleListCMD;
 import com.cadiducho.bot.modules.pole.cmds.UpdateUsernameCMD;
@@ -16,6 +13,10 @@ import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
+import com.cadiducho.zincite.ZinciteBot;
+import com.cadiducho.zincite.api.command.CommandManager;
+import com.cadiducho.zincite.api.module.ModuleInfo;
+import com.cadiducho.zincite.api.module.ZinciteModule;
 import com.vdurmont.emoji.EmojiManager;
 import lombok.Getter;
 import lombok.extern.java.Log;
@@ -29,12 +30,13 @@ import java.util.Optional;
 
 @Log
 @ModuleInfo(name = "Poles", description = "Módulo para hacer poles cada día")
-public class PoleModule implements Module {
+public class PoleModule implements ZinciteModule {
 
     public static final String TABLA_POLES = "cadibot_poles";
 
     @Getter private PoleCacheManager poleCacheManager;
     @Getter private PoleAntiCheat poleAntiCheat;
+    private final CadiBotServer cadiBotServer = CadiBotServer.getInstance();
 
     @Override
     public void onLoad() {
@@ -44,7 +46,7 @@ public class PoleModule implements Module {
         poleAntiCheat = new PoleAntiCheat(this);
         poleAntiCheat.loadBannedUsers();
 
-        CommandManager commandManager = BotServer.getInstance().getCommandManager();
+        CommandManager commandManager = ZinciteBot.getInstance().getCommandManager();
         commandManager.register(new PoleCMD());
         commandManager.register(new PoleListCMD());
         commandManager.register(new UpdateUsernameCMD());
@@ -59,10 +61,10 @@ public class PoleModule implements Module {
     @Override
     public void onNewChatMembers(Chat chat, List<User> newChatMembers) {
         try {
-            Integer botId = botServer.getCadibot().getMe().getId();
+            Integer botId = cadiBotServer.getCadibot().getTelegramBot().getMe().getId();
             if (newChatMembers.stream().anyMatch(user -> user.getId().equals(botId))) {
                 log.info("Me han añadido al grupo " + chat.getTitle());
-                botServer.getDatabase().updateGroup(chat.getId(), chat.getTitle(), true);
+                cadiBotServer.getDatabase().updateGroup(chat.getId(), chat.getTitle(), true);
                 poleCacheManager.setGroupLastAdded(Long.parseLong(chat.getId()));
             }
         } catch (TelegramException ignored) { }
@@ -93,7 +95,7 @@ public class PoleModule implements Module {
      */
     public Optional<String> getGroupName(Long groupId) {
         Optional<String> name = Optional.empty();
-        try (Connection connection = botServer.getDatabase().getConnection()) {
+        try (Connection connection = cadiBotServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT name FROM cadibot_grupos WHERE groupid=?");
             statement.setLong(1, groupId);
@@ -117,7 +119,7 @@ public class PoleModule implements Module {
     public String[] getUsername(Integer userid) {
         String name = "";
         String username = "";
-        try (Connection connection = botServer.getDatabase().getConnection()) {
+        try (Connection connection = cadiBotServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT name, username FROM cadibot_users WHERE userid=?");
             statement.setInt(1, userid);

@@ -1,7 +1,7 @@
 {
     "aliases": ["/patata"],
     "description": "Te comes una patata",
-    "funcionalities": [
+    "functionalities": [
         {
             "type": "text",
             "text": "Soy una patata y tú no. Bienvenido a tu cinta",

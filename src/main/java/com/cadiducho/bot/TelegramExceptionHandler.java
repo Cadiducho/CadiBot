@@ -1,5 +1,6 @@
 package com.cadiducho.bot;
 
+import com.cadiducho.telegrambotapi.ParseMode;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 import com.cadiducho.telegrambotapi.handlers.ExceptionHandler;
@@ -42,7 +43,7 @@ public class TelegramExceptionHandler implements ExceptionHandler {
      */
     private void send(String msg) {
         try {
-            bot.sendMessage(ownerId, msg, "html", null, null, null, null);
+            bot.sendMessage(ownerId, msg, ParseMode.HTML, null, null, null, null);
         } catch (TelegramException ignored) { }
     }
 }

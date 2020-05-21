@@ -1,6 +1,6 @@
 package com.cadiducho.bot.database;
 
-import com.cadiducho.bot.BotServer;
+import com.cadiducho.bot.CadiBotServer;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 import lombok.extern.java.Log;
@@ -17,9 +17,9 @@ public class MySQLDatabase {
     public static final String TABLE_GRUPOS = "cadibot_grupos";
 
     private final HikariConnectionManager manager;
-    private final BotServer server;
+    private final CadiBotServer server;
 
-    public MySQLDatabase(BotServer server, String hostname, String port, String database, String username, String passphrase) throws SQLException {
+    public MySQLDatabase(CadiBotServer server, String hostname, String port, String database, String username, String passphrase) throws SQLException {
         this.server = server;
         this.manager = new HikariConnectionManager(hostname, port, database, username, passphrase);
 
@@ -78,7 +78,7 @@ public class MySQLDatabase {
         Optional<User> user = Optional.empty();
         boolean actualizado = false;
         try {
-            user = Optional.ofNullable(server.getCadibot().getChatMember(groupchat, userid).getUser());
+            user = Optional.ofNullable(server.getCadibot().getTelegramBot().getChatMember(groupchat, userid).getUser());
         } catch (TelegramException ignored) {
         }
         if (user.isPresent()) {

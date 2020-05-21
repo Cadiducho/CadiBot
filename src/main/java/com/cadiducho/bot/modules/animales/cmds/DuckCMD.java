@@ -1,12 +1,12 @@
 package com.cadiducho.bot.modules.animales.cmds;
 
-import com.cadiducho.bot.api.command.BotCommand;
-import com.cadiducho.bot.api.command.CommandContext;
-import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
+import com.cadiducho.zincite.api.command.BotCommand;
+import com.cadiducho.zincite.api.command.CommandContext;
+import com.cadiducho.zincite.api.command.CommandInfo;
 import com.squareup.moshi.Moshi;
 import lombok.Getter;
 import lombok.extern.java.Log;
@@ -16,6 +16,7 @@ import okhttp3.Response;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Objects;
 
 @Log
 @CommandInfo(aliases = {"/duck", "cuack", "/cuack", "pato"})
@@ -28,7 +29,7 @@ public class DuckCMD implements BotCommand {
     @Override
     public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         try (Response response = httpClient.newCall(new Request.Builder().url(duckAPI).build()).execute()) {
-            String duckFile = moshi.adapter(DuckAPIWrapper.class).fromJson(response.body().source()).getUrl();
+            String duckFile = Objects.requireNonNull(moshi.adapter(DuckAPIWrapper.class).fromJson(Objects.requireNonNull(response.body()).source())).getUrl();
             getBot().sendPhoto(chat.getId(), duckFile);
         } catch (IOException | NullPointerException ex) {
             getBot().sendMessage(chat.getId(), "No he podido encontrar un pato :(");

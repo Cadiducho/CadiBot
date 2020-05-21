@@ -26,8 +26,8 @@ public class HikariConnectionManager {
      */
     public void setupPool() {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mysql://" + hostname + ":" + port + "/" + database + args);
-        config.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        config.setJdbcUrl("jdbc:mariadb://" + hostname + ":" + port + "/" + database + args);
+        config.setDriverClassName("org.mariadb.jdbc.Driver");
         config.setUsername(username);
         config.setPassword(password);
         config.setLeakDetectionThreshold(60 * 1000);

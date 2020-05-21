@@ -1,7 +1,7 @@
 {
     "aliases": ["/titanic"],
-    "description": "",
-    "funcionalities": [
+    "description": "Titanic flute song",
+    "functionalities": [
         {
             "type": "voice",
             "voice_id": "AwADBAADujYAAv4dZAcEaOHAa3eQ8wI",

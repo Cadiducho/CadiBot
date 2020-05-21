@@ -1,13 +1,13 @@
 package com.cadiducho.bot.modules.animales.cmds;
 
-import com.cadiducho.bot.api.command.BotCommand;
-import com.cadiducho.bot.api.command.CommandContext;
-import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 import com.cadiducho.telegrambotapi.inline.InlineKeyboardMarkup;
+import com.cadiducho.zincite.api.command.BotCommand;
+import com.cadiducho.zincite.api.command.CommandContext;
+import com.cadiducho.zincite.api.command.CommandInfo;
 
 import java.time.Instant;
 

@@ -1,17 +1,17 @@
 package com.cadiducho.bot.modules.core;
 
-import com.cadiducho.bot.BotServer;
-import com.cadiducho.bot.api.command.CommandManager;
-import com.cadiducho.bot.api.module.Module;
-import com.cadiducho.bot.api.module.ModuleInfo;
 import com.cadiducho.bot.modules.core.cmds.*;
+import com.cadiducho.zincite.ZinciteBot;
+import com.cadiducho.zincite.api.command.CommandManager;
+import com.cadiducho.zincite.api.module.ModuleInfo;
+import com.cadiducho.zincite.api.module.ZinciteModule;
 
 @ModuleInfo(name = "Cadibot-Core", description = "Funcionalidades generales de Cadibot")
-public class CoreModule implements Module {
+public class CoreModule implements ZinciteModule {
 
     @Override
     public void onLoad() {
-        CommandManager commandManager = BotServer.getInstance().getCommandManager();
+        CommandManager commandManager = ZinciteBot.getInstance().getCommandManager();
 
         commandManager.register(new VersionCMD());
         commandManager.register(new ChangelogCMD());

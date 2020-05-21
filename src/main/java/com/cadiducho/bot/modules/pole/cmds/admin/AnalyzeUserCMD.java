@@ -1,16 +1,17 @@
 package com.cadiducho.bot.modules.pole.cmds.admin;
 
-import com.cadiducho.bot.api.command.BotCommand;
-import com.cadiducho.bot.api.command.CommandContext;
-import com.cadiducho.bot.api.command.CommandInfo;
-import com.cadiducho.bot.api.command.args.Argument;
-import com.cadiducho.bot.api.command.args.CommandParseException;
 import com.cadiducho.bot.modules.pole.PoleModule;
 import com.cadiducho.bot.modules.pole.util.PoleAntiCheat;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
+import com.cadiducho.telegrambotapi.ParseMode;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
+import com.cadiducho.zincite.api.command.BotCommand;
+import com.cadiducho.zincite.api.command.CommandContext;
+import com.cadiducho.zincite.api.command.CommandInfo;
+import com.cadiducho.zincite.api.command.args.Argument;
+import com.cadiducho.zincite.api.command.args.CommandParseException;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -34,8 +35,8 @@ public class AnalyzeUserCMD implements BotCommand {
         try {
             Optional<Integer> usuario = context.get("usuario");
             Optional<Long> grupo = context.get("grupo");
-            if (!usuario.isPresent() || !grupo.isPresent()) {
-                getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(), "html", null, false, messageId, null);
+            if (usuario.isEmpty() || grupo.isEmpty()) {
+                getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, messageId, null);
                 return;
             }
 
@@ -45,7 +46,7 @@ public class AnalyzeUserCMD implements BotCommand {
                 getBot().sendMessage(chat.getId(), "El usuario con id " + usuario.get() + " no es sospechoso de usar cheats en " + grupo.get());
             }
         } catch (CommandParseException ex) {
-            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(), "html", null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, messageId, null);
         }
     }
 }

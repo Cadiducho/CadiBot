@@ -1,7 +1,7 @@
 {
     "aliases": ["aplausos"],
-    "description": "",
-    "funcionalities": [
+    "description": "Gif de aplausos",
+    "functionalities": [
         {
             "type": "gif",
             "gif_id": "CgADBAADTAMAAjEZZAfPEedEXgJYPwI",
