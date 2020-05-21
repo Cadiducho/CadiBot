@@ -12,7 +12,7 @@ import com.cadiducho.zincite.api.command.CommandInfo;
 
 import java.time.Instant;
 
-@CommandInfo(module = PoleModule.class, aliases = "/updateusername")
+@CommandInfo(module = PoleModule.class, aliases = "/updateusername", description = "Actualiza los datos de un usuario en el servidor")
 public class UpdateUsernameCMD implements BotCommand {
 
     private final CadiBotServer cadiBotServer = CadiBotServer.getInstance();

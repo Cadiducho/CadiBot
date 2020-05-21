@@ -12,7 +12,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-@CommandInfo(aliases = "/hora")
+@CommandInfo(aliases = "/hora", description = "Ver la hora del servidor")
 public class HoraCMD implements BotCommand {
     
     @Override

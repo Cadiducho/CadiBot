@@ -12,7 +12,7 @@ import com.cadiducho.zincite.api.command.CommandInfo;
 
 import java.time.Instant;
 
-@CommandInfo(aliases = {"/cadibot", "/version", "/start", "/about"})
+@CommandInfo(aliases = {"/cadibot", "/version", "/start", "/about"}, description = "Ver la versión del bot")
 public class VersionCMD implements BotCommand {
     
     @Override

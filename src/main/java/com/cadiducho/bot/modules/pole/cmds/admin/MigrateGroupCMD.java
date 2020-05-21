@@ -23,6 +23,7 @@ import java.util.Optional;
 @Log
 @CommandInfo(module = PoleModule.class,
         aliases = "/migrategroup",
+        hidden = true,
         arguments = {
                 @Argument(name = "viejoGrupo", type = Long.class, description = "ID del viejo grupo"),
                 @Argument(name = "nuevoGrupo", type = Long.class, description = "ID del nuevo grupo")

@@ -19,7 +19,7 @@ import java.time.Instant;
 import java.util.Objects;
 
 @Log
-@CommandInfo(aliases = {"/duck", "cuack", "/cuack", "pato"})
+@CommandInfo(aliases = {"/duck", "cuack", "/cuack", "pato"}, description = "Fotos de patos")
 public class DuckCMD implements BotCommand {
 
     private static final String duckAPI = "https://random-d.uk/api/v1/random?type=jpg";

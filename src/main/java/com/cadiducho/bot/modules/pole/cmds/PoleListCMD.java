@@ -22,7 +22,8 @@ import java.util.function.Supplier;
 @Log
 @CommandInfo(module = PoleModule.class,
         aliases = {"/poles", "/polelist"},
-        arguments = @Argument(name = "dia", type = LocalDate.class, required = false, description = "Día en el que observar las poles")
+        arguments = @Argument(name = "dia", type = LocalDate.class, required = false, description = "Día en el que observar las poles"),
+        description = "Ver los resultados de las poles de este grupo"
 )
 public class PoleListCMD implements BotCommand, CallbackListener {
 

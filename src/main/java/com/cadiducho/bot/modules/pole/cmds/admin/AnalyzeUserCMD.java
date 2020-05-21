@@ -18,9 +18,11 @@ import java.util.Optional;
 
 @CommandInfo(module = PoleModule.class,
         aliases = "/analyzeuser",
+        hidden = true,
+        description = "Analiza el comportamiento de un usuario",
         arguments = {
             @Argument(name = "usuario", type = Integer.class, description = "ID del usuario"),
-            @Argument(name = "grupo", type = Long.class, description = "ID del grupo donde analizar")
+            @Argument(name = "grupo", type = Long.class, description = "ID del grupo donde analizar"),
 })
 public class AnalyzeUserCMD implements BotCommand {
 

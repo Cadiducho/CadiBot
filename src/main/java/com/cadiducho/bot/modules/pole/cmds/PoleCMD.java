@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Log
-@CommandInfo(module = PoleModule.class, aliases = "pole")
+@CommandInfo(module = PoleModule.class, aliases = "pole", description = "Realiza la pole en un grupo")
 public class PoleCMD implements BotCommand {
 
     private final PoleModule module = (PoleModule) getModule();

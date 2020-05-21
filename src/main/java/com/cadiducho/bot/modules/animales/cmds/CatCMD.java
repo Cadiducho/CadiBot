@@ -11,7 +11,7 @@ import com.cadiducho.zincite.api.command.CommandInfo;
 
 import java.time.Instant;
 
-@CommandInfo(aliases = {"cat", "miau", "meow", "gato"})
+@CommandInfo(aliases = {"cat", "miau", "meow", "gato"}, description = "Fotos de gatos")
 public class CatCMD implements BotCommand {
     
     private static final String catApi = "https://cataas.com/cat/cute";

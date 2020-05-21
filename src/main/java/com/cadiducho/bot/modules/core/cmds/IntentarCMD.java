@@ -14,7 +14,7 @@ import com.vdurmont.emoji.EmojiManager;
 import java.time.Instant;
 import java.util.Optional;
 
-@CommandInfo(aliases = "/intentar", arguments = @Argument(name = "accion", type = String.class, description = "Acción a intentar"))
+@CommandInfo(aliases = "/intentar", description = "Intenta una acción", arguments = @Argument(name = "accion", type = String.class, description = "Acción a intentar"))
 public class IntentarCMD implements BotCommand {
 
     @Override

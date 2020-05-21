@@ -15,7 +15,7 @@ import com.cadiducho.zincite.api.command.args.CommandParseException;
 import java.time.Instant;
 import java.util.Optional;
 
-@CommandInfo(aliases = "/broadcastcadibot", arguments = @Argument(name = "mensaje", type = String.class, description = "Mensaje a retransmitir"))
+@CommandInfo(aliases = "/broadcastcadibot", hidden = true, description = "Retransmitir un mensaje", arguments = @Argument(name = "mensaje", type = String.class, description = "Mensaje a retransmitir"))
 public class BroadcastCMD implements BotCommand {
 
     private final CadiBotServer cadiBotServer = CadiBotServer.getInstance();

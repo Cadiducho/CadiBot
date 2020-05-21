@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-@CommandInfo(aliases = "/changelog", arguments = @Argument(name = "cantidad", type = Integer.class, description = "Número de versiones a visualizar"))
+@CommandInfo(aliases = "/changelog", description = "Ver los cambios del servidor", arguments = @Argument(name = "cantidad", type = Integer.class, description = "Número de versiones a visualizar"))
 public class ChangelogCMD implements BotCommand {
     
     @Override

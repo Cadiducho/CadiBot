@@ -18,6 +18,7 @@ import java.util.Optional;
 
 @CommandInfo(module = PoleModule.class,
         aliases = "/banuser",
+        hidden = true,
         arguments = {
                 @Argument(name = "usuario", type = Integer.class, description = "ID del usuario"),
                 @Argument(name = "grupo", type = Long.class, description = "ID del grupo donde cometió la falta"),
