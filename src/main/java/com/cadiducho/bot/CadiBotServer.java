@@ -19,7 +19,7 @@ public class CadiBotServer {
     /**
      * Server / bot version
      */
-    public static final String VERSION = "3.0-beta";
+    public static final String VERSION = "3.0";
 
     /**
      * The database (MySQL)
