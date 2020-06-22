@@ -1,8 +1,5 @@
 package com.cadiducho.bot.modules.pole.cmds;
 
-import com.cadiducho.bot.api.command.BotCommand;
-import com.cadiducho.bot.api.command.CommandContext;
-import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.bot.modules.pole.CachedGroup;
 import com.cadiducho.bot.modules.pole.PoleCacheManager;
 import com.cadiducho.bot.modules.pole.PoleCollection;
@@ -10,8 +7,12 @@ import com.cadiducho.bot.modules.pole.PoleModule;
 import com.cadiducho.bot.modules.pole.util.PoleAntiCheat;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
+import com.cadiducho.telegrambotapi.ParseMode;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
+import com.cadiducho.zincite.api.command.BotCommand;
+import com.cadiducho.zincite.api.command.CommandContext;
+import com.cadiducho.zincite.api.command.CommandInfo;
 import lombok.extern.java.Log;
 
 import java.time.Instant;
@@ -23,7 +24,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Log
-@CommandInfo(module = PoleModule.class, aliases = "pole")
+@CommandInfo(module = PoleModule.class, aliases = "pole", description = "Realiza la pole en un grupo")
 public class PoleCMD implements BotCommand {
 
     private final PoleModule module = (PoleModule) getModule();
@@ -71,26 +72,26 @@ public class PoleCMD implements BotCommand {
             save(manager, cachedGroup, today, polesHoy);
             saveToDatabase(manager, cachedGroup, polesHoy, 1);
             checkSuspiciousBehaviour(antiCheat, groupId, from.getId());
-            getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b>!!!", "html", null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b>!!!",  ParseMode.HTML, null, false, messageId, null);
             log.info("Pole otorgado a " + from.getId() + " en " + chat.getId());
         } else if (!poles.get().contains(from.getId())) {
             if (!poles.get().getFirst().isPresent() && !poles.get().getSecond().isPresent() && !poles.get().getThird().isPresent()) { //fixbug a si el objeto PolleCollection existe en memoria pero realmente no se han realizado poles
                 poles.get().setFirst(from.getId());
                 save(manager, cachedGroup, today, poles.get());
                 saveToDatabase(manager, cachedGroup, poles.get(), 1);
-                getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b><i>*</i>!!!", "html", null, false, messageId, null);
+                getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b><i>*</i>!!!",  ParseMode.HTML, null, false, messageId, null);
                 log.info("Pole (fixbug) otorgado a " + from.getId() + " en " + chat.getId());
             } else if (!poles.get().getSecond().isPresent()) { // si hay lista y el segundo no está presente, es plata
                 poles.get().setSecond(from.getId());
                 save(manager, cachedGroup, today, poles.get());
                 saveToDatabase(manager, cachedGroup, poles.get(), 2);
-                getBot().sendMessage(chat.getId(), base + " ha hecho la <b>subpole</b>, meh", "html", null, false, messageId, null);
+                getBot().sendMessage(chat.getId(), base + " ha hecho la <b>subpole</b>, meh",  ParseMode.HTML, null, false, messageId, null);
                 log.info("Plata otorgado a " + from.getId() + " en " + chat.getId());
             } else if (!poles.get().getThird().isPresent()) { // si hay lista y el tercero no está presente, es plata
                 poles.get().setThird(from.getId());
                 save(manager, cachedGroup, today, poles.get());
                 saveToDatabase(manager, cachedGroup, poles.get(), 3);
-                getBot().sendMessage(chat.getId(), base + " ha hecho la <b>bronce</b> (cual perdedor)", "html", null, false, messageId, null);
+                getBot().sendMessage(chat.getId(), base + " ha hecho la <b>bronce</b> (cual perdedor)",  ParseMode.HTML, null, false, messageId, null);
                 log.info("Bronce otorgado a " + from.getId() + " en " + chat.getId());
             }
         }

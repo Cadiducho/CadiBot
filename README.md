@@ -13,7 +13,7 @@ Para crear un módulo nuevo, debes crear un nuevo package dentro de `com.cadiduc
 Esa clase debe implementar `Module` y la información acorde a este quedará registrada mediante la anotación `ModuleInfo`
 ```
 @ModuleInfo(name = "MiFuncionalidad", description = "Breve descripción de qué hará mi módulo")
-public class MiFuncionalidadModule implements Module {
+public class MiFuncionalidadModule implements ZinciteModule {
     @Override
     public void onLoad() {
         //qué ejecutar cuando carga el módulo, por ejemplo: registrar comandos

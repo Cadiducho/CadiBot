@@ -3,6 +3,9 @@
 *.iml
 *.DS_Store
 .idea/
+.gradle/
 target/
 build/
 run/
+
+logs/

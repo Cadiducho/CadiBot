@@ -3,9 +3,8 @@ package com.cadiducho.bot;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
 import java.util.logging.*;
-import java.util.logging.Formatter;
 
 /**
  * A meta-class to handle all logging and input-related console improvements.
@@ -16,11 +15,11 @@ public final class ConsoleManager {
     private static final Logger logger = Logger.getLogger("");
     private static final String CONSOLE_DATE = "HH:mm:ss";
     private static final String FILE_DATE = "dd/MM/yyyy HH:mm:ss";
-    private final BotServer server;
+    private final CadiBotServer server;
 
     private boolean running = true;
 
-    public ConsoleManager(BotServer server) {
+    public ConsoleManager(CadiBotServer server) {
         this.server = server;
 
         for (Handler h : logger.getHandlers()) {
@@ -158,7 +157,7 @@ public final class ConsoleManager {
                             System.out.println("pong");
                             break;
                         case "version":
-                            System.out.println("Ejecutando versión " + BotServer.VERSION);
+                            System.out.println("Ejecutando versión " + CadiBotServer.VERSION);
                             break;
                         default:
                             System.out.println("Opción no válida.\n");
@@ -170,14 +169,14 @@ public final class ConsoleManager {
         }
     }
 
-    private class FancyConsoleHandler extends ConsoleHandler {
+    private static class FancyConsoleHandler extends ConsoleHandler {
         FancyConsoleHandler() {
             setFormatter(new DateOutputFormatter(CONSOLE_DATE));
             setOutputStream(System.out);
         }
     }
 
-    private class DateOutputFormatter extends Formatter {
+    private static class DateOutputFormatter extends Formatter {
         private final SimpleDateFormat date;
 
         DateOutputFormatter(String pattern) {
@@ -185,7 +184,6 @@ public final class ConsoleManager {
         }
 
         @Override
-        @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
         public String format(LogRecord record) {
             StringBuilder builder = new StringBuilder();
 
@@ -198,7 +196,6 @@ public final class ConsoleManager {
 
             if (record.getThrown() != null) {
                 // StringWriter's close() is trivial
-                @SuppressWarnings("resource")
                 StringWriter writer = new StringWriter();
                 record.getThrown().printStackTrace(new PrintWriter(writer));
                 builder.append(writer);

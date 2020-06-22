@@ -1,18 +1,18 @@
 package com.cadiducho.bot.modules.core.cmds;
 
-import com.cadiducho.bot.api.command.BotCommand;
-import com.cadiducho.bot.api.command.CommandContext;
-import com.cadiducho.bot.api.command.CommandInfo;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
+import com.cadiducho.zincite.api.command.BotCommand;
+import com.cadiducho.zincite.api.command.CommandContext;
+import com.cadiducho.zincite.api.command.CommandInfo;
 
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-@CommandInfo(aliases = "/hora")
+@CommandInfo(aliases = "/hora", description = "Ver la hora del servidor")
 public class HoraCMD implements BotCommand {
     
     @Override

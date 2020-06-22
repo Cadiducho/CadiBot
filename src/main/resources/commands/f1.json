@@ -1,7 +1,7 @@
 {
     "aliases": ["/f1"],
-    "description": "",
-    "funcionalities": [
+    "description": "F1 flute song",
+    "functionalities": [
         {
             "type": "voice",
             "voice_id": "AwADBAAD0xIAAoJ_8VB8wiPab57BYgI",

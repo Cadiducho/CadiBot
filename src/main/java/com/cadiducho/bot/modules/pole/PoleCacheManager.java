@@ -1,6 +1,6 @@
 package com.cadiducho.bot.modules.pole;
 
-import com.cadiducho.bot.BotServer;
+import com.cadiducho.bot.CadiBotServer;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 
@@ -19,7 +19,7 @@ import java.util.logging.Level;
 @AllArgsConstructor
 public class PoleCacheManager {
 
-    private static final BotServer botServer = BotServer.getInstance();
+    private static final CadiBotServer cadiBotServer = CadiBotServer.getInstance();
     private final PoleModule module;
     private final HashMap<Long, CachedGroup> cacheMap = new HashMap<>();
 
@@ -46,7 +46,7 @@ public class PoleCacheManager {
 
     private LinkedHashMap<Integer, Integer> getPolesOfGroupchat(Long groupId) {
         LinkedHashMap<Integer, Integer> poles = new LinkedHashMap<>();
-        try (Connection connection = botServer.getDatabase().getConnection()) {
+        try (Connection connection = cadiBotServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT `userid`, `poleType` FROM `" + PoleModule.TABLA_POLES + "` WHERE "
                             + "DATE(time)=DATE(CURDATE()) AND "
@@ -69,7 +69,7 @@ public class PoleCacheManager {
      */
     void loadCachedGroups() {
         log.info("Iniciando caché de grupos");
-        try (Connection connection = botServer.getDatabase().getConnection()) {
+        try (Connection connection = cadiBotServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT p.groupid, g.name, g.lastAdded FROM cadibot_poles p " +
                             "JOIN cadibot_grupos g ON (p.groupid = g.groupid) " +
@@ -141,10 +141,10 @@ public class PoleCacheManager {
      * @param updated La posición que se ha actualizado
      */
     public void savePoleToDatabase(CachedGroup group, PoleCollection poles, int updated) {
-        try (Connection connection = botServer.getDatabase().getConnection()) {
+        try (Connection connection = cadiBotServer.getDatabase().getConnection()) {
             Integer userid = getUserIdFromUpdatedPoleCollection(poles, updated);
-            botServer.getDatabase().updateUsername(userid, group.getId());
-            botServer.getDatabase().updateGroup(group.getId(), group.getTitle(), false);
+            cadiBotServer.getDatabase().updateUsername(userid, group.getId());
+            cadiBotServer.getDatabase().updateGroup(group.getId(), group.getTitle(), false);
 
             PreparedStatement insert = connection.prepareStatement("INSERT INTO `" + PoleModule.TABLA_POLES + "` (`userid`, groupid, `poleType`) VALUES (?, ?, ?)");
 
@@ -164,7 +164,7 @@ public class PoleCacheManager {
      * @return Fecha en la que el bot fue añadido
      */
     public LocalDate getChatLastAdded(Long groupId) {
-        try (Connection connection = botServer.getDatabase().getConnection()) {
+        try (Connection connection = cadiBotServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT lastAdded FROM cadibot_grupos WHERE groupid=?");
             statement.setLong(1, groupId);

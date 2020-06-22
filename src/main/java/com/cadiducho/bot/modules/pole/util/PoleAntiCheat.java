@@ -1,7 +1,8 @@
 package com.cadiducho.bot.modules.pole.util;
 
-import com.cadiducho.bot.BotServer;
+import com.cadiducho.bot.CadiBotServer;
 import com.cadiducho.bot.modules.pole.PoleModule;
+import com.cadiducho.telegrambotapi.ParseMode;
 import com.cadiducho.telegrambotapi.TelegramBot;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 import com.cadiducho.telegrambotapi.inline.InlineKeyboardButton;
@@ -30,7 +31,7 @@ import java.util.List;
 public class PoleAntiCheat {
 
     private final PoleModule module;
-    private static final BotServer botServer = BotServer.getInstance();
+    private static final CadiBotServer cadiBotServer = CadiBotServer.getInstance();
     private final HashMap<UserInGroup, AntiFloodData> antiFloodDataMap = new HashMap<>();
 
     private final List<Integer> bannedUsers = new ArrayList<>();
@@ -43,7 +44,7 @@ public class PoleAntiCheat {
      * @return Verdadero si es sospechoso
      */
     public boolean checkSuspiciousBehaviour(Long groupId, Integer userId, int days) {
-        try (Connection connection = botServer.getDatabase().getConnection()) {
+        try (Connection connection = cadiBotServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT `time` FROM cadibot_poles " +
                             "WHERE userid=? " +
@@ -66,8 +67,8 @@ public class PoleAntiCheat {
                     String username = names[1];
 
                     log.info("Comportamiento sospechoso de " + name + "@" + username + "#" + userId + " en " + groupName + "#" + groupId);
-                    TelegramBot bot = botServer.getCadibot();
-                    Long ownerId = botServer.getOwnerId();
+                    TelegramBot bot = cadiBotServer.getCadibot().getTelegramBot();
+                    Long ownerId = cadiBotServer.getOwnerId();
                     StringBuilder sb = new StringBuilder();
 
                     sb.append("Posible uso de mensajes automáticos por ")
@@ -83,7 +84,7 @@ public class PoleAntiCheat {
                     banear.setCallbackData("askBanUser#" + userId + "#" + groupId);
                     inlineKeyboard.setInlineKeyboard(Collections.singletonList(Collections.singletonList(banear)));
 
-                    bot.sendMessage(ownerId, sb.toString(), "html", null, null, null, inlineKeyboard);
+                    bot.sendMessage(ownerId, sb.toString(),  ParseMode.HTML, null, null, null, inlineKeyboard);
                     return true;
                 } catch (TelegramException e) {
                     e.printStackTrace();
@@ -139,7 +140,7 @@ public class PoleAntiCheat {
 
     public void loadBannedUsers() {
         bannedUsers.clear();
-        try (Connection connection = botServer.getDatabase().getConnection()) {
+        try (Connection connection = cadiBotServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement("SELECT userid FROM cadibot_users WHERE isBanned=1");
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
@@ -161,7 +162,7 @@ public class PoleAntiCheat {
         banUserInDatabase(userid);
         if (groupid != null && message != null) {
             try {
-                botServer.getCadibot().sendMessage(groupid, message);
+                cadiBotServer.getCadibot().getTelegramBot().sendMessage(groupid, message);
             } catch (TelegramException ignored) {}
         }
         loadBannedUsers();
@@ -172,7 +173,7 @@ public class PoleAntiCheat {
      * @param userid ID del usuario. Debe ser válida y corresponder a un usuario existente
      */
     public void banUserInDatabase(Integer userid) {
-        try (Connection connection = botServer.getDatabase().getConnection()) {
+        try (Connection connection = cadiBotServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "UPDATE cadibot_users SET isBanned=1, banTime=NOW() WHERE userid=?;");
             statement.setInt(1, userid);
@@ -193,7 +194,7 @@ public class PoleAntiCheat {
      */
     @EqualsAndHashCode
     @AllArgsConstructor
-    private class UserInGroup {
+    private static class UserInGroup {
         Integer user;
         Long group;
     }
@@ -201,7 +202,7 @@ public class PoleAntiCheat {
     /**
      * Pequeña subclase para controlar los datos del antiflood
      */
-    private class AntiFloodData {
+    private static class AntiFloodData {
         final long[] lastMessages = {0L, 0L, 0L};
         long lastSpam = 0L;
 

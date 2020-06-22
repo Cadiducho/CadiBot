@@ -16,27 +16,27 @@ public class PoleUser {
     /**
      * ID del usuario que realizó la pole
      */
-    private Integer id;
+    private final Integer id;
 
     /**
      * Nombre del usuario
      */
-    private String name;
+    private final String name;
 
     /**
      * Username del usuario. Puede ser null
      */
-    private String username;
+    private final String username;
 
     /**
      * Usado para el top por grupos, guardar temporalmente el nombre del grupo de ese registro. Puede ser null
      */
-    private String groupname;
+    private final String groupname;
 
     /**
      * Si el usuario está baneado
      */
-    @Getter private boolean isBanned;
+    @Getter private final boolean isBanned;
 
     /**
      * Obtener el nombre si está disponible

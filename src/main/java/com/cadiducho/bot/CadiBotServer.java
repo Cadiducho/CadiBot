@@ -1,41 +1,25 @@
 package com.cadiducho.bot;
 
-import com.cadiducho.bot.api.command.CommandManager;
-import com.cadiducho.bot.api.module.Module;
-import com.cadiducho.bot.api.module.ModuleManager;
 import com.cadiducho.bot.database.MySQLDatabase;
-import com.cadiducho.telegrambotapi.TelegramBot;
-import com.cadiducho.telegrambotapi.handlers.ExceptionHandler;
+import com.cadiducho.bot.modules.animales.AnimalesModule;
+import com.cadiducho.bot.modules.core.CoreModule;
+import com.cadiducho.bot.modules.insultos.InsultosModule;
+import com.cadiducho.bot.modules.pole.PoleModule;
+import com.cadiducho.zincite.ZinciteBot;
+import com.cadiducho.zincite.modules.json.JsonModule;
 import lombok.Getter;
 import lombok.extern.java.Log;
 import org.apache.commons.cli.*;
 
-import java.io.File;
-import java.io.IOException;
 import java.sql.SQLException;
 
 @Log
-public class BotServer {
+public class CadiBotServer {
 
     /**
      * Server / bot version
      */
-    public static final String VERSION = "2.22";
-
-    /**
-     * The Module manager
-     */
-    @Getter private final ModuleManager moduleManager;
-
-    /**
-     * The (Telegram) Command manager
-     */
-    @Getter private final CommandManager commandManager;
-
-    /**
-     * The Console manager
-     */
-    private final ConsoleManager consoleManager;
+    public static final String VERSION = "3.0";
 
     /**
      * The database (MySQL)
@@ -47,8 +31,8 @@ public class BotServer {
      */
     @Getter private Long ownerId;
 
-    @Getter private TelegramBot cadibot;
-    @Getter private static BotServer instance;
+    @Getter private ZinciteBot cadibot;
+    @Getter private static CadiBotServer instance;
 
     public static void main(String[] args) {
         Options options = new Options();
@@ -87,24 +71,17 @@ public class BotServer {
             System.exit(1);
             return;
         }
-        BotServer bot = new BotServer();
-        bot.startServer(commandLine);
-    }
-    
-    private BotServer() {
-        instance = this;
-        consoleManager = new ConsoleManager(instance);
-        moduleManager = new ModuleManager(instance, new File("modules"));
-        commandManager = new CommandManager();
-    }
-    
-    private void startServer(CommandLine cmd) {
-        log.info("Servidor arrancado");
 
-        consoleManager.startConsole();
-        consoleManager.startFile("logs/log-%D.txt");
-        cadibot = new TelegramBot(cmd.getOptionValue("token"));
-        ownerId = Long.parseLong(cmd.getOptionValue("owner"));
+        CadiBotServer bot = new CadiBotServer();
+        bot.initCadibot(commandLine);
+    }
+    
+    private CadiBotServer() {
+        instance = this;
+    }
+    
+    private void initCadibot(CommandLine cmd) {
+        this.ownerId = Long.parseLong(cmd.getOptionValue("owner"));
 
         try {
             database = new MySQLDatabase(instance,
@@ -114,38 +91,25 @@ public class BotServer {
                     cmd.getOptionValue("database-user"),
                     cmd.getOptionValue("database-pass"));
 
-            log.info("SQL connection established");
+            System.out.println("SQL connection established");
         } catch (SQLException ex) {
-            log.warning("Can't connect to database!");
-            log.warning(ex.getMessage());
+            System.err.println("Can't connect to database!");
+            System.err.println(ex.getMessage());
         }
 
-        try {
-            moduleManager.loadModules();
-        } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
-            log.warning("Can't load modules!");
-            log.warning(ex.getMessage());
-        }
+        this.cadibot = new ZinciteBot(cmd.getOptionValue("token"), ownerId, VERSION);
 
-        UpdatesHandler events = new UpdatesHandler(cadibot, instance);
-        cadibot.getUpdatesPoller().setHandler(events);
+        cadibot.getModuleManager().registerModule(new CoreModule());
+        cadibot.getModuleManager().registerModule(new JsonModule());
+        cadibot.getModuleManager().registerModule(new PoleModule());
+        cadibot.getModuleManager().registerModule(new InsultosModule());
+        cadibot.getModuleManager().registerModule(new AnimalesModule());
 
-        ExceptionHandler exceptionHandler = new TelegramExceptionHandler(cadibot, ownerId);
-        cadibot.getUpdatesPoller().setExceptionHandler(exceptionHandler);
-
-        cadibot.startUpdatesPoller();
-
-        log.info("Bot " + VERSION + " iniciado completamente");
+        cadibot.startServer();
     }
     
     public void shutdown() {
-        cadibot.stopUpdatesPoller();
-        moduleManager.getModules().forEach(Module::onClose);
-
         database.closeDatabase();
-
-        log.info("Terminando...");
-        consoleManager.stop();
-        System.exit(0);
+        cadibot.shutdown();
     }
 }

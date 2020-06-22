@@ -1,17 +1,16 @@
 package com.cadiducho.bot.modules.pole.cmds;
 
-import com.cadiducho.bot.api.command.*;
-import com.cadiducho.bot.api.command.args.Argument;
-import com.cadiducho.bot.api.command.args.CommandParseException;
+import com.cadiducho.bot.CadiBotServer;
 import com.cadiducho.bot.modules.pole.PoleModule;
 import com.cadiducho.bot.modules.pole.util.InlineKeyboardUtil;
 import com.cadiducho.bot.modules.pole.util.PoleMessengerUtil;
-import com.cadiducho.telegrambotapi.CallbackQuery;
-import com.cadiducho.telegrambotapi.Chat;
-import com.cadiducho.telegrambotapi.Message;
-import com.cadiducho.telegrambotapi.User;
+import com.cadiducho.telegrambotapi.*;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 import com.cadiducho.telegrambotapi.inline.InlineKeyboardMarkup;
+import com.cadiducho.zincite.api.command.BotCommand;
+import com.cadiducho.zincite.api.command.*;
+import com.cadiducho.zincite.api.command.args.Argument;
+import com.cadiducho.zincite.api.command.args.CommandParseException;
 import lombok.extern.java.Log;
 
 import java.sql.SQLException;
@@ -23,7 +22,8 @@ import java.util.function.Supplier;
 @Log
 @CommandInfo(module = PoleModule.class,
         aliases = {"/poles", "/polelist"},
-        arguments = @Argument(name = "dia", type = LocalDate.class, required = false, description = "Día en el que observar las poles")
+        arguments = @Argument(name = "dia", type = LocalDate.class, required = false, description = "Día en el que observar las poles"),
+        description = "Ver los resultados de las poles de este grupo"
 )
 public class PoleListCMD implements BotCommand, CallbackListener {
 
@@ -46,9 +46,9 @@ public class PoleListCMD implements BotCommand, CallbackListener {
             final String body = PoleMessengerUtil.showPoleRank(chat,5, atDate, true);
             final InlineKeyboardMarkup inlineKeyboard = InlineKeyboardUtil.getMostrarTops(atDate);
 
-            getBot().sendMessage(chat.getId(), body, "html", null, null, null, inlineKeyboard);
+            getBot().sendMessage(chat.getId(), body,  ParseMode.HTML, null, null, null, inlineKeyboard);
         } catch (SQLException ex) {
-            getBot().sendMessage(chat.getId(), "No se ha podido conectar a la base de datos: ```" + ex.getMessage() + "```", "markdown", null, null, null, null);
+            getBot().sendMessage(chat.getId(), "No se ha podido conectar a la base de datos: ```" + ex.getMessage() + "```",  ParseMode.MARKDOWN, null, null, null, null);
             log.warning("Error generando respuesta para /polelist");
             log.warning(ex.getMessage());
         }
@@ -111,7 +111,7 @@ public class PoleListCMD implements BotCommand, CallbackListener {
     }
 
     private void editPoleListMessage(CallbackQuery callbackQuery, Supplier<String> bodySupplier, InlineKeyboardMarkup inlineKeyboard) throws TelegramException {
-        botServer.getCadibot().editMessageText(callbackQuery.getMessage().getChat().getId(), callbackQuery.getMessage().getMessageId(), callbackQuery.getInlineMessageId(),
-                bodySupplier.get(), "html", false, inlineKeyboard);
+        CadiBotServer.getInstance().getCadibot().getTelegramBot().editMessageText(callbackQuery.getMessage().getChat().getId(), callbackQuery.getMessage().getMessageId(), callbackQuery.getInlineMessageId(),
+                bodySupplier.get(),  ParseMode.HTML, false, inlineKeyboard);
     }
 }

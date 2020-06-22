@@ -1,7 +1,7 @@
 {
     "aliases": ["/viva", "puigdemont"],
-    "description": "",
-    "funcionalities": [
+    "description": "Viva puigdemont",
+    "functionalities": [
         {
             "type": "voice",
             "voice_id": "AwADBAAD0AIAAnhgYFAc6it_QeBppwI",

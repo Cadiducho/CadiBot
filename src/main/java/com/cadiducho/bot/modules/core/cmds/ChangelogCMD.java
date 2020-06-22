@@ -1,14 +1,16 @@
 package com.cadiducho.bot.modules.core.cmds;
 
-import com.cadiducho.bot.api.command.BotCommand;
-import com.cadiducho.bot.api.command.CommandContext;
-import com.cadiducho.bot.api.command.CommandInfo;
-import com.cadiducho.bot.api.command.args.Argument;
-import com.cadiducho.bot.api.command.args.CommandParseException;
+import com.cadiducho.bot.CadiBotServer;
 import com.cadiducho.telegrambotapi.Chat;
 import com.cadiducho.telegrambotapi.Message;
+import com.cadiducho.telegrambotapi.ParseMode;
 import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
+import com.cadiducho.zincite.api.command.BotCommand;
+import com.cadiducho.zincite.api.command.CommandContext;
+import com.cadiducho.zincite.api.command.CommandInfo;
+import com.cadiducho.zincite.api.command.args.Argument;
+import com.cadiducho.zincite.api.command.args.CommandParseException;
 import com.vdurmont.emoji.EmojiManager;
 
 import java.sql.Connection;
@@ -20,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-@CommandInfo(aliases = "/changelog", arguments = @Argument(name = "cantidad", type = Integer.class, description = "Número de versiones a visualizar"))
+@CommandInfo(aliases = "/changelog", description = "Ver los cambios del servidor", arguments = @Argument(name = "cantidad", type = Integer.class, description = "Número de versiones a visualizar"))
 public class ChangelogCMD implements BotCommand {
     
     @Override
@@ -35,7 +37,7 @@ public class ChangelogCMD implements BotCommand {
                 }
             }
         } catch (CommandParseException ex) {
-            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(), "html", null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, messageId, null);
             return;
         }
         List<String> cambios = getChangelog(limit);
@@ -51,7 +53,7 @@ public class ChangelogCMD implements BotCommand {
     
     private List<String> getChangelog(int limit) {
         List<String> versions = new LinkedList<>();
-        try (Connection connection = botServer.getDatabase().getConnection()) {
+        try (Connection connection = CadiBotServer.getInstance().getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM `cadibot_changelog` ORDER BY `major` DESC, `minor` DESC LIMIT ?;");
             statement.setInt(1, limit);
             ResultSet rs = statement.executeQuery();

@@ -1,6 +1,6 @@
 package com.cadiducho.bot.modules.pole.util;
 
-import com.cadiducho.bot.BotServer;
+import com.cadiducho.bot.CadiBotServer;
 import com.cadiducho.bot.modules.pole.PoleUser;
 import com.cadiducho.telegrambotapi.Chat;
 import com.vdurmont.emoji.Emoji;
@@ -150,7 +150,7 @@ public class PoleMessengerUtil {
      */
     public static LinkedHashMap<Integer, PoleUser> getPolesOfDay(LocalDate day, long chatId) throws SQLException {
         final LinkedHashMap<Integer, PoleUser> poles = new LinkedHashMap<>();
-        try (Connection connection = BotServer.getInstance().getDatabase().getConnection()) {
+        try (Connection connection = CadiBotServer.getInstance().getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT * FROM cadibot_poles NATURAL JOIN cadibot_users WHERE "
                             + "DATE(time)=DATE(?) AND "
@@ -186,7 +186,7 @@ public class PoleMessengerUtil {
      */
     public static LinkedHashMap<PoleUser, Integer> getTopPoles(long chatId, LocalDate atDay, int type, int limit) throws SQLException {
         final LinkedHashMap<PoleUser, Integer> poles = new LinkedHashMap<>();
-        try (Connection connection = BotServer.getInstance().getDatabase().getConnection()) {
+        try (Connection connection = CadiBotServer.getInstance().getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement("" +
                     "SELECT count(*) AS `totales`,`userid`,`name`,`username`,`isBanned` FROM cadibot_poles NATURAL JOIN cadibot_users " +
                     "WHERE groupid=? AND `poleType`=? AND DATE(time)<=DATE(?) GROUP BY `userid` ORDER BY `totales` DESC LIMIT ?");
@@ -221,7 +221,7 @@ public class PoleMessengerUtil {
      */
     public static LinkedHashMap<PoleUser, Integer> getTopPolesGlobal(LocalDate atDay, int type, int limit) throws SQLException {
         final LinkedHashMap<PoleUser, Integer> poles = new LinkedHashMap<>();
-        try (Connection connection = BotServer.getInstance().getDatabase().getConnection()) {
+        try (Connection connection = CadiBotServer.getInstance().getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement("" +
                     "SELECT userid, COUNT(*) as totales, u.name, u.username " +
                     "FROM cadibot_poles p NATURAL JOIN cadibot_users u " +
@@ -259,7 +259,7 @@ public class PoleMessengerUtil {
      */
     public static LinkedHashMap<PoleUser, Integer> getTopPolesGrupal(LocalDate atDay, int type, int limit) throws SQLException {
         final LinkedHashMap<PoleUser, Integer> poles = new LinkedHashMap<>();
-        try (Connection connection = BotServer.getInstance().getDatabase().getConnection()) {
+        try (Connection connection = CadiBotServer.getInstance().getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement("" +
                     "SELECT userid, COUNT(*) as totales, u.name, u.username, g.groupid, g.name " +
                     "FROM cadibot_poles p NATURAL JOIN cadibot_users u JOIN cadibot_grupos g ON (p.groupid = g.groupid) " +
