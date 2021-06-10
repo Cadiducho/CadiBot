@@ -4,9 +4,13 @@
 
 # Colaborar
 Cualquier aporte será bienvenido :D
+
 Puedes [aportar ideas](https://github.com/Cadiducho/CadiBot/issues/new?template=feature_request.md), [reportar errores](https://github.com/Cadiducho/CadiBot/issues/new?template=bug_report.md) o bien puedes hacer un fork y programar una nueva funcionalidad.
 
-Para programar una nueva funcionalidad, debes tener en cuenta lo siguiente:
+### Compilación
+```
+$ gradlew build
+```
 ## Modularidad
 CadiBot desde la versión 2.0 contiene un núcleo principal y una serie de módulos que se añaden a su alrededor.
 Para crear un módulo nuevo, debes crear un nuevo package dentro de `com.cadiducho.bot.modules`, y una clase principal (por convenio, `MiFuncionalidadModule`)
