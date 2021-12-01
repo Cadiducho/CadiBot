@@ -43,7 +43,7 @@ public class PoleAntiCheat {
      * @param days Número de días a analizar
      * @return Verdadero si es sospechoso
      */
-    public boolean checkSuspiciousBehaviour(Long groupId, Integer userId, int days) {
+    public boolean checkSuspiciousBehaviour(Long groupId, Long userId, int days) {
         try (Connection connection = cadiBotServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT `time` FROM cadibot_poles " +
@@ -51,7 +51,7 @@ public class PoleAntiCheat {
                             "AND groupid=? " +
                             "AND `time` >= DATE_SUB(NOW(), INTERVAL " + days + " DAY) " +
                             "GROUP BY `time` ORDER BY `time` DESC;");
-            statement.setInt(1, userId);
+            statement.setLong(1, userId);
             statement.setLong(2, groupId);
             ResultSet rs = statement.executeQuery();
             ArrayList<LocalDateTime> timestamps = new ArrayList<>();
@@ -129,7 +129,7 @@ public class PoleAntiCheat {
      * @param groupId El grupo donde el usuario está siendo analizado
      * @return true si está realizando flood, falso si ha pasado el filtro
      */
-    public boolean isFlooding(Integer userid, Long groupId) {
+    public boolean isFlooding(Long userid, Long groupId) {
         UserInGroup key = new UserInGroup(userid, groupId);
         if (!antiFloodDataMap.containsKey(key)) {
             antiFloodDataMap.put(key, new AntiFloodData());
@@ -157,7 +157,7 @@ public class PoleAntiCheat {
     /**
      * Banear un usuario
      */
-    public void banUser(Integer userid, Long groupid, String message) {
+    public void banUser(Long userid, Long groupid, String message) {
         log.info("Baneando al usuario " + userid + ":" + message);
         banUserInDatabase(userid);
         if (groupid != null && message != null) {
@@ -172,11 +172,11 @@ public class PoleAntiCheat {
      * Banear un usuario en la base de datos
      * @param userid ID del usuario. Debe ser válida y corresponder a un usuario existente
      */
-    public void banUserInDatabase(Integer userid) {
+    public void banUserInDatabase(Long userid) {
         try (Connection connection = cadiBotServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "UPDATE cadibot_users SET isBanned=1, banTime=NOW() WHERE userid=?;");
-            statement.setInt(1, userid);
+            statement.setLong(1, userid);
             statement.executeUpdate();
 
         } catch (SQLException ex) {
@@ -185,7 +185,7 @@ public class PoleAntiCheat {
         }
     }
 
-    public boolean isUserBanned(Integer userid) {
+    public boolean isUserBanned(Long userid) {
         return bannedUsers.contains(userid);
     }
 
@@ -195,7 +195,7 @@ public class PoleAntiCheat {
     @EqualsAndHashCode
     @AllArgsConstructor
     private static class UserInGroup {
-        Integer user;
+        Long user;
         Long group;
     }
 

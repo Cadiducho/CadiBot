@@ -35,7 +35,7 @@ public class AnalyzeUserCMD implements BotCommand {
             return;
         }
         try {
-            Optional<Integer> usuario = context.get("usuario");
+            Optional<Long> usuario = context.get("usuario");
             Optional<Long> grupo = context.get("grupo");
             if (usuario.isEmpty() || grupo.isEmpty()) {
                 getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, messageId, null);

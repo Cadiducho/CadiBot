@@ -28,9 +28,10 @@ public class PoleCacheManager {
      * synchronized porque dos personajes pueden realizar una pole *simultáneamente* y el caché del grupo se duplicaría
      * @param groupId Id del grupo
      * @param title Titulo del grupo
+     * @param poles Map de poles posición->id del usuario
      * @param lastAdded Fecha en la que el bot ha sido añadido al grupo
      */
-    public synchronized void initializeGroupCache(Long groupId, String title, LinkedHashMap<Integer, Integer> poles, LocalDate lastAdded) {
+    public synchronized void initializeGroupCache(Long groupId, String title, LinkedHashMap<Integer, Long> poles, LocalDate lastAdded) {
         CachedGroup cachedGroup = CachedGroup.builder().id(groupId).title(title).lastAdded(lastAdded).build();
         if (!poles.isEmpty()) { //solo crear objeto PoleCollection si hay poles de verdad. Rellenar el optional con el objeto vacío repercutirá en /pole fuertemente
             PoleCollection polesHoy = new PoleCollection(poles.get(1), poles.get(2), poles.get(3));
@@ -44,8 +45,13 @@ public class PoleCacheManager {
         initializeGroupCache(groupId, title, getPolesOfGroupchat(groupId), lastAdded);
     }
 
-    private LinkedHashMap<Integer, Integer> getPolesOfGroupchat(Long groupId) {
-        LinkedHashMap<Integer, Integer> poles = new LinkedHashMap<>();
+    /**
+     * Obtener Map de poles posición->id del usuario
+     * @param groupId El grupo donde buscar las poles
+     * @return Map de poles
+     */
+    private LinkedHashMap<Integer, Long> getPolesOfGroupchat(Long groupId) {
+        LinkedHashMap<Integer, Long> poles = new LinkedHashMap<>();
         try (Connection connection = cadiBotServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT `userid`, `poleType` FROM `" + PoleModule.TABLA_POLES + "` WHERE "
@@ -55,7 +61,7 @@ public class PoleCacheManager {
             statement.setLong(1, groupId);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
-                poles.put(rs.getInt("poleType"), rs.getInt("userid"));
+                poles.put(rs.getInt("poleType"), rs.getLong("userid"));
             }
         } catch (SQLException ex) {
             log.log(Level.WARNING, "No se ha podido cargar las poles en caché del grupo " + groupId, ex);
@@ -118,20 +124,12 @@ public class PoleCacheManager {
     }
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
-    public Integer getUserIdFromUpdatedPoleCollection(PoleCollection poles, int updated) {
-        Integer userid;
-        switch (updated) {
-            case 1:
-                userid = poles.getFirst().get();
-                break;
-            case 2:
-                userid = poles.getSecond().get();
-                break;
-            default:
-                userid = poles.getThird().get();
-                break;
-        }
-        return userid;
+    public Long getUserIdFromUpdatedPoleCollection(PoleCollection poles, int updated) {
+        return switch (updated) {
+            case 1 -> poles.getFirst().get();
+            case 2 -> poles.getSecond().get();
+            default -> poles.getThird().get();
+        };
     }
 
     /**
@@ -142,13 +140,13 @@ public class PoleCacheManager {
      */
     public void savePoleToDatabase(CachedGroup group, PoleCollection poles, int updated) {
         try (Connection connection = cadiBotServer.getDatabase().getConnection()) {
-            Integer userid = getUserIdFromUpdatedPoleCollection(poles, updated);
+            Long userid = getUserIdFromUpdatedPoleCollection(poles, updated);
             cadiBotServer.getDatabase().updateUsername(userid, group.getId());
             cadiBotServer.getDatabase().updateGroup(group.getId(), group.getTitle(), false);
 
             PreparedStatement insert = connection.prepareStatement("INSERT INTO `" + PoleModule.TABLA_POLES + "` (`userid`, groupid, `poleType`) VALUES (?, ?, ?)");
 
-            insert.setInt(1, userid);
+            insert.setLong(1, userid);
             insert.setLong(2, group.getId());
             insert.setInt(3, updated);
             insert.executeUpdate();

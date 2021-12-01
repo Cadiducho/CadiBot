@@ -40,21 +40,20 @@ public class PoleCMD implements BotCommand {
             getBot().sendMessage(chat.getId(), "Has sido baneado y no tienes permitido realizar poles", null, null, true, messageId, null);
             return;
         }
-        if (antiCheat.isFlooding(from.getId(), Long.parseLong(chat.getId()))) {
+        if (antiCheat.isFlooding(from.getId(), chat.getId())) {
             getBot().sendMessage(chat.getId(), "Antiflood aplicado a " + from.getFirstName() + ", te quedas sin poles por listo");
             return;
         }
 
         PoleCacheManager manager = module.getPoleCacheManager();
-        Long groupId = Long.parseLong(chat.getId());
         String currentname = from.getFirstName();
         String base = "<i>" + DateTimeFormatter.ofPattern("HH:mm:ss.SSS").withZone(ZoneId.systemDefault()).format(instant) + "</i>: " + currentname;
 
         // Obtener grupo del caché y/o cargar este
-        if (!manager.isCached(groupId)) {
-            manager.initializeGroupCache(groupId, chat.getTitle(), manager.getChatLastAdded(groupId));
+        if (!manager.isCached(chat.getId())) {
+            manager.initializeGroupCache(chat.getId(), chat.getTitle(), manager.getChatLastAdded(chat.getId()));
         }
-        CachedGroup cachedGroup = manager.getCachedGroup(groupId).get();
+        CachedGroup cachedGroup = manager.getCachedGroup(chat.getId()).get();
 
         // Si el bot ha sido añadido hoy, no se podrán hacer poles hasta el siguiente 00:00:00
         if (today.isEqual(cachedGroup.getLastAdded())) {
@@ -71,7 +70,7 @@ public class PoleCMD implements BotCommand {
             cachedGroup.getPolesMap().put(today, polesHoy);
             save(manager, cachedGroup, today, polesHoy);
             saveToDatabase(manager, cachedGroup, polesHoy, 1);
-            checkSuspiciousBehaviour(antiCheat, groupId, from.getId());
+            checkSuspiciousBehaviour(antiCheat, chat.getId(), from.getId());
             getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b>!!!",  ParseMode.HTML, null, false, messageId, null);
             log.info("Pole otorgado a " + from.getId() + " en " + chat.getId());
         } else if (!poles.get().contains(from.getId())) {
@@ -106,7 +105,7 @@ public class PoleCMD implements BotCommand {
         CompletableFuture.runAsync(() -> manager.savePoleToDatabase(group, poles, updated));
     }
 
-    private void checkSuspiciousBehaviour(PoleAntiCheat antiCheat, Long groupid, Integer userid) {
-        CompletableFuture.runAsync(() -> antiCheat.checkSuspiciousBehaviour(groupid, userid, 5));
+    private void checkSuspiciousBehaviour(PoleAntiCheat antiCheat, Long groupId, Long userId) {
+        CompletableFuture.runAsync(() -> antiCheat.checkSuspiciousBehaviour(groupId, userId, 5));
     }
 }

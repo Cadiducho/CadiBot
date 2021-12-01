@@ -35,7 +35,7 @@ public class BanUserCMD implements BotCommand {
             return;
         }
         try {
-            Optional<Integer> usuario = context.get("usuario");
+            Optional<Long> usuario = context.get("usuario");
             Optional<Long> grupo = context.get("grupo");
             Optional<String> razon = context.getLastArguments();
             if (usuario.isEmpty()) {

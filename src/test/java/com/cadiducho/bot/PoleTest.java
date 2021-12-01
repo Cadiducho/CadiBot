@@ -35,9 +35,9 @@ public class PoleTest {
     @DisplayName("Estructura básica de poles en caché")
     public void testSimplePoles() {
         Long groupId = 1000L;
-        Integer firstUserId = 1;
-        Integer secondUserId = 2;
-        Integer thirdUserId = 3;
+        Long firstUserId = 1L;
+        Long secondUserId = 2L;
+        Long thirdUserId = 3L;
         LocalDateTime today = LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
 
         manager.initializeGroupCache(groupId, "Chat test", new LinkedHashMap<>(), today.toLocalDate().minusDays(1));
@@ -80,38 +80,38 @@ public class PoleTest {
         manager.initializeGroupCache(groupId, "Chat test", new LinkedHashMap<>(), treintaSeptiembre.minusDays(1));
 
         CachedGroup cachedGroup = manager.getCachedGroup(groupId).get();
-        PoleCollection polesTreinta = PoleCollection.builder().first(1).build();
+        PoleCollection polesTreinta = PoleCollection.builder().first(1L).build();
         cachedGroup.updatePoles(treintaSeptiembre, polesTreinta);
         manager.clearOldCache(cachedGroup, treintaSeptiembre);
         final Optional<PoleCollection> polesA = cachedGroup.getPolesOfADay(treintaSeptiembre);
         assertAll(() -> {
-            assertEquals(polesA.get().getFirst().get(), (Integer) 1);
+            assertEquals(polesA.get().getFirst().get(), 1L);
             assertFalse(polesA.get().getSecond().isPresent());
             assertFalse(polesA.get().getThird().isPresent());
         });
 
         cachedGroup = manager.getCachedGroup(groupId).get();
-        PoleCollection polesUno = PoleCollection.builder().first(58).second(489).build();
+        PoleCollection polesUno = PoleCollection.builder().first(58L).second(489L).build();
         cachedGroup.updatePoles(unoOctubre, polesUno);
         manager.clearOldCache(cachedGroup, unoOctubre);
         final Optional<PoleCollection> polesB = cachedGroup.getPolesOfADay(unoOctubre);
 
         assertAll(() -> {
-            assertEquals(polesB.get().getFirst().get(), (Integer) 58);
-            assertEquals(polesB.get().getSecond().get(), (Integer) 489);
+            assertEquals(polesB.get().getFirst().get(), 58L);
+            assertEquals(polesB.get().getSecond().get(), 489L);
             assertFalse(polesB.get().getThird().isPresent());
         });
 
         cachedGroup = manager.getCachedGroup(groupId).get();
-        PoleCollection polesDos = PoleCollection.builder().first(586).second(858).third(7896).build();
+        PoleCollection polesDos = PoleCollection.builder().first(586L).second(858L).third(7896L).build();
         cachedGroup.updatePoles(dosOctubre, polesDos);
         manager.clearOldCache(cachedGroup, dosOctubre);
         final Optional<PoleCollection> polesC = cachedGroup.getPolesOfADay(dosOctubre);
 
         assertAll(() -> {
-            assertEquals(polesC.get().getFirst().get(), (Integer) 586);
-            assertEquals(polesC.get().getSecond().get(), (Integer) 858);
-            assertEquals(polesC.get().getThird().get(), (Integer) 7896);
+            assertEquals(polesC.get().getFirst().get(), 586L);
+            assertEquals(polesC.get().getSecond().get(), 858L);
+            assertEquals(polesC.get().getThird().get(), 7896L);
         });
     }
 
@@ -129,17 +129,17 @@ public class PoleTest {
     @Test
     @DisplayName("Antiflood")
     public void antiFloodTest() {
-        Integer userid = 1;
+        Long userId = 1085L;
         Long groupOne = 1L;
         Long groupTwo = 2L;
-        assertFalse(antiCheat.isFlooding(userid, groupOne)); //la primera vez debe dar falso
-        antiCheat.isFlooding(userid, groupOne);
-        antiCheat.isFlooding(userid, groupOne);
-        antiCheat.isFlooding(userid, groupOne);
-        antiCheat.isFlooding(userid, groupOne);
-        assertTrue(antiCheat.isFlooding(userid, groupOne)); // tras 4 intentos seguidos, falta el antiflood
+        assertFalse(antiCheat.isFlooding(userId, groupOne)); //la primera vez debe dar falso
+        antiCheat.isFlooding(userId, groupOne);
+        antiCheat.isFlooding(userId, groupOne);
+        antiCheat.isFlooding(userId, groupOne);
+        antiCheat.isFlooding(userId, groupOne);
+        assertTrue(antiCheat.isFlooding(userId, groupOne)); // tras 4 intentos seguidos, falta el antiflood
 
-        assertFalse(antiCheat.isFlooding(userid, groupTwo)); // en otro grupo no cuenta como flood
+        assertFalse(antiCheat.isFlooding(userId, groupTwo)); // en otro grupo no cuenta como flood
     }
 
     @Test

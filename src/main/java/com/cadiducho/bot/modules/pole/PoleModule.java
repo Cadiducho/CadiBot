@@ -61,11 +61,11 @@ public class PoleModule implements ZinciteModule {
     @Override
     public void onNewChatMembers(Chat chat, List<User> newChatMembers) {
         try {
-            Integer botId = cadiBotServer.getCadibot().getTelegramBot().getMe().getId();
+            Long botId = cadiBotServer.getCadibot().getTelegramBot().getMe().getId();
             if (newChatMembers.stream().anyMatch(user -> user.getId().equals(botId))) {
                 log.info("Me han añadido al grupo " + chat.getTitle());
                 cadiBotServer.getDatabase().updateGroup(chat.getId(), chat.getTitle(), true);
-                poleCacheManager.setGroupLastAdded(Long.parseLong(chat.getId()));
+                poleCacheManager.setGroupLastAdded(chat.getId());
             }
         } catch (TelegramException ignored) { }
     }
@@ -113,16 +113,16 @@ public class PoleModule implements ZinciteModule {
     /**
      * Obten el nombre de un usuario desde la base de datos
      * La posición 0 representará el nombre y la 1 el @username
-     * @param userid La id del usuario
+     * @param userId La id del usuario
      * @return El nombre usuario
      */
-    public String[] getUsername(Integer userid) {
+    public String[] getUsername(Long userId) {
         String name = "";
         String username = "";
         try (Connection connection = cadiBotServer.getDatabase().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT name, username FROM cadibot_users WHERE userid=?");
-            statement.setInt(1, userid);
+            statement.setLong(1, userId);
             ResultSet rs = statement.executeQuery();
             if (rs.next()) {
                 name = rs.getString("name");
