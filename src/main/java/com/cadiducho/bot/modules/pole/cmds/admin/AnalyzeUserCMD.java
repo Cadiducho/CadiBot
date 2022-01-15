@@ -21,7 +21,7 @@ import java.util.Optional;
         hidden = true,
         description = "Analiza el comportamiento de un usuario",
         arguments = {
-            @Argument(name = "usuario", type = Integer.class, description = "ID del usuario"),
+            @Argument(name = "usuario", type = Long.class, description = "ID del usuario"),
             @Argument(name = "grupo", type = Long.class, description = "ID del grupo donde analizar"),
 })
 public class AnalyzeUserCMD implements BotCommand {
