@@ -34,7 +34,7 @@ public class PoleAntiCheat {
     private static final CadiBotServer cadiBotServer = CadiBotServer.getInstance();
     private final HashMap<UserInGroup, AntiFloodData> antiFloodDataMap = new HashMap<>();
 
-    private final List<Integer> bannedUsers = new ArrayList<>();
+    private final List<Long> bannedUsers = new ArrayList<>();
 
     /**
      * Analizar ultimos comportamientos de un usuario para determinar si son sospechosos o no
@@ -144,7 +144,7 @@ public class PoleAntiCheat {
             PreparedStatement statement = connection.prepareStatement("SELECT userid FROM cadibot_users WHERE isBanned=1");
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
-                bannedUsers.add(rs.getInt("userid"));
+                bannedUsers.add(rs.getLong("userid"));
             }
             log.info("Cargados " + bannedUsers.size() + " usuarios baneados");
         } catch (SQLException ex) {

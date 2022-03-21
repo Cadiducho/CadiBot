@@ -16,7 +16,7 @@ public class PoleUser {
     /**
      * ID del usuario que realizó la pole
      */
-    private final Integer id;
+    private final Long id;
 
     /**
      * Nombre del usuario

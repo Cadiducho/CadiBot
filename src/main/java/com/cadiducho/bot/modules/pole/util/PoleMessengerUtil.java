@@ -162,7 +162,7 @@ public class PoleMessengerUtil {
 
             while (rs.next()) {
                 PoleUser user = PoleUser.builder()
-                        .id(rs.getInt("userid"))
+                        .id(rs.getLong("userid"))
                         .name(rs.getString("name"))
                         .username(rs.getString("username"))
                         .build();
@@ -197,7 +197,7 @@ public class PoleMessengerUtil {
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 PoleUser user = PoleUser.builder()
-                        .id(rs.getInt("userid"))
+                        .id(rs.getLong("userid"))
                         .name(rs.getString("name"))
                         .username(rs.getString("username"))
                         .isBanned(rs.getBoolean("isBanned"))
@@ -236,7 +236,7 @@ public class PoleMessengerUtil {
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 PoleUser user = PoleUser.builder()
-                        .id(rs.getInt("userid"))
+                        .id(rs.getLong("userid"))
                         .name(rs.getString("u.name"))
                         .username(rs.getString("username"))
                         .build();
@@ -274,7 +274,7 @@ public class PoleMessengerUtil {
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 PoleUser user = PoleUser.builder()
-                        .id(rs.getInt("userid"))
+                        .id(rs.getLong("userid"))
                         .name(rs.getString("u.name"))
                         .username(rs.getString("username"))
                         .groupname(rs.getString("g.name"))
