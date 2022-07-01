@@ -81,7 +81,7 @@ public class PoleModule implements ZinciteModule {
             bot.sendMessage(chat.getId(), "No se vale hacer poles por privado loko");
             return true;
         }
-        if (bot.getChatMembersCount(chat.getId()) < 3) {
+        if (bot.getChatMemberCount(chat.getId()) < 3) {
             bot.sendMessage(chat.getId(), "Este grupo no tiene el mínimo de usuarios para hacer poles " + EmojiManager.getForAlias("sweat_smile").getUnicode());
             return true;
         }
