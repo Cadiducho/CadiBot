@@ -26,10 +26,10 @@ public class BanUserListener implements CallbackListener {
     @ListenTo("askBanUser")
     public void askBanUser(CallbackQuery callbackQuery) throws TelegramException {
         String[] callbackData = callbackQuery.getData().split("#");
-        Integer userid = Integer.parseInt(callbackData[1]);
-        Long groupid = Long.parseLong(callbackData[2]);
-        String[] nombreUsuario = module.getUsername(userid);
-        Optional<String> nombreGrupo = module.getGroupName(groupid);
+        Long userId = Long.parseLong(callbackData[1]);
+        Long groupId = Long.parseLong(callbackData[2]);
+        String[] nombreUsuario = module.getUsername(userId);
+        Optional<String> nombreGrupo = module.getGroupName(groupId);
         if (nombreGrupo.isEmpty()) {
             return;
         }
@@ -52,7 +52,7 @@ public class BanUserListener implements CallbackListener {
     @ListenTo("executeBanUser")
     public void executeBanUser(CallbackQuery callbackQuery) throws TelegramException {
         String[] callbackData = callbackQuery.getData().split("#");
-        Integer userid = Integer.parseInt(callbackData[1]);
+        Long userid = Long.parseLong(callbackData[1]);
         Long groupid = Long.parseLong(callbackData[2]);
         String[] nombreUsuario = module.getUsername(userid);
         Optional<String> nombreGrupo = module.getGroupName(groupid);

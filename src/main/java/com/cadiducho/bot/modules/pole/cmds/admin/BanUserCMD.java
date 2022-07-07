@@ -20,7 +20,7 @@ import java.util.Optional;
         aliases = "/banuser",
         hidden = true,
         arguments = {
-                @Argument(name = "usuario", type = Integer.class, description = "ID del usuario"),
+                @Argument(name = "usuario", type = Long.class, description = "ID del usuario"),
                 @Argument(name = "grupo", type = Long.class, description = "ID del grupo donde cometió la falta"),
                 @Argument(name = "razon", type = String.class, description = "La razón")
         })
@@ -35,7 +35,7 @@ public class BanUserCMD implements BotCommand {
             return;
         }
         try {
-            Optional<Integer> usuario = context.get("usuario");
+            Optional<Long> usuario = context.get("usuario");
             Optional<Long> grupo = context.get("grupo");
             Optional<String> razon = context.getLastArguments();
             if (usuario.isEmpty()) {

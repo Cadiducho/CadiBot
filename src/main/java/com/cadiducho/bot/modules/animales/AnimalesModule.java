@@ -2,6 +2,7 @@ package com.cadiducho.bot.modules.animales;
 
 import com.cadiducho.bot.modules.animales.cmds.CatCMD;
 import com.cadiducho.bot.modules.animales.cmds.DuckCMD;
+import com.cadiducho.bot.modules.animales.cmds.GuauCMD;
 import com.cadiducho.zincite.ZinciteBot;
 import com.cadiducho.zincite.api.command.CommandManager;
 import com.cadiducho.zincite.api.module.ModuleInfo;
@@ -16,5 +17,6 @@ public class AnimalesModule implements ZinciteModule {
 
         commandManager.register(new CatCMD());
         commandManager.register(new DuckCMD());
+        commandManager.register(new GuauCMD());
     }
 }

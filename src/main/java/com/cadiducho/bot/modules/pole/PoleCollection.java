@@ -12,21 +12,41 @@ import java.util.Optional;
 @ToString
 public class PoleCollection {
 
-    private Integer first, second, third;
+    /**
+     * IDs del usuario primero, segundo y tercero
+     */
+    private Long first, second, third;
 
-    public Optional<Integer> getFirst() {
+    /**
+     * ID del primero en la colección de poles
+     * @return ID de la primera posición, o un opcional vacío
+     */
+    public Optional<Long> getFirst() {
         return Optional.ofNullable(first);
     }
 
-    public Optional<Integer> getSecond() {
+    /**
+     * ID del segundo en la colección de poles
+     * @return ID de la segunda posición, o un opcional vacío
+     */
+    public Optional<Long> getSecond() {
         return Optional.ofNullable(second);
     }
 
-    public Optional<Integer> getThird() {
+    /**
+     * ID del tercero en la colección de poles
+     * @return ID de la tercera posición, o un opcional vacío
+     */
+    public Optional<Long> getThird() {
         return Optional.ofNullable(third);
     }
 
-    public boolean contains(Integer userId) {
+    /**
+     * Comprobar si la colección de poles contiene a un usuario concreto
+     * @param userId La id del usuario a comprobar
+     * @return Verdadero si la colección contiene a ese usuario
+     */
+    public boolean contains(Long userId) {
         return (Objects.equals(userId, first) || Objects.equals(userId, second) || Objects.equals(userId, third));
     }
 }

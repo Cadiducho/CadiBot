@@ -37,7 +37,7 @@ public class PoleMessengerUtil {
     public static String showPoleRank(Chat chat, int limit, LocalDate atDay, boolean showToday) throws SQLException {
         StringBuilder body = new StringBuilder();
         if (showToday) {
-            Map<Integer, PoleUser> poles = getPolesOfDay(atDay, Long.parseLong(chat.getId()));
+            Map<Integer, PoleUser> poles = getPolesOfDay(atDay, chat.getId());
             if (poles.isEmpty()) {
                 if (atDay.isEqual(LocalDate.now())) {
                     body.append("Nadie ha hecho hoy la pole :(");
@@ -71,13 +71,13 @@ public class PoleMessengerUtil {
 
         body.append("\n\n").append(chart.getUnicode()).append("Ranking: \n");
 
-        Map<PoleUser, Integer> topPoles = getTopPoles(Long.parseLong(chat.getId()), atDay, 1, limit);
+        Map<PoleUser, Integer> topPoles = getTopPoles(chat.getId(), atDay, 1, limit);
         parseTopToStringBuilder(gold.getUnicode() + " Poles " + gold.getUnicode(), body, topPoles);
 
-        Map<PoleUser, Integer> topSubpoles = getTopPoles(Long.parseLong(chat.getId()), atDay, 2, limit);
+        Map<PoleUser, Integer> topSubpoles = getTopPoles(chat.getId(), atDay, 2, limit);
         parseTopToStringBuilder(silver.getUnicode() + " Subpoles " + silver.getUnicode(), body, topSubpoles);
 
-        Map<PoleUser, Integer> topBronces = getTopPoles(Long.parseLong(chat.getId()), atDay, 3, limit);
+        Map<PoleUser, Integer> topBronces = getTopPoles(chat.getId(), atDay, 3, limit);
         parseTopToStringBuilder(bronze.getUnicode() + " Bronces " + bronze.getUnicode(), body, topBronces);
 
         return body.toString();
@@ -162,7 +162,7 @@ public class PoleMessengerUtil {
 
             while (rs.next()) {
                 PoleUser user = PoleUser.builder()
-                        .id(rs.getInt("userid"))
+                        .id(rs.getLong("userid"))
                         .name(rs.getString("name"))
                         .username(rs.getString("username"))
                         .build();
@@ -197,7 +197,7 @@ public class PoleMessengerUtil {
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 PoleUser user = PoleUser.builder()
-                        .id(rs.getInt("userid"))
+                        .id(rs.getLong("userid"))
                         .name(rs.getString("name"))
                         .username(rs.getString("username"))
                         .isBanned(rs.getBoolean("isBanned"))
@@ -236,7 +236,7 @@ public class PoleMessengerUtil {
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 PoleUser user = PoleUser.builder()
-                        .id(rs.getInt("userid"))
+                        .id(rs.getLong("userid"))
                         .name(rs.getString("u.name"))
                         .username(rs.getString("username"))
                         .build();
@@ -274,7 +274,7 @@ public class PoleMessengerUtil {
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 PoleUser user = PoleUser.builder()
-                        .id(rs.getInt("userid"))
+                        .id(rs.getLong("userid"))
                         .name(rs.getString("u.name"))
                         .username(rs.getString("username"))
                         .groupname(rs.getString("g.name"))

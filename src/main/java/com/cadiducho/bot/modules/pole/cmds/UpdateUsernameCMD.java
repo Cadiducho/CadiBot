@@ -19,7 +19,7 @@ public class UpdateUsernameCMD implements BotCommand {
 
     @Override
     public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
-        boolean updated = cadiBotServer.getDatabase().updateUsername(from.getId(), Long.parseLong(chat.getId()));
+        boolean updated = cadiBotServer.getDatabase().updateUsername(from.getId(), chat.getId());
         if (chat.isGroupChat()) {
             cadiBotServer.getDatabase().updateGroup(chat.getId(), chat.getTitle(), false);
         }

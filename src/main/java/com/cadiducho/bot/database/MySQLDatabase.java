@@ -74,7 +74,7 @@ public class MySQLDatabase {
      * @param groupchat La id del chat
      * @return true si se ha actualizado correctamente
      */
-    public boolean updateUsername(int userid, Long groupchat) {
+    public boolean updateUsername(Long userid, Long groupchat) {
         Optional<User> user = Optional.empty();
         boolean actualizado = false;
         try {
@@ -87,7 +87,7 @@ public class MySQLDatabase {
             try (Connection connection = getConnection()) {
                 PreparedStatement update_user_name = connection.prepareStatement("INSERT INTO `" + TABLE_USERS + "` (`userid`, `name`, `username`, `lang`) VALUES(?, ?, ?, ?) " +
                         "ON DUPLICATE KEY UPDATE `name`=?, `username`=?, `lang`=?");
-                update_user_name.setInt(1, user.get().getId());
+                update_user_name.setLong(1, user.get().getId());
                 update_user_name.setString(2, currentname);
                 update_user_name.setString(3, user.get().getUsername());
                 update_user_name.setString(4, user.get().getLanguageCode());

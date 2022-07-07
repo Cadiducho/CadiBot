@@ -21,7 +21,7 @@ import java.util.Optional;
         hidden = true,
         description = "Analiza el comportamiento de un usuario",
         arguments = {
-            @Argument(name = "usuario", type = Integer.class, description = "ID del usuario"),
+            @Argument(name = "usuario", type = Long.class, description = "ID del usuario"),
             @Argument(name = "grupo", type = Long.class, description = "ID del grupo donde analizar"),
 })
 public class AnalyzeUserCMD implements BotCommand {
@@ -35,7 +35,7 @@ public class AnalyzeUserCMD implements BotCommand {
             return;
         }
         try {
-            Optional<Integer> usuario = context.get("usuario");
+            Optional<Long> usuario = context.get("usuario");
             Optional<Long> grupo = context.get("grupo");
             if (usuario.isEmpty() || grupo.isEmpty()) {
                 getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, messageId, null);
