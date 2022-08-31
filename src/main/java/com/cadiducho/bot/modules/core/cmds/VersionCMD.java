@@ -21,6 +21,6 @@ public class VersionCMD implements BotCommand {
                 "Se está ejecutando la versión _" + CadiBotServer.VERSION + "_\n" +
                 "Información y novedades: @Cadibotnews";
 
-        getBot().sendMessage(chat.getId(), aboutme, ParseMode.MARKDOWN, null, false, messageId, null);
+        getBot().sendMessage(chat.getId(), aboutme, ParseMode.MARKDOWN, null, false, null, messageId, null);
     }
 }

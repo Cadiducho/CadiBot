@@ -21,7 +21,7 @@ public class IntentarCMD implements BotCommand {
     public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         Optional<String> accion = context.getLastArguments();
         if (accion.isEmpty()) {
-            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, null, null, messageId, null);
             return;
         }
         String tried = "intenta";

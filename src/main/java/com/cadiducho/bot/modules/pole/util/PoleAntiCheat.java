@@ -84,7 +84,7 @@ public class PoleAntiCheat {
                     banear.setCallbackData("askBanUser#" + userId + "#" + groupId);
                     inlineKeyboard.setInlineKeyboard(Collections.singletonList(Collections.singletonList(banear)));
 
-                    bot.sendMessage(ownerId, sb.toString(),  ParseMode.HTML, null, null, null, inlineKeyboard);
+                    bot.sendMessage(ownerId, sb.toString(),  ParseMode.HTML, null, null, null, null, inlineKeyboard);
                     return true;
                 } catch (TelegramException e) {
                     e.printStackTrace();

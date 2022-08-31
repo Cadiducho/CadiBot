@@ -40,15 +40,15 @@ public class PoleListCMD implements BotCommand, CallbackListener {
                 atDate = diaDeseado.get();
             }
         } catch (CommandParseException ex) {
-            getBot().sendMessage(chat.getId(), "No he entendido esa fecha. Aquí tienes las poles a día de hoy", null, null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), "No he entendido esa fecha. Aquí tienes las poles a día de hoy", null, null,false, null, messageId, null);
         }
         try {
             final String body = PoleMessengerUtil.showPoleRank(chat,5, atDate, true);
             final InlineKeyboardMarkup inlineKeyboard = InlineKeyboardUtil.getMostrarTops(atDate);
 
-            getBot().sendMessage(chat.getId(), body,  ParseMode.HTML, null, null, null, inlineKeyboard);
+            getBot().sendMessage(chat.getId(), body,  ParseMode.HTML, null, null, null, null, inlineKeyboard);
         } catch (SQLException ex) {
-            getBot().sendMessage(chat.getId(), "No se ha podido conectar a la base de datos: ```" + ex.getMessage() + "```",  ParseMode.MARKDOWN, null, null, null, null);
+            getBot().sendMessage(chat.getId(), "No se ha podido conectar a la base de datos: ```" + ex.getMessage() + "```",  ParseMode.MARKDOWN, null, null, null, null, null);
             log.warning("Error generando respuesta para /polelist");
             log.warning(ex.getMessage());
         }

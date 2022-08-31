@@ -37,6 +37,6 @@ public class InsultosAbstractCMD implements BotCommand {
         Random rand = new Random(instant.getNano());
         String reply = EmojiParser.parseToUnicode(replies.get(rand.nextInt(replies.size())));
 
-        getBot().sendMessage(chat.getId(), reply, null, null, false, messageId, null);
+        getBot().sendMessage(chat.getId(), reply, null, null, false, null, messageId, null);
     }
 }

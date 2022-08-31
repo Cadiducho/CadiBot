@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.cadiducho'
-version = '3.2.1'
+version = '3.3'
 sourceCompatibility = JavaVersion.VERSION_17;
 mainClassName = 'com.cadiducho.bot.CadiBotServer'
 
@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'com.cadiducho', name: 'Zincite', version: '1.4.3'
+    implementation group: 'com.cadiducho', name: 'Zincite', version: '1.5'
     implementation group: 'com.cadiducho', name: 'Zincite-JsonModule', version: '1.4'
     implementation group: 'com.cadiducho', name: 'Zincite-MessageIDModule', version: '1.2'
 
