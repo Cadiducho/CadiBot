@@ -24,9 +24,9 @@ public class UpdateUsernameCMD implements BotCommand {
             cadiBotServer.getDatabase().updateGroup(chat.getId(), chat.getTitle(), false);
         }
         if (updated) {
-            getBot().sendMessage(chat.getId(), "Tu información ha sido actualizada/registrada", null, null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), "Tu información ha sido actualizada/registrada", null, null,false, null, messageId, null);
         } else {
-            getBot().sendMessage(chat.getId(), "No he podido actualizar tu información", null, null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), "No he podido actualizar tu información", null, null,false, null, messageId, null);
         }
     }
 }

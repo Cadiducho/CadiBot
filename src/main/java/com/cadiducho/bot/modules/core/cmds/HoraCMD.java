@@ -17,6 +17,6 @@ public class HoraCMD implements BotCommand {
     
     @Override
     public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
-        getBot().sendMessage(chat.getId(), DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withZone(ZoneId.systemDefault()).format(instant), null, null, false, messageId, null);
+        getBot().sendMessage(chat.getId(), DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withZone(ZoneId.systemDefault()).format(instant), null, null, null, null, messageId, null);
     }
 }

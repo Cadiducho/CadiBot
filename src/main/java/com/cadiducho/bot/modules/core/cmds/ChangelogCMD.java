@@ -37,7 +37,7 @@ public class ChangelogCMD implements BotCommand {
                 }
             }
         } catch (CommandParseException ex) {
-            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, null, messageId, null);
             return;
         }
         List<String> cambios = getChangelog(limit);

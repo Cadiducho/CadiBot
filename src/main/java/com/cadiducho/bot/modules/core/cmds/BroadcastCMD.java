@@ -23,13 +23,13 @@ public class BroadcastCMD implements BotCommand {
     @Override
     public void execute(final Chat chat, final User from, final CommandContext context, final Integer messageId, final Message replyingTo, Instant instant) throws TelegramException {
         if (!from.getUsername().equalsIgnoreCase("cadiducho")) {
-            getBot().sendMessage(chat.getId(), "No tienes permiso para usar este comando", null, null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), "No tienes permiso para usar este comando", null, null, false, null, messageId, null);
             return;
         }
         try {
             Optional<String> mensaje = context.get("mensaje");
             if (!mensaje.isPresent()) {
-                getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(), ParseMode.HTML, null, false, messageId, null);
+                getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(), ParseMode.HTML, null, false, null, messageId, null);
                 return;
             }
             cadiBotServer.getDatabase().getGroupsIds().forEach(id -> {
@@ -41,7 +41,7 @@ public class BroadcastCMD implements BotCommand {
                 }
             });
         } catch (CommandParseException ex) {
-            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, null, messageId, null);
         }
     }
 }

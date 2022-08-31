@@ -37,7 +37,7 @@ public class PoleCMD implements BotCommand {
 
         PoleAntiCheat antiCheat = module.getPoleAntiCheat();
         if (antiCheat.isUserBanned(from.getId())) {
-            getBot().sendMessage(chat.getId(), "Has sido baneado y no tienes permitido realizar poles", null, null, true, messageId, null);
+            getBot().sendMessage(chat.getId(), "Has sido baneado y no tienes permitido realizar poles", null, null, true, null, messageId, null);
             return;
         }
         if (antiCheat.isFlooding(from.getId(), chat.getId())) {
@@ -71,26 +71,26 @@ public class PoleCMD implements BotCommand {
             save(manager, cachedGroup, today, polesHoy);
             saveToDatabase(manager, cachedGroup, polesHoy, 1);
             checkSuspiciousBehaviour(antiCheat, chat.getId(), from.getId());
-            getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b>!!!",  ParseMode.HTML, null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b>!!!",  ParseMode.HTML, null,false, null, messageId, null);
             log.info("Pole otorgado a " + from.getId() + " en " + chat.getId());
         } else if (!poles.get().contains(from.getId())) {
             if (!poles.get().getFirst().isPresent() && !poles.get().getSecond().isPresent() && !poles.get().getThird().isPresent()) { //fixbug a si el objeto PolleCollection existe en memoria pero realmente no se han realizado poles
                 poles.get().setFirst(from.getId());
                 save(manager, cachedGroup, today, poles.get());
                 saveToDatabase(manager, cachedGroup, poles.get(), 1);
-                getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b><i>*</i>!!!",  ParseMode.HTML, null, false, messageId, null);
+                getBot().sendMessage(chat.getId(), base + " ha hecho la <b>pole</b><i>*</i>!!!",  ParseMode.HTML, null,false, null, messageId, null);
                 log.info("Pole (fixbug) otorgado a " + from.getId() + " en " + chat.getId());
             } else if (!poles.get().getSecond().isPresent()) { // si hay lista y el segundo no está presente, es plata
                 poles.get().setSecond(from.getId());
                 save(manager, cachedGroup, today, poles.get());
                 saveToDatabase(manager, cachedGroup, poles.get(), 2);
-                getBot().sendMessage(chat.getId(), base + " ha hecho la <b>subpole</b>, meh",  ParseMode.HTML, null, false, messageId, null);
+                getBot().sendMessage(chat.getId(), base + " ha hecho la <b>subpole</b>, meh",  ParseMode.HTML, null,false, null, messageId, null);
                 log.info("Plata otorgado a " + from.getId() + " en " + chat.getId());
             } else if (!poles.get().getThird().isPresent()) { // si hay lista y el tercero no está presente, es plata
                 poles.get().setThird(from.getId());
                 save(manager, cachedGroup, today, poles.get());
                 saveToDatabase(manager, cachedGroup, poles.get(), 3);
-                getBot().sendMessage(chat.getId(), base + " ha hecho la <b>bronce</b> (cual perdedor)",  ParseMode.HTML, null, false, messageId, null);
+                getBot().sendMessage(chat.getId(), base + " ha hecho la <b>bronce</b> (cual perdedor)",  ParseMode.HTML, null,false, null, messageId, null);
                 log.info("Bronce otorgado a " + from.getId() + " en " + chat.getId());
             }
         }

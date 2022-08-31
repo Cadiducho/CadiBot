@@ -31,14 +31,14 @@ public class AnalyzeUserCMD implements BotCommand {
     @Override
     public void execute(Chat chat, User from, CommandContext context, Integer messageId, Message replyingTo, Instant instant) throws TelegramException {
         if (!from.getUsername().equalsIgnoreCase("cadiducho")) {
-            getBot().sendMessage(chat.getId(), "No tienes permiso para usar este comando", null, null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), "No tienes permiso para usar este comando", null, null, false, null, messageId, null);
             return;
         }
         try {
             Optional<Long> usuario = context.get("usuario");
             Optional<Long> grupo = context.get("grupo");
             if (usuario.isEmpty() || grupo.isEmpty()) {
-                getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, messageId, null);
+                getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null,false, null, messageId, null);
                 return;
             }
 
@@ -48,7 +48,7 @@ public class AnalyzeUserCMD implements BotCommand {
                 getBot().sendMessage(chat.getId(), "El usuario con id " + usuario.get() + " no es sospechoso de usar cheats en " + grupo.get());
             }
         } catch (CommandParseException ex) {
-            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null,false, null, messageId, null);
         }
     }
 }

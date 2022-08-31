@@ -31,7 +31,7 @@ public class BanUserCMD implements BotCommand {
     @Override
     public void execute(Chat chat, User from, CommandContext context, Integer messageId, Message replyingTo, Instant instant) throws TelegramException {
         if (!from.getUsername().equalsIgnoreCase("cadiducho")) {
-            getBot().sendMessage(chat.getId(), "No tienes permiso para usar este comando", null, null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), "No tienes permiso para usar este comando", null, null,false, null, messageId, null);
             return;
         }
         try {
@@ -39,7 +39,7 @@ public class BanUserCMD implements BotCommand {
             Optional<Long> grupo = context.get("grupo");
             Optional<String> razon = context.getLastArguments();
             if (usuario.isEmpty()) {
-                getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, messageId, null);
+                getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null,false, null, messageId, null);
                 return;
             }
 
@@ -66,7 +66,7 @@ public class BanUserCMD implements BotCommand {
             antiCheat.banUser(usuario.get(), grupo.orElse(null), fMessage);
             getBot().sendMessage(from.getId(), fMessage);
         } catch (CommandParseException ex) {
-            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null,false, null, messageId, null);
         }
     }
 }

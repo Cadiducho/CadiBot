@@ -46,7 +46,7 @@ public class CatCMD implements BotCommand {
             Optional<String> code = context.get("code");
             if (code.isPresent()) {
                 String catFile = catHttp + code.get();
-                getBot().sendPhoto(chat.getId(), catFile, null, false, null, null);
+                getBot().sendPhoto(chat.getId(), catFile, null, false, null, null, null);
                 return;
             }
         } catch (CommandParseException e) {

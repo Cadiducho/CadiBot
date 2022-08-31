@@ -37,14 +37,14 @@ public class MigrateGroupCMD implements BotCommand, CallbackListener {
     @Override
     public void execute(Chat chat, User from, CommandContext context, Integer messageId, Message replyingTo, Instant instant) throws TelegramException {
         if (!from.getUsername().equalsIgnoreCase("cadiducho")) {
-            getBot().sendMessage(chat.getId(), "No tienes permiso para usar este comando", null, null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), "No tienes permiso para usar este comando", null, null,false, null, messageId, null);
             return;
         }
         try {
             Optional<Long> viejoGrupo = context.get("viejoGrupo");
             Optional<Long> nuevoGrupo = context.get("nuevoGrupo");
             if (viejoGrupo.isEmpty() || nuevoGrupo.isEmpty()) {
-                getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, messageId, null);
+                getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null,false, null, messageId, null);
                 return;
             }
 
@@ -69,9 +69,9 @@ public class MigrateGroupCMD implements BotCommand, CallbackListener {
                     + "<b>" + nombreViejoGrupo.get() + "</b>[<i>" + viejoGrupo.get() + "</i>] "
                     + "al nuevo <b>" + nombreNuevoGrupo.get() + "</b>[<i>" + nuevoGrupo.get() + "</i>]?\n"
                     + "Esto alterará todas las poles de esos dos grupos.";
-            getBot().sendMessage(chat.getId(), body,  ParseMode.HTML, null, null, null, inlineKeyboard);
+            getBot().sendMessage(chat.getId(), body,  ParseMode.HTML, null, null, null, null, inlineKeyboard);
         } catch (CommandParseException ex) {
-            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null, false, messageId, null);
+            getBot().sendMessage(chat.getId(), "<b>Usa:</b> " + this.getUsage(),  ParseMode.HTML, null,false, null, messageId, null);
         }
     }
 
@@ -94,12 +94,12 @@ public class MigrateGroupCMD implements BotCommand, CallbackListener {
 
         body = "Se han migrado " + updated + " registros de poles desde el grupo <b>" + nombreViejoGrupo.get() + "</b>[<i>" + newId + "</i>] a este";
         cadiBotServer.getCadibot().getTelegramBot().sendMessage(oldId, body,
-                 ParseMode.HTML, false, false, null, null);
+                 ParseMode.HTML, false, false, null, null, null);
 
         try {
             body = "Las poles que habían en este grupo han sido migradas a  <b>" + nombreNuevoGrupo.get() + "</b>[<i>" + oldId + "</i>]";
             cadiBotServer.getCadibot().getTelegramBot().sendMessage(newId, body,
-                 ParseMode.HTML, false, false, null, null);
+                 ParseMode.HTML, false, false, null, null, null);
         } catch (TelegramException ex) {
             log.info("Disabling group " + oldId);
             cadiBotServer.getDatabase().disableGroup(oldId);
