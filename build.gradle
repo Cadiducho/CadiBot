@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.cadiducho'
-version = '3.3'
+version = '3.4'
 sourceCompatibility = JavaVersion.VERSION_17;
 mainClassName = 'com.cadiducho.bot.CadiBotServer'
 
@@ -13,7 +13,7 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven {
-        url "https://cadiducho.com/repo/"
+        url "https://repo.cadiducho.com/releases/"
     }
 }
 
