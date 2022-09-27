@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.flywaydb.core.Flyway;
 
 import java.sql.Connection;
 
@@ -39,6 +40,9 @@ public class HikariConnectionManager {
         config.addDataSourceProperty("useUnicode", "true");
 
         dataSource = new HikariDataSource(config);
+
+        final Flyway flyway = Flyway.configure().dataSource(dataSource).load();
+        flyway.migrate();
     }
 
     /**
