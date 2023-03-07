@@ -6,6 +6,7 @@ import com.cadiducho.bot.modules.core.CoreModule;
 import com.cadiducho.bot.modules.desmotivaciones.DesmotivacionesModule;
 import com.cadiducho.bot.modules.insultos.InsultosModule;
 import com.cadiducho.bot.modules.pole.PoleModule;
+import com.cadiducho.bot.modules.treintaytres.TreintaYTres;
 import com.cadiducho.zincite.ZinciteBot;
 import com.cadiducho.zincite.modules.json.JsonModule;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import lombok.extern.java.Log;
 import org.apache.commons.cli.*;
 
 import java.sql.SQLException;
+import java.time.temporal.Temporal;
 
 @Log
 public class CadiBotServer {
@@ -106,6 +108,7 @@ public class CadiBotServer {
         cadibot.getModuleManager().registerModule(new InsultosModule());
         cadibot.getModuleManager().registerModule(new AnimalesModule());
         cadibot.getModuleManager().registerModule(new DesmotivacionesModule());
+        cadibot.getModuleManager().registerModule(new TreintaYTres());
 
         cadibot.startServer();
     }
