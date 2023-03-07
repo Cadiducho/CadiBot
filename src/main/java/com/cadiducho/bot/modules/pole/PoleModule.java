@@ -2,6 +2,7 @@ package com.cadiducho.bot.modules.pole;
 
 import com.cadiducho.bot.CadiBotServer;
 import com.cadiducho.bot.modules.pole.cmds.PoleCMD;
+import com.cadiducho.bot.modules.pole.cmds.PoleFailCMD;
 import com.cadiducho.bot.modules.pole.cmds.PoleListCMD;
 import com.cadiducho.bot.modules.pole.cmds.UpdateUsernameCMD;
 import com.cadiducho.bot.modules.pole.cmds.admin.AnalyzeUserCMD;
@@ -48,6 +49,7 @@ public class PoleModule implements ZinciteModule {
 
         CommandManager commandManager = ZinciteBot.getInstance().getCommandManager();
         commandManager.register(new PoleCMD());
+        commandManager.register(new PoleFailCMD());
         commandManager.register(new PoleListCMD());
         commandManager.register(new UpdateUsernameCMD());
         commandManager.register(new MigrateGroupCMD());

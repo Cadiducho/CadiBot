@@ -13,7 +13,7 @@ public class InsultosModule implements ZinciteModule {
 
     private final List<String> insultos = Arrays.asList("tus muertos", "cuerpoescombro", "canica", "anormal", "retrasado", "parguelas", "jueputa",
             "malparido", "gonorrea", "cabezabuque", "gilipollas", "cabezón", "cabezon", "subnormal", "joputa", "me cago en tus ancestros", "desgraciado",
-            "desgraciao", "tonto", "mortadelo", "lonchas", "lammer", "cabezahuevo");
+            "desgraciao", "tonto", "mortadelo", "lonchas", "lammer", "cabezahuevo", "bellaco", "merluzo", "besugo", "cantamañanas", "pintamonas", "tuercebotas");
 
     @Override
     public void onLoad() {

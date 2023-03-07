@@ -1,6 +1,7 @@
 package com.cadiducho.bot.modules.pole.util;
 
 import com.cadiducho.bot.CadiBotServer;
+import com.cadiducho.bot.modules.pole.PoleType;
 import com.cadiducho.bot.modules.pole.PoleUser;
 import com.cadiducho.telegrambotapi.Chat;
 import com.vdurmont.emoji.Emoji;
@@ -30,13 +31,14 @@ public class PoleMessengerUtil {
      * @param chat El chat
      * @param limit Limite del ranking total que quieras
      * @param atDay El día en el que estás observando el ranking
+     * @param endInterval Si existe, la fecha en la que termina el intervalo que mostrar. Comienza en atDay
      * @param showToday Si mostrar las poles de hoy o no
      * @return String con el ranking
      * @throws SQLException Si falla la base de datos
      */
-    public static String showPoleRank(Chat chat, int limit, LocalDate atDay, boolean showToday) throws SQLException {
+    public static String showPoleRank(Chat chat, int limit, LocalDate atDay, LocalDate endInterval, boolean showToday) throws SQLException {
         StringBuilder body = new StringBuilder();
-        if (showToday) {
+        if (showToday && endInterval == null) {
             Map<Integer, PoleUser> poles = getPolesOfDay(atDay, chat.getId());
             if (poles.isEmpty()) {
                 if (atDay.isEqual(LocalDate.now())) {
@@ -52,32 +54,29 @@ public class PoleMessengerUtil {
                     final Emoji trophy = EmojiManager.getForAlias("trophy");
                     final Emoji medal = EmojiManager.getForAlias("sports_medal");
                     final Emoji dis = EmojiManager.getForAlias("disappointed_relieved");
-                    String puesto;
-                    switch (entry.getKey()) {
-                        case 1:
-                            puesto = trophy.getUnicode() + "<b>Pole</b>";
-                            break;
-                        case 2:
-                            puesto = medal.getUnicode() + "<b>Subpole</b>";
-                            break;
-                        default:
-                            puesto = dis.getUnicode() + "<b>Bronce</b>";
-                            break;
-                    }
+                    String puesto = switch (entry.getKey()) {
+                        case 1 -> trophy.getUnicode() + "<b>Pole</b>";
+                        case 2 -> medal.getUnicode() + "<b>Subpole</b>";
+                        default -> dis.getUnicode() + "<b>Bronce</b>";
+                    };
                     body.append(puesto).append(": ").append(EmojiParser.parseToUnicode(pole_user_name)).append("\n");
                 }
             }
         }
 
-        body.append("\n\n").append(chart.getUnicode()).append("Ranking: \n");
+        if (endInterval != null) {
+            body.append("\n\n").append(chart.getUnicode()).append("Ranking en el intervalo desde ").append(atDay.format(formatter)).append(" hasta ").append(endInterval.format(formatter)).append("\n");
+        } else {
+            body.append("\n\n").append(chart.getUnicode()).append("Ranking: \n");
+        }
 
-        Map<PoleUser, Integer> topPoles = getTopPoles(chat.getId(), atDay, 1, limit);
+        Map<PoleUser, Integer> topPoles = getTopPoles(chat.getId(), atDay, endInterval, PoleType.WINNER, limit);
         parseTopToStringBuilder(gold.getUnicode() + " Poles " + gold.getUnicode(), body, topPoles);
 
-        Map<PoleUser, Integer> topSubpoles = getTopPoles(chat.getId(), atDay, 2, limit);
+        Map<PoleUser, Integer> topSubpoles = getTopPoles(chat.getId(), atDay, endInterval, PoleType.SUBPOLE, limit);
         parseTopToStringBuilder(silver.getUnicode() + " Subpoles " + silver.getUnicode(), body, topSubpoles);
 
-        Map<PoleUser, Integer> topBronces = getTopPoles(chat.getId(), atDay, 3, limit);
+        Map<PoleUser, Integer> topBronces = getTopPoles(chat.getId(), atDay, endInterval, PoleType.BRONZE, limit);
         parseTopToStringBuilder(bronze.getUnicode() + " Bronces " + bronze.getUnicode(), body, topBronces);
 
         return body.toString();
@@ -86,15 +85,19 @@ public class PoleMessengerUtil {
     /**
      * Mostrar ranking global individual
      * @param atDay Día para contar sólo las poles hasta ese momento
+     * @param endDate Fin del intervalo en el que contar las poles, si existe. Comienza en atDay
      * @param limit Limite del ranking
      * @return String con el ranking
      * @throws SQLException Si falla la base de datos
      */
-    public static String showGlobalRanking(LocalDate atDay, int limit) throws SQLException {
+    public static String showGlobalRanking(LocalDate atDay, LocalDate endDate, int limit) throws SQLException {
         StringBuilder body = new StringBuilder();
         body.append("<i>Este ranking cuenta todas las poles \nde todos los grupos</i>");
         body.append("\n\n").append(chart.getUnicode()).append("Ranking global individual");
-        if (!atDay.isEqual(LocalDate.now())) {
+        if (endDate != null) {
+            body.append(" desde el día <b>")
+                    .append(formatter.format(atDay)).append(" a ").append(formatter.format(endDate)).append("</b>");
+        } else if (!atDay.isEqual(LocalDate.now())) {
             body.append(" a día <b>")
                     .append(formatter.format(atDay)).append("</b>");
         }
@@ -115,15 +118,19 @@ public class PoleMessengerUtil {
     /**
      * Mostrar ranking global individual
      * @param atDay Día para contar sólo las poles hasta ese momento
+     * @param endDate Fin del intervalo en el que contar las poles, si existe. Comienza en atDay
      * @param limit Limite del ranking
      * @return String con el ranking
      * @throws SQLException Si falla la base de datos
      */
-    public static String showGroupalGlobalRanking(LocalDate atDay, int limit) throws SQLException {
+    public static String showGrupalGlobalRanking(LocalDate atDay, LocalDate endDate, int limit) throws SQLException {
         StringBuilder body = new StringBuilder();
         body.append("<i>Este ranking cuenta los mejores registros\nde poles por grupos</i>");
         body.append("\n\n").append(chart.getUnicode()).append("Ranking global de grupos");
-        if (!atDay.isEqual(LocalDate.now())) {
+        if (endDate != null) {
+            body.append(" desde el día <b>")
+                    .append(formatter.format(atDay)).append(" a ").append(formatter.format(endDate)).append("</b>");
+        } else if (!atDay.isEqual(LocalDate.now())) {
             body.append(" a día <b>")
             .append(formatter.format(atDay)).append("</b>");
         }
@@ -181,19 +188,40 @@ public class PoleMessengerUtil {
      * @param chatId El chat
      * @param type El tipo
      * @param atDay Día para contar sólo las poles hasta ese momento
+     * @param endInterval Si existe, la fecha en la que termina el intervalo que mostrar. Comienza en atDay
      * @return Map de usuario y cantidad de poles de dicho tipo realizado en dicho grupo
      * @throws SQLException Si falla la base de datos
      */
-    public static LinkedHashMap<PoleUser, Integer> getTopPoles(long chatId, LocalDate atDay, int type, int limit) throws SQLException {
+    public static LinkedHashMap<PoleUser, Integer> getTopPoles(long chatId, LocalDate atDay, LocalDate endInterval, PoleType type, int limit) throws SQLException {
         final LinkedHashMap<PoleUser, Integer> poles = new LinkedHashMap<>();
         try (Connection connection = CadiBotServer.getInstance().getDatabase().getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("" +
-                    "SELECT count(*) AS `totales`,`userid`,`name`,`username`,`isBanned` FROM cadibot_poles NATURAL JOIN cadibot_users " +
-                    "WHERE groupid=? AND `poleType`=? AND DATE(time)<=DATE(?) GROUP BY `userid` ORDER BY `totales` DESC LIMIT ?");
+            String query = """
+                    SELECT count(*) AS `totales`,`userid`,`name`,`username`,`isBanned`
+                    FROM cadibot_poles NATURAL JOIN cadibot_users
+                    WHERE groupid=? AND `poleType`=? AND DATE(time)<=DATE(?) 
+                    GROUP BY `userid` ORDER BY `totales` DESC LIMIT ?
+            """;
+            String intervalQuery = """
+                    SELECT count(*) AS `totales`,`userid`,`name`,`username`,`isBanned` 
+                    FROM cadibot_poles NATURAL JOIN cadibot_users
+                    WHERE groupid=? AND `poleType`=? AND DATE(time)>=DATE(?) AND DATE(time)<=DATE(?) 
+                    GROUP BY `userid` ORDER BY `totales` DESC LIMIT ?
+            """;
+
+            PreparedStatement statement = (endInterval == null) ? connection.prepareStatement(query) : connection.prepareStatement(intervalQuery);
+
             statement.setLong(1, chatId);
-            statement.setInt(2, type);
+            statement.setInt(2, type.getId());
             statement.setTimestamp(3, Timestamp.valueOf(atDay.atStartOfDay()));
-            statement.setInt(4, limit);
+            if (endInterval == null) {
+                statement.setTimestamp(3, Timestamp.valueOf(atDay.atStartOfDay()));
+                statement.setInt(4, limit);
+            } else {
+                statement.setTimestamp(3, Timestamp.valueOf(atDay.atStartOfDay()));
+                statement.setTimestamp(4, Timestamp.valueOf(endInterval.atStartOfDay()));
+                System.out.println( Timestamp.valueOf(endInterval.atStartOfDay()));
+                statement.setInt(5, limit);
+            }
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 PoleUser user = PoleUser.builder()

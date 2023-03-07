@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,10 +34,14 @@ public class InlineKeyboardUtil {
      * Generar botón para el top de poles global
      * @return InlineKeyboardButton
      */
-    private static InlineKeyboardButton rankingGlobal(String fecha) {
-        InlineKeyboardButton rankingGlobal = new InlineKeyboardButton();
-        rankingGlobal.setText("Top global");
-        rankingGlobal.setCallbackData(RANKING_GLOBAL + "#" + fecha);
+    private static InlineKeyboardButton rankingGlobal(String fecha, String finIntervalo) {
+        final InlineKeyboardButton rankingGlobal = new InlineKeyboardButton();
+        if (finIntervalo != null) {
+            rankingGlobal.setText("Top global (int.)");
+        } else {
+            rankingGlobal.setText("Top global");
+        }
+        rankingGlobal.setCallbackData(RANKING_GLOBAL + "#" + fecha + "#" + finIntervalo);
         return rankingGlobal;
     }
 
@@ -44,10 +49,14 @@ public class InlineKeyboardUtil {
      * Generar botón para el top de poles del grupo
      * @return InlineKeyboardButton
      */
-    private static InlineKeyboardButton topGrupo(String fecha) {
-        InlineKeyboardButton topGrupo = new InlineKeyboardButton();
-        topGrupo.setText("Top del grupo");
-        topGrupo.setCallbackData(TOP_GRUPO + "#" + fecha);
+    private static InlineKeyboardButton topGrupo(String fecha, String finIntervalo) {
+        final InlineKeyboardButton topGrupo = new InlineKeyboardButton();
+        if (finIntervalo != null) {
+            topGrupo.setText("Top del grupos (int.)");
+        } else {
+            topGrupo.setText("Top del grupos");
+        }
+        topGrupo.setCallbackData(TOP_GRUPO + "#" + fecha + "#" + finIntervalo);
         return topGrupo;
     }
 
@@ -55,10 +64,14 @@ public class InlineKeyboardUtil {
      * Generar botón para el top de poles global reunido por grupos
      * @return InlineKeyboardButton
      */
-    private static InlineKeyboardButton rankingPorGrupos(String fecha) {
-        InlineKeyboardButton rankingPorGrupos = new InlineKeyboardButton();
-        rankingPorGrupos.setText("Top por grupos");
-        rankingPorGrupos.setCallbackData(TOP_GLOBAL_GRUPAL + "#" + fecha);
+    private static InlineKeyboardButton rankingPorGrupos(String fecha, String finIntervalo) {
+        final InlineKeyboardButton rankingPorGrupos = new InlineKeyboardButton();
+        if (finIntervalo != null) {
+            rankingPorGrupos.setText("Top por grupos (int.)");
+        } else {
+            rankingPorGrupos.setText("Top por grupos");
+        }
+        rankingPorGrupos.setCallbackData(TOP_GLOBAL_GRUPAL + "#" + fecha + "#" + finIntervalo);
         return rankingPorGrupos;
     }
 
@@ -66,10 +79,14 @@ public class InlineKeyboardUtil {
      * Generar botón para el resumen diario
      * @return InlineKeyboardButton
      */
-    private static InlineKeyboardButton resumenDia(String fecha) {
+    private static InlineKeyboardButton resumenDia(String fecha, String finIntervalo) {
         InlineKeyboardButton resumenDia = new InlineKeyboardButton();
-        resumenDia.setText("Resumen del día");
-        resumenDia.setCallbackData(RESUMEN_GRUPO + "#" + fecha);
+        if (finIntervalo != null) {
+            resumenDia.setText("Resumen del día (int.)");
+        } else {
+            resumenDia.setText("Resumen del día");
+        }
+        resumenDia.setCallbackData(RESUMEN_GRUPO + "#" + fecha + "#" + finIntervalo);
         return resumenDia;
     }
 
@@ -83,7 +100,7 @@ public class InlineKeyboardUtil {
         InlineKeyboardButton resumenDia = new InlineKeyboardButton();
         fecha = fecha.minusDays(1);
         resumenDia.setText(flechaAnterior.getUnicode() + " " + otherDayFormatter.format(fecha));
-        resumenDia.setCallbackData(originalCallback + "#" + fecha.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        resumenDia.setCallbackData(originalCallback + "#" + fecha.format(DateTimeFormatter.ISO_LOCAL_DATE) + "#null");
         return resumenDia;
     }
 
@@ -99,7 +116,7 @@ public class InlineKeyboardUtil {
 
         InlineKeyboardButton resumenDia = new InlineKeyboardButton();
         resumenDia.setText(flechaSiguiente.getUnicode() + " " + otherDayFormatter.format(fecha));
-        resumenDia.setCallbackData(originalCallback + "#" + fecha.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        resumenDia.setCallbackData(originalCallback + "#" + fecha.format(DateTimeFormatter.ISO_LOCAL_DATE) + "#null");
         return resumenDia;
     }
 
@@ -114,29 +131,46 @@ public class InlineKeyboardUtil {
         InlineKeyboardButton resumenDia = new InlineKeyboardButton();
         LocalDate today = LocalDate.now();
         resumenDia.setText(diaActual.getUnicode() + " Hoy");
-        resumenDia.setCallbackData(originalCallback + "#" + today.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        resumenDia.setCallbackData(originalCallback + "#" + today.format(DateTimeFormatter.ISO_LOCAL_DATE) + "#null");
         return resumenDia;
+    }
+
+    /**
+     * Generar la fila inferior del teclado, solo mostrar si no es un intervalo (endDate es null)
+     * @param date Fecha donde se está viendo las poles
+     * @param endDate El fin del intervalo, si existe
+     * @param tipo El tipo de mensaje de callback que mandarán los botones
+     * @return Lista de botones para poner según el caso
+     */
+    private static List<InlineKeyboardButton> generarFilaInferior(LocalDate date, LocalDate endDate, String tipo) {
+        if (endDate != null) {
+            return List.of();
+        } else {
+            return Stream.of(
+                    diaAnterior(date, tipo),
+                    diaActual(date, tipo),
+                    diaSiguiente(date, tipo)
+            ).filter(Objects::nonNull).toList();
+        }
     }
 
     /**
      * Generar teclado para mostrar los tops
      * @return InlineKeyboardMarkup
      */
-    public static InlineKeyboardMarkup getMostrarTops(LocalDate date) {
+    public static InlineKeyboardMarkup getMostrarTops(LocalDate date, LocalDate endDate) {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-        String fecha = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        final String fecha = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        final String finIntervalo = (endDate != null) ? endDate.format(DateTimeFormatter.ISO_LOCAL_DATE) : null;
+
         inlineKeyboard.setInlineKeyboard(
                 Arrays.asList(
-                        Collections.singletonList(topGrupo(fecha)),
+                        Collections.singletonList(topGrupo(fecha, finIntervalo)),
                         Arrays.asList(
-                                rankingGlobal(fecha),
-                                rankingPorGrupos(fecha)
+                                rankingGlobal(fecha, finIntervalo),
+                                rankingPorGrupos(fecha, finIntervalo)
                         ),
-                        Stream.of(
-                                diaAnterior(date, RESUMEN_GRUPO),
-                                diaActual(date, RESUMEN_GRUPO),
-                                diaSiguiente(date, RESUMEN_GRUPO)
-                        ).filter(Objects::nonNull).collect(Collectors.toList())
+                        generarFilaInferior(date, endDate, RESUMEN_GRUPO)
                 )
         );
         return inlineKeyboard;
@@ -146,21 +180,18 @@ public class InlineKeyboardUtil {
      * Generar teclado para volver a mostrar el resumen diario o los tops globales
      * @return InlineKeyboardMarkup
      */
-    public static InlineKeyboardMarkup getMostrarResumen(LocalDate date) {
+    public static InlineKeyboardMarkup getMostrarResumen(LocalDate date, LocalDate endDate) {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-        String fecha =  date.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        final String fecha = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        final String finIntervalo = (endDate != null) ? endDate.format(DateTimeFormatter.ISO_LOCAL_DATE) : null;
         inlineKeyboard.setInlineKeyboard(
                 Arrays.asList(
-                        Collections.singletonList(resumenDia(fecha)),
+                        Collections.singletonList(resumenDia(fecha, finIntervalo)),
                         Arrays.asList(
-                                rankingGlobal(fecha),
-                                rankingPorGrupos(fecha)
+                                rankingGlobal(fecha, finIntervalo),
+                                rankingPorGrupos(fecha, finIntervalo)
                         ),
-                        Stream.of(
-                                diaAnterior(date, TOP_GRUPO),
-                                diaActual(date, TOP_GRUPO),
-                                diaSiguiente(date, TOP_GRUPO)
-                        ).filter(Objects::nonNull).collect(Collectors.toList())
+                        generarFilaInferior(date, endDate, TOP_GRUPO)
                 )
         );
         return inlineKeyboard;
@@ -170,21 +201,18 @@ public class InlineKeyboardUtil {
      * Generar teclado para mostrar los resumenes del grupo o el top global por grupos
      * @return InlineKeyboardMarkup
      */
-    public static InlineKeyboardMarkup getResumenesYTopGrupal(LocalDate date) {
+    public static InlineKeyboardMarkup getResumenesYTopGrupal(LocalDate date, LocalDate endDate) {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-        String fecha =  date.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        final String fecha = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        final String finIntervalo = (endDate != null) ? endDate.format(DateTimeFormatter.ISO_LOCAL_DATE) : null;
         inlineKeyboard.setInlineKeyboard(
                 Arrays.asList(
                         Arrays.asList(
-                                resumenDia(fecha),
-                                topGrupo(fecha)
+                                resumenDia(fecha, finIntervalo),
+                                topGrupo(fecha, finIntervalo)
                         ),
-                        Collections.singletonList(rankingPorGrupos(fecha)),
-                        Stream.of(
-                                diaAnterior(date, RANKING_GLOBAL),
-                                diaActual(date, RANKING_GLOBAL),
-                                diaSiguiente(date, RANKING_GLOBAL)
-                        ).filter(Objects::nonNull).collect(Collectors.toList())
+                        Collections.singletonList(rankingPorGrupos(fecha, finIntervalo)),
+                        generarFilaInferior(date, endDate, RANKING_GLOBAL)
                 )
         );
         return inlineKeyboard;
@@ -194,21 +222,18 @@ public class InlineKeyboardUtil {
      * Generar teclado para mostrar los resumenes del grupo o el top global
      * @return InlineKeyboardMarkup
      */
-    public static InlineKeyboardMarkup getResumenesYTopGlobal(LocalDate date) {
+    public static InlineKeyboardMarkup getResumenesYTopGlobal(LocalDate date, LocalDate endDate) {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-        String fecha =  date.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        final String fecha = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        final String finIntervalo = (endDate != null) ? endDate.format(DateTimeFormatter.ISO_LOCAL_DATE) : null;
         inlineKeyboard.setInlineKeyboard(
                 Arrays.asList(
                         Arrays.asList(
-                                resumenDia(fecha),
-                                topGrupo(fecha)
+                                resumenDia(fecha, finIntervalo),
+                                topGrupo(fecha, finIntervalo)
                         ),
-                        Collections.singletonList(rankingGlobal(fecha)),
-                        Stream.of(
-                                diaAnterior(date, TOP_GLOBAL_GRUPAL),
-                                diaActual(date, TOP_GLOBAL_GRUPAL),
-                                diaSiguiente(date, TOP_GLOBAL_GRUPAL)
-                        ).filter(Objects::nonNull).collect(Collectors.toList())
+                        Collections.singletonList(rankingGlobal(fecha, finIntervalo)),
+                        generarFilaInferior(date, endDate, TOP_GLOBAL_GRUPAL)
                 )
         );
         return inlineKeyboard;

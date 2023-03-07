@@ -6,6 +6,7 @@ import com.cadiducho.bot.modules.core.CoreModule;
 import com.cadiducho.bot.modules.desmotivaciones.DesmotivacionesModule;
 import com.cadiducho.bot.modules.insultos.InsultosModule;
 import com.cadiducho.bot.modules.pole.PoleModule;
+import com.cadiducho.bot.modules.treintaytres.TreintaYTres;
 import com.cadiducho.zincite.ZinciteBot;
 import com.cadiducho.zincite.modules.json.JsonModule;
 import lombok.Getter;
@@ -106,6 +107,7 @@ public class CadiBotServer {
         cadibot.getModuleManager().registerModule(new InsultosModule());
         cadibot.getModuleManager().registerModule(new AnimalesModule());
         cadibot.getModuleManager().registerModule(new DesmotivacionesModule());
+        cadibot.getModuleManager().registerModule(new TreintaYTres());
 
         cadibot.startServer();
     }
