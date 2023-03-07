@@ -14,7 +14,6 @@ import lombok.extern.java.Log;
 import org.apache.commons.cli.*;
 
 import java.sql.SQLException;
-import java.time.temporal.Temporal;
 
 @Log
 public class CadiBotServer {
