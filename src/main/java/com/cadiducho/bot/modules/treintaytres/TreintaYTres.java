@@ -27,7 +27,7 @@ public class TreintaYTres implements ZinciteModule {
     public void onPostCommand(Update update, boolean success) {
 
         if (update.getMessage().getText().contains("33")) {
-            Random rand = new Random(update.getMessage().getDate());
+            Random rand = new Random();
             String reply = EmojiParser.parseToUnicode(respuestas.get(rand.nextInt(respuestas.size())));
 
             try {
