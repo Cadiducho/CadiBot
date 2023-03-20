@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'com.cadiducho', name: 'Zincite', version: '1.6'
+    implementation group: 'com.cadiducho', name: 'Zincite', version: '1.7'
     implementation group: 'com.cadiducho', name: 'Zincite-JsonModule', version: '1.5'
     implementation group: 'com.cadiducho', name: 'Zincite-MessageIDModule', version: '1.5'
 
