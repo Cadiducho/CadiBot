@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     implementation group: 'com.cadiducho', name: 'Zincite', version: '1.7'
-    implementation group: 'com.cadiducho', name: 'Zincite-JsonModule', version: '1.5'
+    implementation group: 'com.cadiducho', name: 'Zincite-JsonModule', version: '1.7'
     implementation group: 'com.cadiducho', name: 'Zincite-MessageIDModule', version: '1.5'
 
     implementation group: 'com.vdurmont', name: 'emoji-java', version: '5.1.1'
