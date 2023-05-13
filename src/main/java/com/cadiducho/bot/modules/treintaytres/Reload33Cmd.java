@@ -26,8 +26,6 @@ public class Reload33Cmd implements BotCommand {
             } catch (IOException e) {
                 getBot().sendMessage(chat.getId(), "Error al recargar las frases:"+e.getMessage());
             }
-
-
         }
     }
 }

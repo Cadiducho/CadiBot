@@ -46,7 +46,7 @@ public class TreintaYTres implements ZinciteModule {
     public void onLoad() {
         log.info("Cargando módulo 33");
         CommandManager commandManager = ZinciteBot.getInstance().getCommandManager();
-
+        commandManager.register(new Reload33Cmd());
     }
 
 }
