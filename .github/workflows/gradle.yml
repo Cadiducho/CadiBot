@@ -1,10 +1,6 @@
 name: Java CI
 
 on:
-  push:
-    branches-ignore:
-      - master
-  pull_request:
   workflow_call:
     inputs:
       jdk_version:
