@@ -1,0 +1,10 @@
+name: Test PR
+
+on: [ pull_request ]
+
+jobs:
+  build:
+    name: Build
+    uses: Cadiducho/CadiBot/.github/workflows/gradle.yml@development
+    with:
+      jdk_version: 17
