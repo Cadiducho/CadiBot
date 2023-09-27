@@ -57,9 +57,12 @@ public class DesmotivacionesModule implements ZinciteModule {
         }
     }
 
-    public static String getAPost(){
-        if(postsBuffer.size() <= 1) getPosts();
-        return "http://img.desmotivaciones.es/" + postsBuffer.remove((int) (Math.random() * postsBuffer.size()));
+    public static String getAPost() {
+        if (postsBuffer.size() <= 1) getPosts();
+        int index = (int) (Math.random() * postsBuffer.size());
+        if (index == 0) return null;
+
+        return "http://img.desmotivaciones.es/" + postsBuffer.remove(index);
     }
 
 }
