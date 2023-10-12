@@ -52,9 +52,9 @@ public class InlineKeyboardUtil {
     private static InlineKeyboardButton topGrupo(String fecha, String finIntervalo) {
         final InlineKeyboardButton topGrupo = new InlineKeyboardButton();
         if (finIntervalo != null) {
-            topGrupo.setText("Top del grupos (int.)");
+            topGrupo.setText("Top del grupo (int.)");
         } else {
-            topGrupo.setText("Top del grupos");
+            topGrupo.setText("Top del grupo");
         }
         topGrupo.setCallbackData(TOP_GRUPO + "#" + fecha + "#" + finIntervalo);
         return topGrupo;
