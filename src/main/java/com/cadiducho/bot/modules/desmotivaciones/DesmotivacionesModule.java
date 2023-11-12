@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Queue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,7 +24,7 @@ import java.util.regex.Pattern;
 @ModuleInfo(name = "Desmotivaciones", description = "Carteles aleatorios de desmotivaciones.es")
 public class DesmotivacionesModule implements ZinciteModule {
 
-    private static List<String> postsBuffer = new ArrayList<>();
+    private static final Queue<String> postsBuffer = new LinkedBlockingDeque<>();
     private static final String desmotivacionesWeb = "http://desmotivaciones.es/aleatorio";
     private static final OkHttpClient httpClient = new OkHttpClient();
 
@@ -48,7 +51,7 @@ public class DesmotivacionesModule implements ZinciteModule {
                 carteles.add(image.group(1));
             }
 
-            postsBuffer = carteles;
+            postsBuffer.addAll(carteles);
 
         } catch (IOException | NullPointerException ex) {
             log.warning("Error procesando un cartel");
@@ -58,11 +61,15 @@ public class DesmotivacionesModule implements ZinciteModule {
     }
 
     public static String getAPost() {
-        if (postsBuffer.size() <= 1) getPosts();
-        int index = (int) (Math.random() * postsBuffer.size());
-        if (index == 0) return null;
-
-        return "http://img.desmotivaciones.es/" + postsBuffer.remove(index);
+        String id = postsBuffer.poll();
+        if (id == null) {
+            getPosts(); //Carga en el hilo principal, bloquea
+            id = postsBuffer.poll();
+        } else if (postsBuffer.size() < 5) {
+            Executors.newSingleThreadExecutor().submit(DesmotivacionesModule::getPosts); //Carga en segundo plano
+        }
+        if(id == null) log.warning("No se ha podido cargar carteles");
+        return "http://img.desmotivaciones.es/" + id;
     }
 
 }
