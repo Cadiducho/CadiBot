@@ -42,7 +42,7 @@ public class DesmotivacionesModule implements ZinciteModule {
             String html = Objects.requireNonNull(response.body()).string();
 
             List<String> carteles = new ArrayList<>();
-            Matcher image = Pattern.compile("<img\\s.*?src=(?:'|\")\\/\\/img.desmotivaciones.es([^'\">]+)(?:'|\")").matcher(html);
+            Matcher image = Pattern.compile("<img\\s.*?src=(?:'|\")https?:\\/\\/img.desmotivaciones.es\\/([^'\">]+)(?:'|\")").matcher(html);
 
             while (image.find()) {
                 carteles.add(image.group(1));
