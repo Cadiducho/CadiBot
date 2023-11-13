@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -60,7 +61,7 @@ public class DesmotivacionesModule implements ZinciteModule {
         }
     }
 
-    public static String getAPost() {
+    public static Optional<String> getAPost() {
         String id = postsBuffer.poll();
         if (id == null) {
             getPosts(); //Carga en el hilo principal, bloquea
@@ -68,8 +69,12 @@ public class DesmotivacionesModule implements ZinciteModule {
         } else if (postsBuffer.size() < 5) {
             Executors.newSingleThreadExecutor().submit(DesmotivacionesModule::getPosts); //Carga en segundo plano
         }
-        if(id == null) log.warning("No se ha podido cargar carteles");
-        return "http://img.desmotivaciones.es/" + id;
+
+        if (id == null) { //Si sigue siendo null, no se ha podido cargar
+            log.warning("No se han podido cargar carteles");
+            return Optional.empty();
+        }
+        return Optional.of("http://img.desmotivaciones.es/" + id);
     }
 
 }

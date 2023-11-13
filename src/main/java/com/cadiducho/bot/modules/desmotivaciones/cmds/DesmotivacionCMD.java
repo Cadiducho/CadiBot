@@ -10,6 +10,7 @@ import com.cadiducho.zincite.api.command.CommandContext;
 import com.cadiducho.zincite.api.command.CommandInfo;
 import lombok.extern.java.Log;
 import java.time.Instant;
+import java.util.Optional;
 
 @Log
 @CommandInfo(
@@ -19,11 +20,11 @@ import java.time.Instant;
 public class DesmotivacionCMD implements BotCommand {
     @Override
     public void execute(Chat chat, User user, CommandContext commandContext, Integer integer, Message message, Instant instant) throws TelegramException {
-        String cartel = DesmotivacionesModule.getAPost();
-        if (cartel == null) {
+        Optional<String> cartel = DesmotivacionesModule.getAPost();
+        if (cartel.isEmpty()) {
             getBot().sendMessage(chat.getId(), "No hay carteles en el buffer, inténtalo de nuevo.");
         } else {
-            getBot().sendPhoto(chat.getId(), cartel);
+            getBot().sendPhoto(chat.getId(), cartel.get());
         }
     }
 }
