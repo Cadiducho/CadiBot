@@ -1,11 +1,11 @@
 plugins {
     id 'java'
     id 'application'
-    id "io.freefair.lombok" version "6.5.0.2"
+    id "io.freefair.lombok" version "8.4"
 }
 
 group = 'com.cadiducho'
-version = '3.4'
+version = '3.5'
 sourceCompatibility = JavaVersion.VERSION_17;
 mainClassName = 'com.cadiducho.bot.CadiBotServer'
 
@@ -28,17 +28,17 @@ dependencies {
     implementation group: 'com.squareup.moshi', name: 'moshi', version: '1.13.0'
     implementation group: 'com.squareup.moshi', name: 'moshi-adapters', version: '1.13.0'
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.10.0'
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.6'
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '3.3.0'
     implementation group: 'com.zaxxer', name: 'HikariCP', version: '5.0.1' // Database
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.3.1' // Database migrations
-    implementation group: 'org.flywaydb', name: 'flyway-mysql', version: '9.3.1' // Database migrations
+    implementation group: 'org.flywaydb', name: 'flyway-core', version: '10.0.0' // Database migrations
+    implementation group: 'org.flywaydb', name: 'flyway-mysql', version: '10.0.0' // Database migrations
 
     //Tests
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.0'
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.9.0'
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.9.0'
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.7.0'
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.7.0'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.1'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.10.1'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.1'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.7.0'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.7.0'
 }
 
 test {
