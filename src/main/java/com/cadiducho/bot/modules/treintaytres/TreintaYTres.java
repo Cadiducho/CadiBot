@@ -28,8 +28,8 @@ public class TreintaYTres implements ZinciteModule {
     private final Random rand = new Random();
     @Override
     public void onPostCommand(Update update, boolean success) {
-        final String text = update.getMessage().getText();
-        if ((text.contains("33") || text.length() == 33) && !text.contains("http")) {
+        final String text = update.getMessage().getText().toLowerCase();
+        if ((text.contains("33") || text.length() == 33 || text.contains("xxxiii") || text.contains("treintaytres") || text.contains("treinta y tres") || text.contains("treinta y 3")) && !text.contains("http")) {
             List<String> respuestas = Respuestas.getInstance().getRespuestas();
 
             String reply = EmojiParser.parseToUnicode(respuestas.get(rand.nextInt(respuestas.size())));
