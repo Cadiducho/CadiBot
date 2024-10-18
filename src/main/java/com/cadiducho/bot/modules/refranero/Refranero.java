@@ -35,6 +35,7 @@ public class Refranero implements ZinciteModule {
     @Override
     public void onLoad() {
         log.info("Cargando módulo refranero");
+        CommandManager commandManager = ZinciteBot.getInstance().getCommandManager();
         commandManager.register(new RefranCMD());
     }
 
