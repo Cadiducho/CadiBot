@@ -1,4 +1,4 @@
-package com.cadiducho.bot.modules.treintaytres;
+package com.cadiducho.bot.modules.refranero;
 
 import com.cadiducho.telegrambotapi.util.MoshiProvider;
 import com.squareup.moshi.JsonAdapter;
@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.logging.Level;
 
 @Log
-final class Respuestas{
+final class Respuestas {
 
-    private static final String URL_RESPUESTAS = "https://raw.githubusercontent.com/Alonsistas/33/main/frases.json";
+    private static final String URL_RESPUESTAS = "https://raw.githubusercontent.com/Alonsistas/33/main/refranes.json";
 
     private static final OkHttpClient client = new OkHttpClient();
     private static final JsonAdapter<List<String>> adapter = MoshiProvider.getMoshi().adapter(Types.newParameterizedType(List.class, String.class));
@@ -26,14 +26,15 @@ final class Respuestas{
     private List<String> respuestas;
 
     private static Respuestas INSTANCE;
-    private Respuestas(){
+
+    private Respuestas() {
         if (INSTANCE != null) throw new UnsupportedOperationException("Cannot create singleton class twice");
         INSTANCE = this;
         try {
             respuestas = obtenerRespuestas();
         } catch (IOException e) {
-            log.log(Level.WARNING,"Error obteniendo respuestas del módulo 33",e);
-            respuestas = new ArrayList<>(List.of("33"));
+            log.log(Level.WARNING, "Error obteniendo respuestas del módulo refranero", e);
+            respuestas = new ArrayList<>(List.of("no hay refranes :("));
         }
 
     }

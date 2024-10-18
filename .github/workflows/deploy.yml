@@ -9,7 +9,7 @@ jobs:
     name: Build
     uses: Cadiducho/CadiBot/.github/workflows/gradle.yml@master
     with:
-      jdk_version: 17
+      jdk_version: 21
   deploy:
     name: Deploy
     needs: build

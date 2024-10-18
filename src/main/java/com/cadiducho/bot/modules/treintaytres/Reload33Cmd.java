@@ -18,9 +18,10 @@ import java.time.Instant;
 public class Reload33Cmd implements BotCommand {
     @Override
     public void execute(Chat chat, User user, CommandContext commandContext, Integer integer, Message message, Instant instant) throws TelegramException {
-        if(chat.getId() != -1001696570609L) getBot().sendMessage(chat.getId(), "No tienes permisos para ejecutar este comando");
+        if (chat.getId() != -1001696570609L) 
+            getBot().sendMessage(chat.getId(), "No tienes permisos para ejecutar este comando");
         else {
-            try{
+            try {
                 Respuestas.getInstance().refrescar();
                 getBot().sendMessage(chat.getId(), "Frases recargadas");
             } catch (IOException e) {

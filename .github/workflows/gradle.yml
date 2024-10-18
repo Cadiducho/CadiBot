@@ -7,7 +7,7 @@ on:
         description: "JDK version to build."
         type: string
         required: false
-        default: '17'
+        default: '21'
 
 jobs:
   build:
