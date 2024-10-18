@@ -1,4 +1,4 @@
-package com.cadiducho.bot.modules.treintaytres;
+package com.cadiducho.bot.modules.refranero;
 
 import com.cadiducho.telegrambotapi.util.MoshiProvider;
 import com.squareup.moshi.JsonAdapter;
@@ -17,7 +17,7 @@ import java.util.logging.Level;
 @Log
 final class Respuestas{
 
-    private static final String URL_RESPUESTAS = "https://raw.githubusercontent.com/Alonsistas/33/main/frases.json";
+    private static final String URL_RESPUESTAS = "https://raw.githubusercontent.com/Alonsistas/33/main/refranes.json";
 
     private static final OkHttpClient client = new OkHttpClient();
     private static final JsonAdapter<List<String>> adapter = MoshiProvider.getMoshi().adapter(Types.newParameterizedType(List.class, String.class));
@@ -32,8 +32,8 @@ final class Respuestas{
         try {
             respuestas = obtenerRespuestas();
         } catch (IOException e) {
-            log.log(Level.WARNING,"Error obteniendo respuestas del módulo 33",e);
-            respuestas = new ArrayList<>(List.of("33"));
+            log.log(Level.WARNING,"Error obteniendo respuestas del módulo refranero",e);
+            respuestas = new ArrayList<>(List.of("no hay refranes :("));
         }
 
     }
@@ -56,7 +56,7 @@ final class Respuestas{
     }
 
     public static Respuestas getInstance() {
-        if (INSTANCE == null) {
+        if (INSTANCE == null){
             INSTANCE = new Respuestas();
         }
         return INSTANCE;
