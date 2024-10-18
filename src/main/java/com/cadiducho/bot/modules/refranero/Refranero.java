@@ -40,8 +40,8 @@ public class Refranero implements ZinciteModule {
     }
 
     @CommandInfo(
-        aliases = {"/refran", "/refranero", "/sabiduria"},
-        description = "Obtiene un refran del precioso idioma que es el Castellano"
+            aliases = {"/refran", "/refranero", "/sabiduria"},
+            description = "Obtiene un refran del precioso idioma que es el Castellano"
     )
     class RefranCMD implements BotCommand {
         private final Random rand = new Random();

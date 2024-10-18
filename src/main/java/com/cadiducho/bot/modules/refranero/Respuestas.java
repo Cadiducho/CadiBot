@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 @Log
-final class Respuestas{
+final class Respuestas {
 
     private static final String URL_RESPUESTAS = "https://raw.githubusercontent.com/Alonsistas/33/main/refranes.json";
 
@@ -26,13 +26,14 @@ final class Respuestas{
     private List<String> respuestas;
 
     private static Respuestas INSTANCE;
-    private Respuestas(){
+
+    private Respuestas() {
         if (INSTANCE != null) throw new UnsupportedOperationException("Cannot create singleton class twice");
         INSTANCE = this;
         try {
             respuestas = obtenerRespuestas();
         } catch (IOException e) {
-            log.log(Level.WARNING,"Error obteniendo respuestas del módulo refranero",e);
+            log.log(Level.WARNING, "Error obteniendo respuestas del módulo refranero", e);
             respuestas = new ArrayList<>(List.of("no hay refranes :("));
         }
 
@@ -56,7 +57,7 @@ final class Respuestas{
     }
 
     public static Respuestas getInstance() {
-        if (INSTANCE == null){
+        if (INSTANCE == null) {
             INSTANCE = new Respuestas();
         }
         return INSTANCE;
