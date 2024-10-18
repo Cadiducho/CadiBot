@@ -3,10 +3,16 @@ package com.cadiducho.bot.modules.refranero;
 import com.cadiducho.telegrambotapi.Update;
 import com.cadiducho.telegrambotapi.exception.TelegramException;
 import com.cadiducho.telegrambotapi.util.MoshiProvider;
+import com.cadiducho.telegrambotapi.Chat;
+import com.cadiducho.telegrambotapi.Message;
+import com.cadiducho.telegrambotapi.User;
 import com.cadiducho.zincite.ZinciteBot;
 import com.cadiducho.zincite.api.command.CommandManager;
 import com.cadiducho.zincite.api.module.ModuleInfo;
 import com.cadiducho.zincite.api.module.ZinciteModule;
+import com.cadiducho.zincite.api.command.BotCommand;
+import com.cadiducho.zincite.api.command.CommandContext;
+import com.cadiducho.zincite.api.command.CommandInfo;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
@@ -17,6 +23,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.*;
 import java.util.logging.Level;
 
