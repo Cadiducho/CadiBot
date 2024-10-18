@@ -9,6 +9,7 @@ import com.cadiducho.bot.modules.pole.PoleModule;
 import com.cadiducho.bot.modules.purabulla.PuraBullaModule;
 import com.cadiducho.bot.modules.treintaytres.TreintaYTres;
 import com.cadiducho.zincite.ZinciteBot;
+import com.cadiducho.zincite.ZinciteConfig;
 import com.cadiducho.zincite.modules.json.JsonModule;
 import lombok.Getter;
 import lombok.extern.java.Log;
@@ -100,7 +101,12 @@ public class CadiBotServer {
             System.err.println(ex.getMessage());
         }
 
-        this.cadibot = new ZinciteBot(cmd.getOptionValue("token"), ownerId, VERSION);
+        ZinciteConfig config = ZinciteConfig.builder()
+                .token(cmd.getOptionValue("token"))
+                .ownerId(ownerId)
+                .version(VERSION)
+                .build();
+        this.cadibot = new ZinciteBot(config);
 
         cadibot.getModuleManager().registerModule(new CoreModule());
         cadibot.getModuleManager().registerModule(new JsonModule());
