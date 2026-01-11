@@ -9,27 +9,59 @@ jobs:
     name: Build
     uses: Cadiducho/CadiBot/.github/workflows/gradle.yml@master
     with:
-      jdk_version: 21
-  deploy:
-    name: Deploy
+      jdk_version: 25
+  
+  docker:
+    name: Build and Push Docker Image
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/checkout@v6
+      
+      - uses: actions/download-artifact@v7
         with:
           name: cadibot-distribution
-      - run: ls -lah
-      - name: 🚀 Upload new artifact
-        uses: appleboy/scp-action@v0.1.3
+          path: build/distributions
+      
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          host: ${{ secrets.SECRET_PRODUCTION_HOST }}
-          username: ${{ secrets.SECRET_PRODUCTION_USER }}
-          key: ${{ secrets.SECRET_PRODUCTION_RSA }}
-          port: ${{ secrets.SECRET_PRODUCTION_PORT }}
-          source: "Cadibot.zip"
-          target: ${{ secrets.SECRET_PRODUCTION_PATH }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+  
+  deploy:
+    name: Deploy
+    needs: docker
+    runs-on: ubuntu-latest
+    steps:
       - name: 🔨 Deploy & Restart server
-        uses: appleboy/ssh-action@v0.1.5
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SECRET_PRODUCTION_HOST }}
           username: ${{ secrets.SECRET_PRODUCTION_USER }}
@@ -37,6 +69,4 @@ jobs:
           port: ${{ secrets.SECRET_PRODUCTION_PORT }}
           script: |
             cd ${{ secrets.SECRET_PRODUCTION_PATH }}
-            ./cleanOld.sh
-            ./extractArtifact.sh
-            ./reboot.sh
+            ./deploy.sh
