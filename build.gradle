@@ -56,8 +56,10 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
-distributions {
-    main {
-        distributionBaseName = 'Cadibot'
-    }
+tasks.named('distTar').configure { enabled = false }
+build {
+    dependsOn installDist
+}
+distZip {
+    archiveFileName = "CadiBot.zip"
 }
