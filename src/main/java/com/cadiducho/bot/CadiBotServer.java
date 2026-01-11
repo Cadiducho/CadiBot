@@ -14,7 +14,6 @@ import com.cadiducho.zincite.ZinciteConfig;
 import com.cadiducho.zincite.modules.json.JsonModule;
 import lombok.Getter;
 import lombok.extern.java.Log;
-import org.apache.commons.cli.*;
 
 import java.sql.SQLException;
 
@@ -24,7 +23,7 @@ public class CadiBotServer {
     /**
      * Server / bot version
      */
-    public static final String VERSION = "3.3";
+    public static final String VERSION = "3.7";
 
     /**
      * The database (MySQL)
@@ -40,62 +39,34 @@ public class CadiBotServer {
     @Getter private static CadiBotServer instance;
 
     public static void main(String[] args) {
-        Options options = new Options();
-
-        Option token = new Option("t", "token", true, "telegram bot token");
-        Option dbh = new Option("dbh", "database-host", true, "database host");
-        Option dbp = new Option("dbp", "database-port", true, "database port");
-        Option dbn = new Option("dbn", "database-name", true, "database name");
-        Option dbu = new Option("dbu", "database-user", true, "database user");
-        Option dbpa = new Option("dbpa", "database-pass", true, "database passphrase");
-        Option owner = new Option("o", "owner", true, "ID of the owner");
-        
-        token.setRequired(true);
-        dbh.setRequired(true);
-        dbp.setRequired(true);
-        dbn.setRequired(true);  
-        dbu.setRequired(true);
-        dbpa.setRequired(true);
-        owner.setRequired(true);
-        
-        options.addOption(token);
-        options.addOption(dbh);
-        options.addOption(dbp);
-        options.addOption(dbn);
-        options.addOption(dbu);
-        options.addOption(dbpa);
-        options.addOption(owner);
-        
-        CommandLine commandLine;
-        try {
-            commandLine = new DefaultParser().parse(options, args);
-        } catch (ParseException e) {
-            System.out.println(e.getMessage());
-            new HelpFormatter().printHelp("cadibot", options);
-
-            System.exit(1);
-            return;
-        }
-
         CadiBotServer bot = new CadiBotServer();
-        bot.initCadibot(commandLine);
+        bot.initCadibot();
     }
     
     private CadiBotServer() {
         instance = this;
     }
     
-    private void initCadibot(CommandLine cmd) {
-        this.ownerId = Long.parseLong(cmd.getOptionValue("owner"));
+    private void initCadibot() {
+        String token = System.getenv("BOT_TOKEN");
+        String dbHost = System.getenv("DATABASE_HOST");
+        String dbPort = System.getenv("DATABASE_PORT");
+        String dbName = System.getenv("DATABASE_NAME");
+        String dbUser = System.getenv("DATABASE_USER");
+        String dbPass = System.getenv("DATABASE_PASS");
+        String ownerIdStr = System.getenv("OWNER_ID");
+
+        if (token == null || dbHost == null || dbPort == null || dbName == null ||
+                dbUser == null || dbPass == null || ownerIdStr == null) {
+            System.err.println("Error: Faltan variables de entorno requeridas");
+            System.exit(1);
+            return;
+        }
+
+        this.ownerId = Long.parseLong(ownerIdStr);
 
         try {
-            database = new MySQLDatabase(instance,
-                    cmd.getOptionValue("database-host"),
-                    cmd.getOptionValue("database-port"),
-                    cmd.getOptionValue("database-name"),
-                    cmd.getOptionValue("database-user"),
-                    cmd.getOptionValue("database-pass"));
-
+            database = new MySQLDatabase(instance, dbHost, dbPort, dbName, dbUser, dbPass);
             System.out.println("SQL connection established");
         } catch (SQLException ex) {
             System.err.println("Can't connect to database!");
@@ -103,7 +74,7 @@ public class CadiBotServer {
         }
 
         ZinciteConfig config = ZinciteConfig.builder()
-                .token(cmd.getOptionValue("token"))
+                .token(token)
                 .ownerId(ownerId)
                 .version(VERSION)
                 .build();
